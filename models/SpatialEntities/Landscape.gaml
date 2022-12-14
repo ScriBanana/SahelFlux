@@ -26,8 +26,9 @@ global {
 
 grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	
-	// Land use
+	// Land unit
 	string cellLU;
+	bool grazable <- false;
 	// Part of a parcel
 	parcel myParcel;
 	// Internal N and C stock and processes
@@ -54,7 +55,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	}
 	
 	// Colouring
-	reflex updateColour when: (cellLU != "NonGrazable" and every(visualUpdate)) {
+	action updateColour {
 		
 		if cellLU = "Cropland" {
 			color <- rgb(255 + (216 - 255) / maxCropBiomassContent * biomassContent, 255 + (232 - 255) / maxCropBiomassContent * biomassContent, 180);

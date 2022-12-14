@@ -26,7 +26,7 @@ global {
 	list<string> LUList <- ["Dwellings", "Lowlands", "Ponds", "Wooded savannah", "Fallows", "Rainfed crops", "Gardens"];
 	list<rgb> LUColourList <- [rgb(124, 130, 134), rgb(100, 217, 244), rgb(0, 114, 185), rgb(101, 198, 110), rgb(57, 208, 202), rgb(216, 232, 180), rgb(0, 187, 53)];
 	
-	action importLURaster { //TODO RASTER
+	action importLURaster { //TODO RASTER A bouger dans landscape pour clarté
 		write "Reading input raster";
 		loop cell over: landscape {
 			
@@ -38,11 +38,15 @@ global {
 			// LU assignation
 			if cell.cellLU = "Rainfed crops" or cell.cellLU = "Fallows" {
 				cell.cellLU <- "Cropland";
+				cell.grazable <- true;
 				
 			} else if cell.cellLU = "Wooded savannah" or cell.cellLU = "Lowlands" {
 				cell.cellLU <- "Rangeland";
+				cell.grazable <- true;
 				
 			} else {
+				
+				// TODO Sans doute inutile avec une vraie envelope. Ne pas se baser dessus.
 				cell.cellLU <- "NonGrazable";
 				cell.color <- #grey;
 				
