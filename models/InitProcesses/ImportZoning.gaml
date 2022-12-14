@@ -26,11 +26,9 @@ global {
 	list<string> LUList <- ["Dwellings", "Lowlands", "Ponds", "Wooded savannah", "Fallows", "Rainfed crops", "Gardens"];
 	list<rgb> LUColourList <- [rgb(124, 130, 134), rgb(100, 217, 244), rgb(0, 114, 185), rgb(101, 198, 110), rgb(57, 208, 202), rgb(216, 232, 180), rgb(0, 187, 53)];
 	
-	action importRaster { //TODO RASTER
+	action importLURaster { //TODO RASTER
 		write "Reading input raster";
 		loop cell over: landscape {
-			
-			string cellLUSimple;
 			
 			// LU attribution according to colour (see ImportZoning.gaml)
 			rgb LURasterColour <- rgb(gridLayout at {cell.grid_x, cell.grid_y});
@@ -47,7 +45,7 @@ global {
 				cell.color <- #forestgreen;
 				
 			} else {
-				cell.cellLU <- "Empty";
+				cell.cellLU <- "NonGrazable";
 				cell.color <- #grey;
 				
 			}

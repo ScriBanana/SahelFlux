@@ -14,7 +14,15 @@ import "SOCstock.gaml"
 import "SNstock.gaml"
 
 global {
-
+	
+	action drySeasonStartUpdateBiomassContent {
+		//Updates biomass cotnent in cells at the start of the dry season
+		
+		write "Computing grazable biomass contents";
+		loop cell over: landscape {
+			
+		}
+	}
 }
 
 grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
