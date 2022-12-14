@@ -58,7 +58,7 @@ global {
 			
 			// Compute grazable biomass contents
 			write "Computing grazable biomass contents";
-			ask landscape where (each.cellLU = "Rangeland" or each.cellLU = "Cropland") {
+			ask landscape where each.grazable {
 				do drySeasonStartUpdateGrazBiomassContent;
 			}
 
@@ -70,8 +70,8 @@ global {
 		// Month print
 		write string(date(time), "'		M'M");
 		
-		ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
-			biomassContent <- biomassContent * ( 1 - rnd(0.125)); //TODO DUMMY
+		ask landscape where each.grazable {
+			//biomassContent <- biomassContent * ( 1 - rnd(0.125)); //TODO DUMMY
 			do updateColour;
 		} 
 	}

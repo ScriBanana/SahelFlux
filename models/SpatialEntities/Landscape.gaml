@@ -57,7 +57,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	// Colouring
 	action updateColour {
 		
-		if cellLU = "Cropland" {
+		if cellLU = "Cropland" { // Ternary possible, but if statement more secure
 			color <- rgb(255 + (216 - 255) / maxCropBiomassContent * biomassContent, 255 + (232 - 255) / maxCropBiomassContent * biomassContent, 180);
 		} else if cellLU = "Rangeland" {
 			color <-
