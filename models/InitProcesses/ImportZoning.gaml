@@ -38,11 +38,9 @@ global {
 			// LU assignation
 			if cell.cellLU = "Rainfed crops" or cell.cellLU = "Fallows" {
 				cell.cellLU <- "Cropland";
-				cell.color <- #lime;
 				
 			} else if cell.cellLU = "Wooded savannah" or cell.cellLU = "Lowlands" {
 				cell.cellLU <- "Rangeland";
-				cell.color <- #forestgreen;
 				
 			} else {
 				cell.cellLU <- "NonGrazable";
@@ -50,6 +48,10 @@ global {
 				
 			}
 		}
+	}
+	
+	action initGrazableBiomass {
+		
 	}
 }
 

@@ -15,38 +15,71 @@ import "ExpeRun.gaml"
 global {
 	
 	// Simulation calendar
-	date starting_date <- date([2020, 11, 1, 7, 0, 0]);
+	date starting_date <- date([2020, 11, 1, 7, 0, 0]); // First day of DS, before herds leave paddock
 	int drySeasonFirstMonth <- 11;
 	int rainySeasonFirstMonth <- 7;
-	float endDate <- 2.0 #years;
+	date endDate <- date([2022, 10, 31, 20, 0, 0]);
 	
 	// Time step parameters
 	float step <- 30.0 #minutes;
 	float biophysicalProcessesUpdateFreq <- 1.0 #week;
-	float outputsComputationFreq <- 1.0 #year;
-	float visualUpdate <- 1.0 #week; // For all but the main display
+	float visualUpdate <- 7.0 #week;
+	bool drySeason <- true; // If first day during dry season
 	
-	
+	// Global init
 	init {
-		write "MODEL INITIALISATION";
+		write "=== MODEL INITIALISATION ===";
+		
+		// Assign land units to cells
 		do importLURaster;
-		do drySeasonStartUpdateBiomassContent;
+		
+		
+		write "=== MODEL INITIALISED ===";
 	}
-	
-	// Time prints
-	reflex regularPrompt when: (current_date.day = 1 and current_date.hour = 7 and current_date.minute = 0) {
+
+	// Global timer
+	reflex monthStep when: (current_date.day = 1 and current_date.hour = 7 and current_date.minute = 0) {
+		
+		// Year print
+		if current_date.month = 1 {
+			write string(current_date, "'	Y'y");
+		}
+		
+		// Season print
+		if (current_date.month = drySeasonFirstMonth) {
+			write "	Dry season starts.";
+			drySeason <- true;
+			
+			// Compute grazable biomass contents
+			write "Computing plant biomass production";
+			ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
+				do biomassProduction;
+			}
+			
+			// Compute grazable biomass contents
+			write "Computing grazable biomass contents";
+			ask landscape where (each.cellLU = "Rangeland" or each.cellLU = "Cropland") {
+				do drySeasonStartUpdateGrazBiomassContent;
+			}
+
+		} else if (current_date.month = rainySeasonFirstMonth) {
+			write "	Rain season starts.";
+			drySeason <- false;
+		}
+		
+		// Month print
 		write string(date(time), "'		M'M");
 		
-		if (current_date.month = rainySeasonFirstMonth) {
-			write "	Rain season starts.";
-		} else if (current_date.month = drySeasonFirstMonth) {
-			write "	Dry season starts.";
-		}
+		//TODO DUMMY
+		ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
+			biomassContent <- biomassContent * ( 1 - rnd(biomassContent));
+		} 
 	}
+
 	
 	// Break statement
-	reflex endSim when: time > endDate {
-		write "END OF SIMULATION";
+	reflex endSim when: current_date = endDate {
+		write "=== END OF SIMULATION ===";
 		do pause;
 	}
 	
