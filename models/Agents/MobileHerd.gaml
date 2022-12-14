@@ -146,5 +146,10 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		}
 		satietyMeter <- satietyMeter + eatenBiomass;
 	}
+	
+	
+	aspect default {
+		draw square(sqrt(cellWidth ^ 2 / 2) * 0.8) rotated_by 45.0 color: herdColour border: #black;
+	}
 }
 
