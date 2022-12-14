@@ -8,17 +8,19 @@
 
 model Landscape
 
+import "../InitProcesses/ImportZoning.gaml"
 import "Parcel.gaml"
 import "SOCstock.gaml"
 import "SNstock.gaml"
 
 global {
-	int gridWidth <- 1;
-	int gridHeight <- 1;
+
 }
 
 grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	
+	// Land use
+	string cellLU;
 	// Part of a parcel
 	parcel myParcel;
 	// Internal N and C stock and processes
