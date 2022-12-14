@@ -13,6 +13,7 @@ experiment run type:gui  {
 	output {
 		display mainDisplay type: java2D {
 			grid landscape;
+			species mobileHerd;
 		}
 	}
 	

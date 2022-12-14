@@ -8,6 +8,9 @@
 
 model AnimalGroup
 
+import "MobileHerd.gaml"
+import "FattenedAnimal.gaml"
+
 species animalGroup {
 	
 	

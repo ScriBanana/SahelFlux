@@ -15,10 +15,10 @@ import "ExpeRun.gaml"
 global {
 	
 	// Simulation calendar
-	date starting_date <- date([2020, 11, 1, 7, 0, 0]); // First day of DS, before herds leave paddock
+	date starting_date <- date([2020, 11, 1, wakeUpTime - 1, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
 	int drySeasonFirstMonth <- 11;
 	int rainySeasonFirstMonth <- 7;
-	date endDate <- date([2022, 10, 31, 20, 0, 0]);
+	date endDate <- date([2022, 10, 31, eveningTime + 1, 0, 0]); // After 
 	
 	// Time step parameters
 	float step <- 30.0 #minutes;
@@ -32,12 +32,12 @@ global {
 		
 		// Assign land units to cells
 		do importLURaster;
-		
+		do instantiateMobileHerds;
 		
 		write "=== MODEL INITIALISED ===";
 	}
 
-	// Global timer
+	// Global scheduler
 	reflex monthStep when: (current_date.day = 1 and current_date.hour = 7 and current_date.minute = 0) {
 		
 		// Year print
@@ -70,9 +70,9 @@ global {
 		// Month print
 		write string(date(time), "'		M'M");
 		
-		//TODO DUMMY
 		ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
-			biomassContent <- biomassContent * ( 1 - rnd(biomassContent));
+			biomassContent <- biomassContent * ( 1 - rnd(0.125)); //TODO DUMMY
+			do updateColour;
 		} 
 	}
 
