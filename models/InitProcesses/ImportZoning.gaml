@@ -27,7 +27,7 @@ global {
 	list<rgb> LUColourList <- [rgb(124, 130, 134), rgb(100, 217, 244), rgb(0, 114, 185), rgb(101, 198, 110), rgb(57, 208, 202), rgb(216, 232, 180), rgb(0, 187, 53)];
 	
 	action importLURaster { //TODO RASTER A bouger dans landscape pour clarté
-		write "Reading input raster";
+		write "Reading input raster.";
 		loop cell over: landscape {
 			
 			// LU attribution according to colour (see ImportZoning.gaml)
@@ -52,10 +52,6 @@ global {
 				
 			}
 		}
-	}
-	
-	action initGrazableBiomass {
-		
 	}
 }
 

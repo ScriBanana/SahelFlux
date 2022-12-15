@@ -45,13 +45,13 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	
 	action drySeasonStartUpdateGrazBiomassContent {
 		// Updates biomass content in cells at the start of the dry season
-			if cellLU = "Cropland" {
-				//TODO
-				biomassContent <- maxCropBiomassContent;
-			} else if cellLU = "Rangeland" {
-				//TODO
-				biomassContent <- maxRangelandBiomassContent;
-			}
+		if cellLU = "Cropland" {
+			//TODO
+			biomassContent <- maxCropBiomassContent;
+		} else if cellLU = "Rangeland" {
+			//TODO
+			biomassContent <- maxRangelandBiomassContent;
+		}
 	}
 	
 	// Colouring

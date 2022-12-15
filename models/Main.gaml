@@ -22,7 +22,7 @@ global {
 	
 	// Time step parameters
 	float step <- 30.0 #minutes;
-	float biophysicalProcessesUpdateFreq <- 1.0 #week;
+	int biophysicalProcessesUpdateFreq <- 14; // In days
 	float visualUpdate <- 7.0 #week;
 	bool drySeason <- true; // If first day during dry season
 	
@@ -32,9 +32,18 @@ global {
 		
 		// Assign land units to cells
 		do importLURaster;
+		write "Computing grazable biomass contents.";
+		ask landscape where each.grazable {
+			do drySeasonStartUpdateGrazBiomassContent; // Redundant with first month, but allows clean init
+			do updateColour;
+		}
 		do instantiateMobileHerds;
 		
 		write "=== MODEL INITIALISED ===";
+	}
+	
+	reflex week when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 {
+		do updateGlobalBiomassMeanAndSD;
 	}
 
 	// Global scheduler
@@ -51,13 +60,13 @@ global {
 			drySeason <- true;
 			
 			// Compute grazable biomass contents
-			write "Computing plant biomass production";
+			write "Computing plant biomass production.";
 			ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
 				do biomassProduction;
 			}
 			
 			// Compute grazable biomass contents
-			write "Computing grazable biomass contents";
+			write "Computing grazable biomass contents.";
 			ask landscape where each.grazable {
 				do drySeasonStartUpdateGrazBiomassContent;
 			}

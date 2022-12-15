@@ -38,7 +38,7 @@ global {
 	// Aggregation of biomass content for herds to identify cells to move to and graze
 	float meanBiomassContent;
 	float biomassContentSD;
-	reflex updateGlobalBiomassMeanAndSD when: every(biophysicalProcessesUpdateFreq) {
+	action updateGlobalBiomassMeanAndSD {
 		list<float> allCellsBiomass;
 		ask landscape where (each.grazable) {
 			allCellsBiomass <+ self.biomassContent;
