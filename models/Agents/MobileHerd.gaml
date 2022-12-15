@@ -17,11 +17,15 @@ global {
 	float meanHerdSize <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018) TODO DUMMY
 	
 	// Behaviour parameters
-	int wakeUpTime <- 7; // Time of the day (24h) at which animals are released in the morning (Own accelerometer data)
-	int eveningTime <- 19; // Time of the day (24h) at which animals come back to their sleeping spot (Own accelerometer data)
 	float herdSpeed <- 0.833; // m/s = 3 km/h Does not account for grazing speed due to scale. (Own GPS data)
 	float herdVisionRadius <- 20.0 #m; // (Gersie, 2020)
-	
+	int wakeUpTime <- 7; // Time of the day (24h) at which animals are released in the morning (Own accelerometer data)
+	int eveningTime <- 19; // Time of the day (24h) at which animals come back to their sleeping spot (Own accelerometer data)
+	bool sleepTime <- true update: !(abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) < (eveningTime - wakeUpTime - 1) / 2);
+	int dailyRestStartTime <- 12; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
+	int dailyRestEndTime <- 15; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
+	bool restTime <- false update: abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2;
+
 	// Zootechnical data
 	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
 	float IIRRangelandTLU <- 14.2; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
@@ -48,6 +52,7 @@ global {
 		create mobileHerd number: nbHerds with: [herdSize::round(meanHerdSize), location::(one_of(landscape where (each.cellLU = "Cropland"))).location]; //TODO DUMMY
 		
 	}
+	
 }
 
 species mobileHerd parent: animalGroup control: fsm skills: [moving] {
@@ -55,7 +60,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	int herdSize min: 1; // TLU
 	
 	// FSM parameters and variables
-	bool sleepTime <- true update: !(abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) < (eveningTime - wakeUpTime - 1) / 2);
 	landscape targetCell <- one_of(landscape where each.grazable);
 	bool isInGoodSpot <- false;
 	
@@ -120,13 +124,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		do goto target: currentGrazingCell;
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
 		transition to: isGoingToSleepSpot when: sleepTime;
-		transition to: isResting when: !hungry;
+		transition to: isResting when: restTime or !hungry;
 		transition to: isChangingSite when: !isInGoodSpot;
 	}
 
 	state isResting {
 		transition to: isGoingToSleepSpot when: sleepTime;
-		transition to: isGrazing when: hungry;
+		transition to: isGrazing when: !restTime and hungry;
 	}
 	
 	//// Functions ////
