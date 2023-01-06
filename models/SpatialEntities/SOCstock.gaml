@@ -2,11 +2,13 @@
 * In: SahelFlux
 * Name: SOCstock
 * Soil organic carbon stock
-* Author: scriban
+* Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
 model SOCstock
+
+import "../Main.gaml"
 
 global {
 	// SOC model (ICBM) parameters
@@ -24,9 +26,15 @@ species SOCstock {
 	float labileCPool <- labileCPoolInit;
 	float stableCPool <- stableCPoolInit;
 	
+	reflex updateSOCStockFlows when: every(biophysicalProcessesUpdateFreq) { // TODO A intégrer au scheduler?
+		map<string, float> soilCFlows <- updateCarbonPools();
+		
+	}
+	
 	float computeCarbonInput {
 		// Carbon that enters the soil
 		float periodCinput <- 0.0;
+		periodCinput <- periodCinput + 1.0; //TODO dummy
 		periodCinput <- periodCinput + 1.0; //TODO dummy
 		return periodCinput;
 	}
@@ -43,7 +51,7 @@ species SOCstock {
 		stableCPool <- stableCPool + humifiedC - emissionsFromStable;
 		
 		// Return flows for output indicators computation
-		return [periodCinput, humifiedC, emissionsFromStable, emissionsFromLabile];
+		return ["periodCinput"::periodCinput, "humifiedC"::humifiedC, "emissionsFromStable"::emissionsFromStable, "emissionsFromLabile"::emissionsFromLabile, "periodStableCVar"::(humifiedC - emissionsFromStable), "periodLabileCVar"::(periodCinput - humifiedC - emissionsFromLabile), "periodSOCVar"::periodCinput - emissionsFromLabile - emissionsFromStable];
 	}
 	
 }

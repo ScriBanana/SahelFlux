@@ -11,6 +11,7 @@ model SahelFlux
 import "SpatialEntities/Landscape.gaml"
 import "Agents/AnimalGroup.gaml"
 import "ExpeRun.gaml"
+import "ComputeOutputs.gaml"
 
 global {
 	
@@ -82,7 +83,7 @@ global {
 		ask landscape where each.grazable {
 			//biomassContent <- biomassContent * ( 1 - rnd(0.125)); //TODO DUMMY
 			do updateColour;
-		} 
+		}
 	}
 
 	
