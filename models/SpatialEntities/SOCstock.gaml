@@ -25,18 +25,25 @@ species SOCstock {
 	float stableCPool <- stableCPoolInit;
 	
 	float computeCarbonInput {
+		// Carbon that enters the soil
 		float periodCinput <- 0.0;
 		periodCinput <- periodCinput + 1.0; //TODO dummy
 		return periodCinput;
 	}
 	
 	action updateCarbonPools {
+		// FLows to and from the two pools
 		float periodCinput <- computeCarbonInput();
 		float humifiedC <- humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool;
 		float emissionsFromLabile <- (1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool;
 		float emissionsFromStable <- kineticStable * edaphicClimateFactor * stableCPool;
+		
+		// Update pools SOC content
 		labileCPool <- labileCPool + periodCinput - humifiedC - emissionsFromLabile;
 		stableCPool <- stableCPool + humifiedC - emissionsFromStable;
+		
+		// Return flows for output indicators computation
+		return [periodCinput, humifiedC, emissionsFromStable, emissionsFromLabile];
 	}
 	
 }
