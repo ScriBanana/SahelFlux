@@ -31,14 +31,15 @@ global {
 	init {
 		write "=== MODEL INITIALISATION ===";
 		
-		// Assign land units to cells
+		// All actions defined in related species.
 		do assignLUFromRaster;
 		write "Computing grazable biomass contents.";
-		do placeParcels;
 		ask landscape where each.grazable {
 			do drySeasonStartUpdateGrazBiomassContent; // Redundant with first month, but allows clean init
 			do updateColour;
 		}
+		do placeParcels;
+		do segregateBushFields;
 		do instantiateMobileHerds;
 		
 		write "=== MODEL INITIALISED ===";
