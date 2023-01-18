@@ -27,20 +27,12 @@ species SOCstock {
 	float stableCPool <- stableCPoolInit;
 	
 	reflex updateSOCStockFlows when: every(biophysicalProcessesUpdateFreq) { // TODO A intégrer au scheduler?
+		// Induce and store flows and stock variations
 		map<string, float> soilCFlows <- updateCarbonPools();
-		
-	}
-	
-	float computeCarbonInput {
-		// Carbon that enters the soil
-		float periodCinput <- 0.0;
-		periodCinput <- periodCinput + 1.0; //TODO dummy
-		periodCinput <- periodCinput + 1.0; //TODO dummy
-		return periodCinput;
 	}
 	
 	action updateCarbonPools {
-		// FLows to and from the two pools
+		// Flows to and from the two pools
 		float periodCinput <- computeCarbonInput();
 		float humifiedC <- humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool;
 		float emissionsFromLabile <- (1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool;
@@ -51,7 +43,15 @@ species SOCstock {
 		stableCPool <- stableCPool + humifiedC - emissionsFromStable;
 		
 		// Return flows for output indicators computation
-		return ["periodCinput"::periodCinput, "humifiedC"::humifiedC, "emissionsFromStable"::emissionsFromStable, "emissionsFromLabile"::emissionsFromLabile, "periodStableCVar"::(humifiedC - emissionsFromStable), "periodLabileCVar"::(periodCinput - humifiedC - emissionsFromLabile), "periodSOCVar"::periodCinput - emissionsFromLabile - emissionsFromStable];
+		return ["periodCinput"::periodCinput, "humifiedC"::humifiedC, "emissionsFromStable"::emissionsFromStable, "emissionsFromLabile"::emissionsFromLabile, "periodStableCVar"::(humifiedC - emissionsFromStable), "periodLabileCVar"::(periodCinput - humifiedC - emissionsFromLabile), "periodSOCVar"::periodCinput - emissionsFromLabile - emissionsFromStable]; // TODO periodSOCVar a modifier selon le modèle de SCS?
+	}
+	
+	float computeCarbonInput {
+		// Carbon that enters the soil
+		float periodCinput <- 0.0;
+		periodCinput <- periodCinput + 1.0; //TODO dummy
+		periodCinput <- periodCinput + 1.0; //TODO dummy
+		return periodCinput;
 	}
 	
 }
