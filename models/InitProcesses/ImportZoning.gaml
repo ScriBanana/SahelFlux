@@ -16,6 +16,7 @@ global {
 	// Grid parameters and units
 	//geometry shape <- envelope(gridLayout);
 	geometry shape <- rectangle(4980 #m, 6140 #m); // Faute d'avoir un shapefile TODO RASTER
+	point villageCenterPoint <- point(3294, 2993); // TODO Suits for ZonageReduitDiohineAudouinEtAl2015_LowRes raster. Pourrait partir du centre de l'enveloppe des croplands?
 	int gridHeight <- gridLayout.contents.rows;
 	int gridWidth <- gridLayout.contents.columns;
 	float cellHeight <- shape.height / gridHeight;
@@ -26,8 +27,8 @@ global {
 	list<string> LUList <- ["Dwellings", "Lowlands", "Ponds", "Wooded savannah", "Fallows", "Rainfed crops", "Gardens"];
 	list<rgb> LUColourList <- [rgb(124, 130, 134), rgb(100, 217, 244), rgb(0, 114, 185), rgb(101, 198, 110), rgb(57, 208, 202), rgb(216, 232, 180), rgb(0, 187, 53)];
 	
-	action importLURaster { //TODO RASTER A bouger dans landscape pour clarté
-		write "Reading input raster.";
+	action assignLUFromRaster { //TODO RASTER A bouger dans landscape pour clarté
+		write "Drawing landscape.";
 		loop cell over: landscape {
 			
 			// LU attribution according to colour (see ImportZoning.gaml)

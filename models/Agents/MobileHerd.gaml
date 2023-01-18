@@ -48,7 +48,7 @@ global {
 	}
 	
 	action instantiateMobileHerds {
-		write "Instantiating mobile herds.";
+		write "Gathering animals into mobile herds.";
 		create mobileHerd number: nbHerds with: [herdSize::round(meanHerdSize), location::(one_of(landscape where (each.cellLU = "Cropland"))).location]; //TODO DUMMY
 		
 	}

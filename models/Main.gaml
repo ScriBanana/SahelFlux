@@ -32,8 +32,9 @@ global {
 		write "=== MODEL INITIALISATION ===";
 		
 		// Assign land units to cells
-		do importLURaster;
+		do assignLUFromRaster;
 		write "Computing grazable biomass contents.";
+		do placeParcels;
 		ask landscape where each.grazable {
 			do drySeasonStartUpdateGrazBiomassContent; // Redundant with first month, but allows clean init
 			do updateColour;

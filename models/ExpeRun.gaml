@@ -14,6 +14,7 @@ experiment run type:gui  {
 		display mainDisplay type: java2D {
 			grid landscape;
 			species mobileHerd;
+			species parcel;
 		}
 	}
 	
