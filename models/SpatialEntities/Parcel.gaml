@@ -12,7 +12,7 @@ global {
 	int maxNbCroplandParcels <- 10000;
 	float meanParcelSize <- 80.0 #m; // 1 ha parcels TODO input data
 	float SDParcelSize <- 20.0 #m; // Pour un effet avec des cellules de 50x50 m
-	float bushFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
+	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
 	
 	action placeParcels {
 		// Instantiate parcels
@@ -67,25 +67,26 @@ global {
 				}
 			}
 		}
-		write "Done. " + length(parcel) + " parcels placed.";
+		write "	Done. " + length(parcel) + " parcels placed.";
 	}
 	
 	action segregateBushFields {
 		write "Segregating bush and home fields.";
 		
-		ask first(landscape overlapping villageCenterPoint) neighbors_at (bushFieldsRadius) {
+		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
-				self.bushField <- false;
+				self.homeField <- true;
 				self.parcelColor <- self.parcelColor/1.6;
 			}
 		}
-		
+		write "	Done. " + length(parcel where (each.homeField)) + " home parcels.";
 	}
 }
 
 species parcel parallel: true {
 	list<landscape> myCells;
-	bool bushField <- true;
+	household myOwner;
+	bool homeField <- false;
 	rgb parcelColor;
 	aspect default {
 		ask myCells {

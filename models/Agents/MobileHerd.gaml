@@ -59,6 +59,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	rgb herdColour <- rnd_color(255);
 	int herdSize min: 1; // TLU
 	
+	// Ownership
+	household myHousehold;
+	
 	// FSM parameters and variables
 	landscape targetCell <- one_of(landscape where each.grazable);
 	bool isInGoodSpot <- false;

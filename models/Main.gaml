@@ -10,6 +10,7 @@ model SahelFlux
 
 import "SpatialEntities/Landscape.gaml"
 import "Agents/AnimalGroup.gaml"
+import "Agents/Household.gaml"
 import "ExpeRun.gaml"
 import "ComputeOutputs.gaml"
 
@@ -31,7 +32,7 @@ global {
 	init {
 		write "=== MODEL INITIALISATION ===";
 		
-		// All actions defined in related species.
+		// All actions defined in related species files.
 		do assignLUFromRaster;
 		write "Computing grazable biomass contents.";
 		ask landscape where each.grazable {
@@ -40,7 +41,8 @@ global {
 		}
 		do placeParcels;
 		do segregateBushFields;
-		do instantiateMobileHerds;
+		//do instantiateMobileHerds;
+		do instantiateHouseholds;
 		
 		write "=== MODEL INITIALISED ===";
 	}
