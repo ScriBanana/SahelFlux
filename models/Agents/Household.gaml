@@ -21,6 +21,7 @@ global {
 	
 	action instantiateHouseholds {
 		write "Populating the village.";
+		assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold;
 		create household number: nbHousehold {
 			// Associating parcels
 			ask nbHomeFieldsPerHh among (parcel where (each.homeField and each.myOwner = nil)) {
