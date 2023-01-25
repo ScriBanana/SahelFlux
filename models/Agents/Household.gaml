@@ -21,7 +21,7 @@ global {
 	
 	action instantiateHouseholds {
 		write "Populating the village.";
-		assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold;
+		assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
 		create household number: nbHousehold {
 			// Associating parcels
 			ask nbHomeFieldsPerHh among (parcel where (each.homeField and each.myOwner = nil)) {
@@ -32,17 +32,15 @@ global {
 				self.myOwner <- myself;
 				myOwner.myBushParcelsList <+ self;
 			}
-			// TODO Besoin à un moment de faire un truc pour matcher les nombres de parcelles et de parcelles par household.
-			
-			// TODO Désigner le premier paddock ici.
-			
+						
 			// Giving a mobile herd
 			create mobileHerd with: [
 				myHousehold::self,
 				herdSize::round(meanHerdSize)
 			] {	
 				myHousehold.myMobileHerd <- self;
-				location <- (one_of(myHousehold.myHomeParcelsList)).location; // TODO remplacer par le paddock
+				myPaddock <- (one_of(myHousehold.myHomeParcelsList));
+				location <- myPaddock.location;
 			}
 		}
 	}
