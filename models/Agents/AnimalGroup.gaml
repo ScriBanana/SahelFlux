@@ -26,15 +26,14 @@ species animalGroup {
 	// Digestion process and continuous emissions
 	list chymeChunksList;
 	
-	reflex digest when: !empty(chymeChunksList) {
-		
-		do emitMetabo;
-		
+	action digest { // TODO quid des diff de temporalité herds fattened?
+	
 		// Excretion after digestionLength
 		list nextExcreta <- first(chymeChunksList);
 		if time - float(nextExcreta[0]) > digestionLength {
-			do excrete(nextExcreta[1]);
+			list excretaOutputs <- excrete(nextExcreta[1]);
 			chymeChunksList >- first(chymeChunksList);
+			return excretaOutputs;
 		}
 	}
 	
@@ -55,22 +54,22 @@ species animalGroup {
 		float ingestedDigestibility;
 		switch chymeNature {
 			match "Cropland" {
-				ingestedNContent <- 1.0; //TODO Dummy
-				ingestedCContent <- 1.0; //TODO Dummy
+				ingestedNContent <- 0.2; //TODO Dummy
+				ingestedCContent <- 0.7; //TODO Dummy
 				faecesAshContent <- 0.5; //TODO Dummy
 				ingestedDigestibility <- 0.2; //TODO Dummy
 			}
 
 			match "Rangeland" {
-				ingestedNContent <- 1.0; //TODO Dummy
-				ingestedCContent <- 1.0; //TODO Dummy
+				ingestedNContent <- 0.2; //TODO Dummy
+				ingestedCContent <- 0.7; //TODO Dummy
 				faecesAshContent <- 0.5; //TODO Dummy
 				ingestedDigestibility <- 0.2; //TODO Dummy
 			}
 
 			match "FattenedRation" {
-				ingestedNContent <- 1.0; //TODO Dummy
-				ingestedCContent <- 1.0; //TODO Dummy
+				ingestedNContent <- 0.2; //TODO Dummy
+				ingestedCContent <- 0.7; //TODO Dummy
 				faecesAshContent <- 0.5; //TODO Dummy
 				ingestedDigestibility <- 0.2; //TODO Dummy
 			}
@@ -82,14 +81,16 @@ species animalGroup {
 		float faecesNitrogen <- excretedNitrogen * (1 - ratioNUrineOnFaeces);
 		float urineNirogen <- excretedNitrogen * ratioNUrineOnFaeces;
 		float excretedCarbon <- ingestedMS * ingestedCContent;
-		float faecesAsh <- ingestedMS * faecesAshContent; // (Ash are not digested, so ash quantity is the same)
+		float faecesAsh <- ingestedMS * faecesAshContent; // (Ash are not digested, so ash quantity is the same in ingested and excreta)
+		float volatileSolidExcreted <- ingestedMS * (1 - ingestedDigestibility + urineEnergyFactor) * faecesAshContent; //TODO Besoin du forageEnergyContent ou pas ?
 		
-		// Input data for relevant processes
-		float soilCInput;
-		float soilNOrganicDeposit;
-		float volatileSolidExcreted <- ingestedMS * (1 - ingestedDigestibility + urineEnergyFactor) * faecesAshContent; //Besoin du forageEnergyContent ou pas ?
+		return [faecesNitrogen, urineNirogen, excretedCarbon];
 
-		// Sorties : excretedCarbon, faecesNitrogen, urineNirogen
+		// Variables reused in other processes :
+		//	excretedCarbon in soil carbon model
+		//	faecesNitrogen, urineNirogen in nitrogen available for plant growth
+		//	faecesNitrogen, urineNirogen in N2O and N gases losses from soil
+		//	volatileSolidExcreted in CH4 from soils
 	}
 	
 }

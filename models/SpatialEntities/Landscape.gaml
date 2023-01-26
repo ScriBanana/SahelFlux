@@ -46,12 +46,19 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	// Internal N and C stock and processes
 	SOCstock mySOCstock;
 	SNstock mySNstock;
+	float thisYearNFromFaeces;
+	float thisYearNFromUrine;
+	float thisYearNFromORP;
 	
 	// Grazable biomass
 	float biomassContent min: 0.0; // max: max(maxCropBiomassContent, maxRangelandBiomassContent);
 	
 	action biomassProduction {
 		// Computes plant biomass production at the end of the rain season
+		
+	}
+	
+	action computeNAvailable {
 		
 	}
 	

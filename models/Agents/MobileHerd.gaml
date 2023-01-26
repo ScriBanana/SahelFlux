@@ -135,6 +135,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
 	}
 	
+	reflex herdDigest when: !empty(chymeChunksList) { // Temporality differs with fattened
+		list excreta <- digest;
+	}
 	
 	aspect default {
 		draw square(sqrt(cellWidth ^ 2 / 2) * 0.8) rotated_by 45.0 color: herdColour border: #black;
