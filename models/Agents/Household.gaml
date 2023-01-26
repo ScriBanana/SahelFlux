@@ -24,11 +24,11 @@ global {
 		assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
 		create household number: nbHousehold {
 			// Associating parcels
-			ask nbHomeFieldsPerHh among (parcel where (each.homeField and each.myOwner = nil)) {
+			ask nbHomeFieldsPerHh among (listAllHomeParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;
 				myOwner.myHomeParcelsList <+ self;
 			}
-			ask nbBushFieldsPerHh among (parcel where (!each.homeField and each.myOwner = nil)) {
+			ask nbBushFieldsPerHh among (listAllBushParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;
 				myOwner.myBushParcelsList <+ self;
 			}
@@ -43,6 +43,7 @@ global {
 				location <- myPaddock.location;
 			}
 		}
+		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds.";
 	}
 }
 

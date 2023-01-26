@@ -14,6 +14,10 @@ global {
 	float SDParcelSize <- 20.0 #m; // Pour un effet avec des cellules de 50x50 m
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
 	
+	// Optimisation variables
+	list<parcel> listAllHomeParcels;
+	list<parcel> listAllBushParcels <- list(parcel);
+	
 	action placeParcels {
 		// Instantiate parcels
 		write "Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
@@ -77,9 +81,11 @@ global {
 			ask parcel overlapping self {
 				self.homeField <- true;
 				self.parcelColor <- self.parcelColor/1.6;
+				listAllHomeParcels <+ self;
+				listAllBushParcels >- self;
 			}
 		}
-		write "	Done. " + length(parcel where (each.homeField)) + " home parcels.";
+		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
 	}
 }
 

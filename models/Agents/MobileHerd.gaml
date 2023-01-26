@@ -13,7 +13,7 @@ import "../SpatialEntities/Landscape.gaml"
 
 global {
 	
-	int nbHerds <- 10; // TODO DUMMY 84; // (Grillot et al, 2018)
+	//int nbHerds <- 10; // TODO DUMMY 84; // (Grillot et al, 2018)
 	float meanHerdSize <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018) TODO DUMMY
 	
 	// Behaviour parameters
