@@ -30,8 +30,6 @@ global {
 	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
 	float IIRRangelandTLU <- 14.2; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	float IIRCroplandTLU <- 10.9;// instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
-	float digestionLength <- 20.0 #h; // Duration of the digestion of biomass in the animals (expert knowledge -> ref ou préciser?)
-	// TODO peut être fonction de la ration, cf MC
 	
 	float ratioExcretionIngestion <- 0.55; // TODO DUMMY Dung excreted over ingested biomass (dry matter). Source : Wade (2016)
 	
@@ -134,7 +132,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 			self.biomassContent <- self.biomassContent - eatenQuantity;
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;
-		
+		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
 	}
 	
 	
