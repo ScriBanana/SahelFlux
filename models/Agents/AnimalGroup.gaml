@@ -13,5 +13,8 @@ import "FattenedAnimal.gaml"
 
 species animalGroup {
 	
+	action digest {
+		
+	}
 	
 }

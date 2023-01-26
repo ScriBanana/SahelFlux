@@ -22,6 +22,18 @@ global {
 	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
 	
+	// Aggregation of biomass content for herds to identify cells to move to and graze
+	float meanBiomassContent;
+	float biomassContentSD;
+	action updateGlobalBiomassMeanAndSD {
+		list<float> allCellsBiomass;
+		ask landscape where (each.grazable) {
+			allCellsBiomass <+ self.biomassContent;
+		}
+		meanBiomassContent <- mean(allCellsBiomass);
+		biomassContentSD <- standard_deviation(allCellsBiomass);
+	}
+	
 }
 
 grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
@@ -45,6 +57,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	
 	action drySeasonStartUpdateGrazBiomassContent {
 		// Updates biomass content in cells at the start of the dry season
+		// TODO ajouter la weed en addition
 		if cellLU = "Cropland" {
 			//TODO
 			biomassContent <- maxCropBiomassContent;
@@ -56,7 +69,6 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	
 	// Colouring
 	action updateColour {
-		
 		if cellLU = "Cropland" { // Ternary possible, but if statement more secure
 			color <- rgb(255 + (216 - 255) / maxCropBiomassContent * biomassContent, 255 + (232 - 255) / maxCropBiomassContent * biomassContent, 180);
 		} else if cellLU = "Rangeland" {

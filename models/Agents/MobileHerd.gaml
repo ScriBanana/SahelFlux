@@ -35,24 +35,6 @@ global {
 	
 	float ratioExcretionIngestion <- 0.55; // TODO DUMMY Dung excreted over ingested biomass (dry matter). Source : Wade (2016)
 	
-	// Aggregation of biomass content for herds to identify cells to move to and graze
-	float meanBiomassContent;
-	float biomassContentSD;
-	action updateGlobalBiomassMeanAndSD {
-		list<float> allCellsBiomass;
-		ask landscape where (each.grazable) {
-			allCellsBiomass <+ self.biomassContent;
-		}
-		meanBiomassContent <- mean(allCellsBiomass);
-		biomassContentSD <- standard_deviation(allCellsBiomass);
-	}
-	
-//	action instantiateMobileHerds {
-//		write "Gathering animals into mobile herds.";
-//		create mobileHerd number: nbHerds with: [herdSize::round(meanHerdSize), location::(one_of(landscape where (each.cellLU = "Cropland"))).location]; //TODO DUMMY
-//		
-//	}
-	
 }
 
 species mobileHerd parent: animalGroup control: fsm skills: [moving] {
@@ -74,7 +56,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize;
 	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize;
 	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize;
-	//list chymeChunksMap;
 	float satietyMeter <- 0.0;
 	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
 	landscape currentCell update: one_of(landscape overlapping self);
@@ -147,11 +128,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	
 	// Graze or browse biomass in cell
 	action graze (landscape cellToGraze) {
-		float eatenBiomass <- currentCell.cellLU = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd;
+		string eatenBiomassType <- currentCell.cellLU;
+		float eatenQuantity <- eatenBiomassType = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd;
 		ask cellToGraze {
-			self.biomassContent <- self.biomassContent - eatenBiomass;
+			self.biomassContent <- self.biomassContent - eatenQuantity;
 		}
-		satietyMeter <- satietyMeter + eatenBiomass;
+		satietyMeter <- satietyMeter + eatenQuantity;
+		
 	}
 	
 	
