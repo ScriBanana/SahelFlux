@@ -46,9 +46,12 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	// Internal N and C stock and processes
 	SOCstock mySOCstock;
 	SNstock mySNstock;
-	float thisYearNFromFaeces;
-	float thisYearNFromUrine;
-	float thisYearNFromORP;
+	
+	init {
+		create SOCstock with: [myCell::self] {
+			myself.mySOCstock <- self;
+		}
+	}
 	
 	// Grazable biomass
 	float biomassContent min: 0.0; // max: max(maxCropBiomassContent, maxRangelandBiomassContent);

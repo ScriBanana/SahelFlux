@@ -23,6 +23,8 @@ global {
 
 species SOCstock {
 	
+	landscape myCell;
+	map<string, float> periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
 	float labileCPool <- labileCPoolInit;
 	float stableCPool <- stableCPoolInit;
 	
@@ -48,10 +50,13 @@ species SOCstock {
 	
 	float computeCarbonInput {
 		// Carbon that enters the soil
-		float periodCinput <- 0.0;
-		periodCinput <- periodCinput + 1.0; //TODO dummy
-		periodCinput <- periodCinput + 1.0; //TODO dummy
+		float periodCinput;
+		// TODO virer les émissions
+		loop input over: periodCInputMap {
+			periodCinput <- periodCinput + input;
+		}
 		return periodCinput;
+		periodCinput <- 0.0;
 	}
 	
 }

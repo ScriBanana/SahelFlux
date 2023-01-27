@@ -25,6 +25,7 @@ global {
 	int dailyRestStartTime <- 12; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	int dailyRestEndTime <- 15; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	bool restTime <- false update: abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2;
+	int maxNbNightsPerCellInPaddock <- 4; // Field data TODO Doit être un UBT/cell demandé à Jonathan
 
 	// Zootechnical data
 	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
@@ -49,6 +50,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	// Paddocking parameters and variables
 	parcel myPaddock;
 	landscape currentSleepSpot <- one_of(landscape where (each.cellLU = "Cropland")); //TODO DUMMY location
+	int nbNightInCurrentSleepSpot;
 	
 	// Grazing parameters and variables
 	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize;
@@ -124,6 +126,14 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		return cellsAround;
 	}
 	
+	action updatePaddock {
+		nbNightInCurrentSleepSpot <- nbNightInCurrentSleepSpot + 1;
+		if nbNightInCurrentSleepSpot > maxNbNightsPerCellInPaddock {
+			// TODO if cell is last in paddock
+			currentSleepSpot <- first(myPaddock.myCells);
+		}
+	}
+	
 	// Graze or browse biomass in cell
 	action graze (landscape cellToGraze) {
 		string eatenBiomassType <- currentCell.cellLU;
@@ -135,8 +145,11 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
 	}
 	
-	reflex herdDigest when: !empty(chymeChunksList) { // Temporality differs with fattened
-		list excreta <- digest;
+	// Excretion after digestionLength (Temporality differs with fattened)
+	reflex herdDigest when: !empty(chymeChunksList) and (time - float(first(chymeChunksList)[0]) > digestionLength) {
+		map excretaOutputs <- excrete(first(chymeChunksList)[1]);
+		currentCell.mySOCstock.periodCInputMap["HerdsDung"] <- currentCell.mySOCstock.periodCInputMap["HerdsDung"] + float(excretaOutputs["excretedCarbon"]);
+		chymeChunksList >- first(chymeChunksList);
 	}
 	
 	aspect default {

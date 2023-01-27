@@ -26,17 +26,6 @@ species animalGroup {
 	// Digestion process and continuous emissions
 	list chymeChunksList;
 	
-	action digest { // TODO quid des diff de temporalité herds fattened?
-	
-		// Excretion after digestionLength
-		list nextExcreta <- first(chymeChunksList);
-		if time - float(nextExcreta[0]) > digestionLength {
-			list excretaOutputs <- excrete(nextExcreta[1]);
-			chymeChunksList >- first(chymeChunksList);
-			return excretaOutputs;
-		}
-	}
-	
 	action emitMetabo {
 		// TODO emit CH4 and CO2
 		
@@ -76,21 +65,20 @@ species animalGroup {
 
 		}
 		
-		// Compute outputs
+		// Compute outputs, used in other processes :
+		// In nitrogen available for plant growth and N2O and N gases losses from soil
 		float excretedNitrogen <- ingestedMS * ingestedNContent * ratioNExcretedOnIngested;
 		float faecesNitrogen <- excretedNitrogen * (1 - ratioNUrineOnFaeces);
 		float urineNirogen <- excretedNitrogen * ratioNUrineOnFaeces;
+		 // In soil carbon model
 		float excretedCarbon <- ingestedMS * ingestedCContent;
+		// In CH4 from soils
 		float faecesAsh <- ingestedMS * faecesAshContent; // (Ash are not digested, so ash quantity is the same in ingested and excreta)
 		float volatileSolidExcreted <- ingestedMS * (1 - ingestedDigestibility + urineEnergyFactor) * faecesAshContent; //TODO Besoin du forageEnergyContent ou pas ?
 		
-		return [faecesNitrogen, urineNirogen, excretedCarbon];
+		map<string, float> digestatCharacteristics<- ["faecesNitrogen"::faecesNitrogen, "urineNirogen"::urineNirogen, "excretedCarbon"::excretedCarbon];
+		return digestatCharacteristics;
 
-		// Variables reused in other processes :
-		//	excretedCarbon in soil carbon model
-		//	faecesNitrogen, urineNirogen in nitrogen available for plant growth
-		//	faecesNitrogen, urineNirogen in N2O and N gases losses from soil
-		//	volatileSolidExcreted in CH4 from soils
 	}
 	
 }

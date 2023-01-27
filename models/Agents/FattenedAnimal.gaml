@@ -18,4 +18,12 @@ species fattenedAnimal parent: animalGroup {
 		// ask stock du household >- eatenQuantity
 		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];
 	}
+	
+	action fattenedDigest { // reflex ou scheduler?
+		loop chymeChunk over: chymeChunksList {
+			list excretaOutputs <- excrete(chymeChunk[1]);
+			//ask currentCell   excretaOutputs
+		}
+		chymeChunksList <- [];
+	}
 }
