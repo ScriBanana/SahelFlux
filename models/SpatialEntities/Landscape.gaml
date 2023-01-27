@@ -12,7 +12,7 @@ import "../Main.gaml"
 import "../InitProcesses/ImportZoning.gaml"
 import "Parcel.gaml"
 import "SOCstock.gaml"
-import "SNstock.gaml"
+import "SoilNProcesses.gaml"
 
 global {
 	
@@ -45,11 +45,14 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	parcel myParcel;
 	// Internal N and C stock and processes
 	SOCstock mySOCstock;
-	SNstock mySNstock;
+	soilNProcesses mySoilNProcesses;
 	
 	init {
 		create SOCstock with: [myCell::self] {
 			myself.mySOCstock <- self;
+		}
+		create soilNProcesses with: [myCell::self] {
+			myself.mySoilNProcesses <- self;
 		}
 	}
 	
@@ -58,10 +61,6 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	
 	action biomassProduction {
 		// Computes plant biomass production at the end of the rain season
-		
-	}
-	
-	action computeNAvailable {
 		
 	}
 	
