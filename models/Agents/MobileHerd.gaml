@@ -49,8 +49,10 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	
 	// Paddocking parameters and variables
 	parcel myPaddock;
-	landscape currentSleepSpot <- one_of(landscape where (each.cellLU = "Cropland")); //TODO DUMMY location
+	landscape currentSleepSpot;
 	int nbNightInCurrentSleepSpot;
+	list<landscape> remainingSleepSpots;
+	list<parcel> remainingPaddocks;
 	
 	// Grazing parameters and variables
 	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize;
@@ -77,7 +79,11 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 
 		transition to: isChangingSite when: !sleepTime;
 		exit {
-			//do updatePaddock;
+			nbNightInCurrentSleepSpot <- nbNightInCurrentSleepSpot + 1;
+			if nbNightInCurrentSleepSpot > maxNbNightsPerCellInPaddock {
+				do resetSleepSpot;
+				nbNightInCurrentSleepSpot <- 0;
+			}
 		}
 
 	}
@@ -126,11 +132,22 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		return cellsAround;
 	}
 	
-	action updatePaddock {
-		nbNightInCurrentSleepSpot <- nbNightInCurrentSleepSpot + 1;
-		if nbNightInCurrentSleepSpot > maxNbNightsPerCellInPaddock {
-			// TODO if cell is last in paddock
+	action resetSleepSpot {
+		if !empty(remainingSleepSpots) {
+			remainingSleepSpots >- currentSleepSpot;
 			currentSleepSpot <- first(myPaddock.myCells);
+		} else {
+			if !empty(remainingSleepSpots) {
+				remainingPaddocks >- myPaddock;
+				myPaddock <- first(remainingPaddocks);
+				remainingSleepSpots <- myPaddock.myCells;
+				currentSleepSpot <- first(remainingSleepSpots);
+			} else {
+				remainingPaddocks <- myHousehold.myHomeParcelsList;
+				myPaddock <- (first(remainingPaddocks));
+				remainingSleepSpots <- myPaddock.myCells;
+				currentSleepSpot <- first(remainingSleepSpots);
+			}
 		}
 	}
 	

@@ -39,8 +39,9 @@ global {
 				herdSize::round(meanHerdSize)
 			] {	
 				myHousehold.myMobileHerd <- self;
-				myPaddock <- (one_of(myHousehold.myHomeParcelsList));
-				location <- myPaddock.location;
+				// Paddocking initialisation
+				do resetSleepSpot;
+				location <- currentSleepSpot.location;
 			}
 		}
 		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds.";
