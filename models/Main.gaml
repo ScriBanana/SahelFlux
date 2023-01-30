@@ -41,7 +41,6 @@ global {
 		}
 		do placeParcels;
 		do segregateBushFields;
-		//do instantiateMobileHerds;
 		do instantiateHouseholds;
 		
 		write "=== MODEL INITIALISED ===";
