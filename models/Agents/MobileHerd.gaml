@@ -137,12 +137,12 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 			if length(remainingPaddocks) <= 1 {
 				remainingPaddocks <- copy(myHousehold.myHomeParcelsList);
 				myPaddock <- first(remainingPaddocks);
-				remainingSleepSpots <- copy(myPaddock.myCells);
+				remainingSleepSpots <- copy(myPaddock.myCells) sort_by each;
 				currentSleepSpot <- first(remainingSleepSpots);
 			} else {
 				remainingPaddocks >- myPaddock;
 				myPaddock <- first(remainingPaddocks);
-				remainingSleepSpots <- copy(myPaddock.myCells);
+				remainingSleepSpots <- copy(myPaddock.myCells) sort_by each;
 				currentSleepSpot <- first(remainingSleepSpots);
 			}
 		} else {
