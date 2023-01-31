@@ -9,7 +9,7 @@ model ExpeRun
 
 import "Main.gaml"
 
-experiment run type:gui  {
+experiment run type: gui  {
 	output {
 		display mainDisplay type: java2D {
 			grid landscape;

@@ -44,7 +44,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	household myHousehold;
 	
 	// FSM parameters and variables
-	landscape targetCell <- one_of(landscape where each.grazable);
+	landscape targetCell;
 	bool isInGoodSpot <- false;
 	
 	// Paddocking parameters and variables
@@ -60,7 +60,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize;
 	float satietyMeter <- 0.0;
 	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
-	landscape currentCell update: one_of(landscape overlapping self);
+	landscape currentCell update: first(landscape overlapping self);
 	
 	init {
 		speed <- herdSpeed;
@@ -133,21 +133,21 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	}
 	
 	action resetSleepSpot {
-		if !empty(remainingSleepSpots) {
-			remainingSleepSpots >- currentSleepSpot;
-			currentSleepSpot <- first(myPaddock.myCells);
-		} else {
-			if !empty(remainingSleepSpots) {
-				remainingPaddocks >- myPaddock;
+		if length(remainingSleepSpots) <= 1 {
+			if length(remainingPaddocks) <= 1 {
+				remainingPaddocks <- copy(myHousehold.myHomeParcelsList);
 				myPaddock <- first(remainingPaddocks);
-				remainingSleepSpots <- myPaddock.myCells;
+				remainingSleepSpots <- copy(myPaddock.myCells);
 				currentSleepSpot <- first(remainingSleepSpots);
 			} else {
-				remainingPaddocks <- myHousehold.myHomeParcelsList;
-				myPaddock <- (first(remainingPaddocks));
-				remainingSleepSpots <- myPaddock.myCells;
+				remainingPaddocks >- myPaddock;
+				myPaddock <- first(remainingPaddocks);
+				remainingSleepSpots <- copy(myPaddock.myCells);
 				currentSleepSpot <- first(remainingSleepSpots);
 			}
+		} else {
+			remainingSleepSpots >- currentSleepSpot;
+			currentSleepSpot <- first(remainingSleepSpots);
 		}
 	}
 	
