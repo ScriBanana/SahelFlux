@@ -64,9 +64,6 @@ global {
 						}
 						
 						newParc <- newParc + 1;
-//						if newParc mod int(nbCroplandParcels / 10) = 0 {
-//							write "		Placed : " + newParc + " parcels. (" + int(newParc / nbCroplandParcels * 100) + " %)";
-//						}
 					}
 				}
 			}

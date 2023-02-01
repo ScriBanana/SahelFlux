@@ -28,11 +28,6 @@ species SOCstock {
 	float labileCPool <- labileCPoolInit;
 	float stableCPool <- stableCPoolInit;
 	
-	reflex updateSOCStockFlows when: every(biophysicalProcessesUpdateFreq) { // TODO A intégrer au scheduler?
-		// Induce and store flows and stock variations
-		map<string, float> soilCFlows <- updateCarbonPools();
-	}
-	
 	action updateCarbonPools {
 		// Flows to and from the two pools
 		float periodCinput <- computeCarbonInput();

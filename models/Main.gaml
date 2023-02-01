@@ -34,7 +34,6 @@ global {
 		
 		// All actions defined in related species files.
 		do assignLUFromRaster;
-		write "Computing grazable biomass contents.";
 		ask landscape where each.grazable {
 			do drySeasonStartUpdateGrazBiomassContent; // Redundant with first month, but allows clean init
 			do updateColour;
@@ -82,9 +81,10 @@ global {
 		
 		// Month print
 		write string(date(time), "'		M'M");
-		
+		ask SOCstock {
+			do updateCarbonPools;
+		}
 		ask landscape where each.grazable {
-			//biomassContent <- biomassContent * ( 1 - rnd(0.125)); //TODO DUMMY
 			do updateColour;
 		}
 	}
