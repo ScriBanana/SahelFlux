@@ -13,10 +13,11 @@ global {
 	float meanParcelSize <- 80.0 #m; // 1 ha parcels TODO input data
 	float SDParcelSize <- 20.0 #m; // Pour un effet avec des cellules de 50x50 m
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
+	float homeParcelsDimmingFactor <- 1.6; // Mere esthetic parameter
 	
 	// Optimisation variables
 	list<parcel> listAllHomeParcels;
-	list<parcel> listAllBushParcels <- list(parcel);
+	list<parcel> listAllBushParcels;
 	
 	action placeParcels {
 		// Instantiate parcels
@@ -49,7 +50,7 @@ global {
 					if parcelSize / 2 < min(cellHeight, cellWidth) / 2 or empty(cell neighbors_at (parcelSize / 2) where (each.myParcel != nil or each.cellLU != "Cropland")) {
 					// If all is green, create the parcel and assign its cells to it.
 						create parcel {
-							self.parcelColor <- rnd_color(255);
+							self.parcelColour <- #olive;
 							landscape myCenterCell <- cell;
 							myCenterCell.myParcel <- self;
 							self.myCells <+ myCenterCell;
@@ -68,21 +69,24 @@ global {
 				}
 			}
 		}
+		listAllBushParcels <- copy(list(parcel));
 		write "	Done. " + length(parcel) + " parcels placed.";
 	}
 	
 	action segregateBushFields {
 		write "Segregating bush and home fields.";
 		
+		write listAllBushParcels;
 		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
 				self.homeField <- true;
-				self.parcelColor <- self.parcelColor/1.6;
+				self.parcelColour <- self.parcelColour / homeParcelsDimmingFactor;
 				listAllHomeParcels <+ self;
 				listAllBushParcels >- self;
 			}
 		}
 		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
+		write listAllBushParcels;
 	}
 }
 
@@ -90,10 +94,10 @@ species parcel parallel: true {
 	list<landscape> myCells;
 	household myOwner;
 	bool homeField <- false;
-	rgb parcelColor;
+	rgb parcelColour;
 	aspect default {
 		ask myCells {
-			draw rectangle(cellWidth, cellHeight) color: #transparent border: myself.parcelColor;
+			draw rectangle(cellWidth, cellHeight) color: #transparent border: myself.parcelColour;
 		}
 	}
 }

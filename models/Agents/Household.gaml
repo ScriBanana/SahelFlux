@@ -23,20 +23,25 @@ global {
 		write "Populating the village.";
 		assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
 		create household number: nbHousehold {
+			householdColour <- rnd_color(255);
+			
 			// Associating parcels
 			ask nbHomeFieldsPerHh among (listAllHomeParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;
 				myOwner.myHomeParcelsList <+ self;
+				self.parcelColour <- myself.householdColour / homeParcelsDimmingFactor;
 			}
 			ask nbBushFieldsPerHh among (listAllBushParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;
 				myOwner.myBushParcelsList <+ self;
+				self.parcelColour <- myself.householdColour;
 			}
 						
 			// Giving a mobile herd
 			create mobileHerd with: [
 				myHousehold::self,
-				herdSize::round(meanHerdSize)
+				herdSize::round(meanHerdSize),
+				herdColour::self.householdColour
 			] {	
 				myHousehold.myMobileHerd <- self;
 				// Paddocking initialisation
@@ -49,7 +54,7 @@ global {
 }
 
 species household {
-	
+	rgb householdColour;
 	// Links to other agents
 	list<parcel> myBushParcelsList;
 	list<parcel> myHomeParcelsList;

@@ -37,7 +37,7 @@ global {
 }
 
 species mobileHerd parent: animalGroup control: fsm skills: [moving] {
-	rgb herdColour <- rnd_color(255);
+	rgb herdColour;
 	int herdSize min: 1; // TLU
 	
 	// Ownership
