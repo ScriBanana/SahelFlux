@@ -41,7 +41,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	// Land unit
 	string cellLU;
 	bool grazable <- false;
-	int nbTrees <- floor(abs(gauss(3,2))); // TODO DUMMY
+	int nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY
 	// Part of a parcel
 	parcel myParcel;
 	// Internal N and C stock and processes

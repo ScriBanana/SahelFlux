@@ -68,7 +68,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	
 	//// FSM behaviour ////
 	state isGoingToSleepSpot {
-		do goto target: currentSleepSpot;
+		do goto on:(landscape where each.grazable) target: currentSleepSpot;
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}
 

@@ -11,7 +11,7 @@ import "../SpatialEntities/Landscape.gaml"
 
 global {
 	// Import land unit layout
-	file gridLayout <- image_file("../includes/SpatialInputs/ZonageReduitDiohineAudouinEtAl2015_LowRes.png");
+	file gridLayout <- image_file("../includes/SpatialInputs/ZonageReduitDiohineAudouinEtAl2015_LowRes_Corrected.png");
 	
 	// Grid parameters and units
 	//geometry shape <- envelope(gridLayout);
@@ -25,32 +25,39 @@ global {
 	
 	//TODO  RASTER - Landscape units definition (from source)
 	list<string> LUList <- ["Dwellings", "Lowlands", "Ponds", "Wooded savannah", "Fallows", "Rainfed crops", "Gardens"];
-	list<rgb> LUColourList <- [rgb(124, 130, 134), rgb(100, 217, 244), rgb(0, 114, 185), rgb(101, 198, 110), rgb(57, 208, 202), rgb(216, 232, 180), rgb(0, 187, 53)];
+	list<rgb> LUColourList <- [rgb(134, 140, 134), rgb(100, 217, 244), rgb(57, 106, 178), rgb(101, 198, 110), rgb(57, 208, 202), rgb(216, 232, 180), rgb(0, 187, 53)];
 	
-	action assignLUFromRaster { //TODO RASTER A bouger dans landscape pour clarté
+	action assignLUFromRaster {
 		write "Segregating landscape into land units from raster data.";
 		loop cell over: landscape {
 			
-			// LU attribution according to colour (see ImportZoning.gaml)
+			// LU attribution according to colour
 			rgb LURasterColour <- rgb(gridLayout at {cell.grid_x, cell.grid_y});
 			rgb computedLUColour <- eucliClosestColour(LURasterColour, LUColourList);
-			cell.cellLU <- LUList at (LUColourList index_of computedLUColour);
+			string rasterLU <- LUList at (LUColourList index_of computedLUColour);
 			
 			// LU assignation
-			if cell.cellLU = "Rainfed crops" or cell.cellLU = "Fallows" {
-				cell.cellLU <- "Cropland";
-				cell.grazable <- true;
-				
-			} else if cell.cellLU = "Wooded savannah" or cell.cellLU = "Lowlands" {
-				cell.cellLU <- "Rangeland";
-				cell.grazable <- true;
-				
-			} else {
-				
-				// TODO Sans doute inutile avec une vraie envelope. Ne pas se baser dessus.
-				cell.cellLU <- "NonGrazable";
-				cell.color <- #grey;
-				
+			switch rasterLU {
+				match_one ["Rainfed crops", "Fallows"] {
+					cell.cellLU <- "Cropland";
+					cell.grazable <- true;
+				}
+				match_one ["Wooded savannah", "Lowlands"] {
+					cell.cellLU <- "Rangeland";
+					cell.grazable <- true;
+				}
+				match "Dwellings" {
+					cell.cellLU <- "Dwellings";
+					cell.color <- #grey;
+				}
+				match "Ponds" {
+					cell.cellLU <- "NonGrazable";
+					cell.color <- #lightsteelblue;
+				}
+				default {
+					cell.cellLU <- "NonGrazable";
+					cell.color <- #silver;
+				}
 			}
 		}
 	}
