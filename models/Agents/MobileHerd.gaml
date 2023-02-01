@@ -94,7 +94,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		}
 
 		do checkSpotQuality;
-		do goto target: targetCell;
+		do goto on:(landscape where each.grazable) target: targetCell;
 		
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isGrazing when: isInGoodSpot;
@@ -111,7 +111,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 			currentGrazingCell <- juiciestCellAround;
 		}
 
-		do goto target: currentGrazingCell;
+		do goto on:(landscape where each.grazable) target: currentGrazingCell;
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isResting when: restTime or !hungry;
@@ -122,6 +122,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isGrazing when: !restTime and hungry;
 	}
+	
+	//// Transhumance functions ////
+	// TODO Utiliser capture, release, migrate ?
+	// species transhumance {
+	// 	species transhumingHerd parent: mobileHerd {}
+	// }
+	
 	
 	//// Functions ////
 	// Identify if current cell is suitable enough, in comparison to neighbouring cells.

@@ -32,7 +32,7 @@ species animalGroup {
 		// TODO une fonction pour vérifier que l'émis n'est pas supérieur au digéré?
 	}
 	
-	action excrete (pair someChyme) {
+	action excrete (pair someChyme) { //Virtual: true ?
 		string chymeNature <- someChyme.value;
 		float ingestedMS <- float(someChyme.key);
 

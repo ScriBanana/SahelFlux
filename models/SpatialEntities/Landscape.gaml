@@ -85,7 +85,6 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 			color <-
 			rgb(200 + (101 - 200) / maxRangelandBiomassContent * biomassContent, 230 + (198 - 230) / maxRangelandBiomassContent * biomassContent, 180 + (110 - 180) / maxRangelandBiomassContent * biomassContent);
 		}
-		
 	}
 
 }
