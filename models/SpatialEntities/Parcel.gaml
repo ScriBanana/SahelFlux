@@ -10,8 +10,8 @@ import "Landscape.gaml"
 
 global {
 	int maxNbCroplandParcels <- 10000;
-	float meanParcelSize <- 80.0 #m; // 1 ha parcels TODO input data
-	float SDParcelSize <- 20.0 #m; // Pour un effet avec des cellules de 50x50 m
+	float meanParcelSize <- 100.0 #m; // 1 ha parcels TODO input data
+	float SDParcelSize <- 30.0 #m; // Pour un effet avec des cellules de 50x50 m
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
 	float homeParcelsDimmingFactor <- 1.6; // Mere esthetic parameter
 	
@@ -22,12 +22,12 @@ global {
 	action placeParcels {
 		// Instantiate parcels
 		write "Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
-		
+
 		int newParc <- 0;
 		list<landscape> availableCroplandCells <- landscape where (each.cellLU = "Cropland");
 		int nbAvailableCells <- nil;
-		
-		// TODO try and get a way to have parcels with an even number of cells?
+	
+		//TODO : needs revamp for full coverage and better shapes		
 		loop while: nbAvailableCells != length(availableCroplandCells) {
 			nbAvailableCells <- length(availableCroplandCells);
 			
@@ -96,9 +96,8 @@ species parcel parallel: true {
 	bool homeField <- false;
 	rgb parcelColour;
 	aspect default {
-		ask myCells {
-			draw rectangle(cellWidth, cellHeight) color: #transparent border: myself.parcelColour;
-		}
+		shape <- union(myCells);
+		draw shape color: #transparent border: parcelColour;
 	}
 }
 
