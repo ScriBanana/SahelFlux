@@ -76,7 +76,6 @@ global {
 	action segregateBushFields {
 		write "Segregating bush and home fields.";
 		
-		write listAllBushParcels;
 		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
 				self.homeField <- true;
@@ -86,7 +85,6 @@ global {
 			}
 		}
 		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
-		write listAllBushParcels;
 	}
 }
 

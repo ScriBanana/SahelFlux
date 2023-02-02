@@ -21,7 +21,7 @@ global {
 	float stableCPoolInit <- 0.8; // kgC; own regression
 }
 
-species SOCstock { // TODO parent/ mirror/ intégrer à Landscape???
+species SOCstock parallel: true { // TODO parent/ mirror/ intégrer à Landscape???
 	
 	landscape myCell;
 	map<string, float> periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];

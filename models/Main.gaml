@@ -28,7 +28,7 @@ global {
 	float visualUpdate <- 7.0 #week;
 	bool drySeason <- true; // If first day during dry season
 	
-	// Global init
+	//// Global init ////
 	init {
 		write "=== MODEL INITIALISATION ===";
 		
@@ -44,51 +44,56 @@ global {
 		
 		write "=== MODEL INITIALISED ===";
 	}
-	
-	reflex week when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 {
+
+	//// Global scheduler ////
+	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 {
 		do updateGlobalBiomassMeanAndSD;
 	}
 
-	// Global scheduler
 	reflex monthStep when: (current_date.day = 1 and current_date.hour = 7 and current_date.minute = 0) {
 		
-		// Year print
-		if current_date.month = 1 {
-			write string(current_date, "'	Y'y");
-		}
-		
-		// Season print
-		if (current_date.month = drySeasonFirstMonth) {
-			write "	Dry season starts.";
-			drySeason <- true;
-			
-			// Compute grazable biomass contents
-			write "Computing plant biomass production.";
-			ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
-				do biomassProduction;
-			}
-			
-			// Compute grazable biomass contents
-			write "Computing grazable biomass contents.";
-			ask landscape where each.grazable {
-				do drySeasonStartUpdateGrazBiomassContent;
+		switch current_date.month {
+			match 1 {
+			// New year processes
+				write string(current_date, "'	Y'y");
 			}
 
-		} else if (current_date.month = rainySeasonFirstMonth) {
-			write "	Rain season starts.";
-			drySeason <- false;
+			match drySeasonFirstMonth {
+			// Dry season processes
+				write "	Dry season starts.";
+				drySeason <- true;
+
+				// Compute grazable biomass contents
+				write "Computing plant biomass production.";
+				ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
+					do biomassProduction;
+				}
+
+				// Compute grazable biomass contents
+				write "Computing grazable biomass contents.";
+				ask landscape where each.grazable {
+					do drySeasonStartUpdateGrazBiomassContent;
+				}
+			}
+
+			match rainySeasonFirstMonth {
+			// Rainy season processes
+				write "	Rain season starts.";
+				drySeason <- false;
+			}
 		}
 		
-		// Month print
+		// Monthly processes
 		write string(date(time), "'		M'M");
+		
 		ask SOCstock {
 			do updateCarbonPools;
 		}
 		ask landscape where each.grazable {
 			do updateColour;
 		}
+		
 	}
-
 	
 	// Break statement
 	reflex endSim when: current_date = endDate {
