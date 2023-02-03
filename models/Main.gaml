@@ -36,6 +36,7 @@ global {
 		write "=== MODEL INITIALISATION ===";
 		// All actions defined in related species files.
 		do assignLUFromRaster;
+		do initGrazableCells;
 		ask landscape where each.grazable {
 			do drySeasonStartUpdateGrazBiomassContent; // Redundant with first month, but allows clean init
 			do updateColour;
@@ -87,7 +88,7 @@ global {
 		
 		// Monthly processes
 		write string(date(time), "'		M'M");
-		
+		secondaryDisplayRefresh <- true;
 		ask SOCstock {
 			do updateCarbonPools;
 		}

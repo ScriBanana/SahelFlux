@@ -22,6 +22,18 @@ global {
 	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
 	
+	action initGrazableCells {
+		ask landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland") {
+			grazable <- true;
+			create SOCstock with: [myCell::self] {
+				myself.mySOCstock <- self;
+			}
+			create soilNProcesses with: [myCell::self] {
+				myself.mySoilNProcesses <- self;
+			}
+		}
+	}
+	
 	// Aggregation of biomass content for herds to identify cells to move to and graze
 	float meanBiomassContent;
 	float biomassContentSD;
@@ -48,17 +60,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	SOCstock mySOCstock;
 	soilNProcesses mySoilNProcesses;
 	
-	init {
-		create SOCstock with: [myCell::self] {
-			myself.mySOCstock <- self;
-		}
-		create soilNProcesses with: [myCell::self] {
-			myself.mySoilNProcesses <- self;
-		}
-	}
-	
 	// Grazable biomass
-	float biomassContent min: 0.0; // max: max(maxCropBiomassContent, maxRangelandBiomassContent);
+	float biomassContent min: 0.0 max: max(maxCropBiomassContent, maxRangelandBiomassContent); // TODO hmmmmm
 	
 	action biomassProduction {
 		// Computes plant biomass production at the end of the rain season
@@ -70,10 +73,10 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 		// TODO ajouter la weed en addition
 		if cellLU = "Cropland" {
 			//TODO
-			biomassContent <- maxCropBiomassContent;
+			biomassContent <- gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1);
 		} else if cellLU = "Rangeland" {
 			//TODO
-			biomassContent <- maxRangelandBiomassContent;
+			biomassContent <- gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1);
 		}
 	}
 	

@@ -54,5 +54,10 @@ species SOCstock parallel: true { // TODO parent/ mirror/ intégrer à Landscape
 		periodCinput <- 0.0;
 	}
 	
+	aspect default {
+		location <- myCell.location;
+		draw rectangle(cellWidth, cellHeight) color: rnd_color(255);
+	}
+	
 }
 

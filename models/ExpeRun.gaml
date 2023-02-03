@@ -9,6 +9,10 @@ model ExpeRun
 
 import "Main.gaml"
 
+global {
+	bool secondaryDisplayRefresh <- false update: false;
+}
+
 experiment run type: gui  {
 	// Parameters - Tests in UnitTests.gaml
 	parameter "Start date" category: "Scenario - Time" var: starting_date;
@@ -33,6 +37,20 @@ experiment run type: gui  {
 			species mobileHerd;
 			species parcel;
 		}
+
 	}
 	
 }
+
+experiment extras parent: run {
+	output {
+		display secondaryGrid type: java2D refresh: secondaryDisplayRefresh {
+			grid landscape;
+			species SOCstock;
+		}
+	}
+}
+
+
+
+

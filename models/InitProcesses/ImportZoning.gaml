@@ -40,11 +40,9 @@ global {
 			switch rasterLU {
 				match_one ["Rainfed crops", "Fallows"] {
 					cell.cellLU <- "Cropland";
-					cell.grazable <- true;
 				}
 				match_one ["Wooded savannah", "Lowlands"] {
 					cell.cellLU <- "Rangeland";
-					cell.grazable <- true;
 				}
 				match "Dwellings" {
 					cell.cellLU <- "Dwellings";
