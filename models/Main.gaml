@@ -46,6 +46,7 @@ global {
 		do instantiateHouseholds;
 		
 		write "=== MODEL INITIALISED ===";
+		write "Start date : " + starting_date;
 	}
 
 	//// Global scheduler ////
@@ -53,7 +54,7 @@ global {
 		do updateGlobalBiomassMeanAndSD;
 	}
 
-	reflex monthStep when: (current_date.day = 1 and current_date.hour = 7 and current_date.minute = 0) {
+	reflex monthStep when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and current_date.hour = wakeUpTime and current_date.minute = 0) {
 		
 		switch current_date.month {
 			match 1 {
@@ -68,7 +69,7 @@ global {
 
 				// Compute grazable biomass contents
 				write "Computing plant biomass production.";
-				ask landscape where (each.cellLU = "Rangeland" or "Cropland") {
+				ask landscape where (each.cellLU = "Rangeland" or "Cropland") { // TODO grazable?
 					do biomassProduction;
 				}
 
@@ -78,7 +79,7 @@ global {
 					do drySeasonStartUpdateGrazBiomassContent;
 				}
 			}
-
+			
 			match rainySeasonFirstMonth {
 			// Rainy season processes
 				write "	Rain season starts.";
@@ -88,13 +89,20 @@ global {
 		
 		// Monthly processes
 		write string(date(time), "'		M'M");
-		secondaryDisplayRefresh <- true;
+		
+		ask ORPHeap {
+			do addWastes;
+		}
+		lastORPAddition <- current_date;
 		ask SOCstock {
 			do updateCarbonPools;
 		}
 		ask landscape where each.grazable {
 			do updateColour;
 		}
+		
+		// Refresh display
+		secondaryDisplayRefresh <- true;
 		
 	}
 	

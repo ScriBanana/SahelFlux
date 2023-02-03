@@ -48,6 +48,12 @@ global {
 				do resetSleepSpot;
 				location <- currentSleepSpot.location;
 			}
+			
+			// Assiciating an ORP heap
+			create ORPHeap with: [myHousehold::self] {	
+				myHousehold.myORPHeap <- self;
+				
+			}
 		}
 		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds.";
 	}
