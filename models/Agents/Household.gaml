@@ -15,7 +15,7 @@ import "ORPHeap.gaml"
 
 global {
 	
-	int nbHousehold <- 10; // TODO Dummy
+	int nbHousehold; // Parameter
 	int nbBushFieldsPerHh <- 10; // TODO Dummy
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
 	

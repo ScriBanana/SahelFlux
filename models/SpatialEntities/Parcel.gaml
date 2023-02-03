@@ -10,16 +10,15 @@ import "Landscape.gaml"
 
 global {
 	int maxNbCroplandParcels <- 10000;
-	float meanParcelSize <- 100.0 #m; // 1 ha parcels TODO input data
-	float SDParcelSize <- 30.0 #m; // Pour un effet avec des cellules de 50x50 m
+	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
 	float homeParcelsDimmingFactor <- 1.6; // Mere esthetic parameter
 	
-	// Optimisation variables
+	// Variables
 	list<parcel> listAllHomeParcels;
 	list<parcel> listAllBushParcels;
 	
-	action placeParcels {
+	action placeParcels {		
 		// Instantiate parcels
 		write "Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
 
@@ -43,7 +42,7 @@ global {
 					// Attributing a random (positive) parcel size
 					float parcelSize <- -1.0;
 					loop while: parcelSize < 0.0 {
-						parcelSize <- gauss(meanParcelSize, SDParcelSize);
+						parcelSize <- gauss(parcelRadiusDistri.key, parcelRadiusDistri.value);
 					}
 					
 					// Checking if neighbouring cells can be integrated into the parcel.

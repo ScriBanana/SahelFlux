@@ -13,7 +13,8 @@ import "FattenedAnimal.gaml"
 
 global {
 	// Digestion parameters
-	float digestionLength <- 20.0 #h; // Duration of the digestion of biomass in the animals (expert knowledge -> ref ou préciser?)
+	int digestionLengthParamAsInt; // More readable
+	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals
 	float ratioNExcretedOnIngested <- 0.43; // Lecomte 2002
 	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
 	float ratioNUrineOnFaeces <- 0.25; // Wade 2016
@@ -21,7 +22,7 @@ global {
 	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
 }
 
-species animalGroup {
+species animalGroup virtual: true {
 	
 	// Digestion process and continuous emissions
 	list chymeChunksList;

@@ -10,6 +10,23 @@ model ExpeRun
 import "Main.gaml"
 
 experiment run type: gui  {
+	// Parameters - Tests in UnitTests.gaml
+	parameter "Start date" category: "Scenario - Time" var: starting_date;
+	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;
+	
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: gridLayout;
+	parameter "Maximum numbre of parcels to place" category: "Scenario - Spatial layout" var: maxNbCroplandParcels min: 0;
+	parameter "Parcels radius (m) : Mean :: SD" category: "Scenario - Spatial layout" var: parcelRadiusDistri;
+	parameter "Home fields area radius (m)" category: "Scenario - Spatial layout" var: homeFieldsRadius min: 0.0;
+	
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0;
+	parameter "Mobile herds mean sizes (TLU)" category: "Scenario - Production means repartition" var: meanHerdSize min: 0.0;
+	parameter "Bush fields parcels per household" category: "Scenario - Production means repartition" var: nbBushFieldsPerHh min: 0;
+	parameter "Home fields parcels per household" category: "Scenario - Production means repartition" var: nbHomeFieldsPerHh min: 0;
+	parameter "Number of night per paddock cell" category: "Scenario - Herds management" var: maxNbNightsPerCellInPaddock min: 0;
+	
+	parameter "Digestion length (h)" category: "Calibration" var: digestionLengthParamAsInt <- 20 min: 0;
+	
 	output {
 		display mainDisplay type: java2D {
 			grid landscape;

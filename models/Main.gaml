@@ -8,6 +8,7 @@
 
 model SahelFlux
 
+import "InitProcesses/UnitTests.gaml"
 import "SpatialEntities/Landscape.gaml"
 import "Agents/AnimalGroup.gaml"
 import "Agents/Household.gaml"
@@ -18,9 +19,9 @@ global {
 	
 	// Simulation calendar
 	date starting_date <- date([2020, 11, 1, wakeUpTime - 1, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
+	date endDate <- date([2022, 10, 31, eveningTime + 1, 0, 0]);
 	int drySeasonFirstMonth <- 11;
 	int rainySeasonFirstMonth <- 7;
-	date endDate <- date([2022, 10, 31, eveningTime + 1, 0, 0]); // After 
 	
 	// Time step parameters
 	float step <- 30.0 #minutes;
@@ -30,8 +31,9 @@ global {
 	
 	//// Global init ////
 	init {
-		write "=== MODEL INITIALISATION ===";
+		do unitTests;
 		
+		write "=== MODEL INITIALISATION ===";
 		// All actions defined in related species files.
 		do assignLUFromRaster;
 		ask landscape where each.grazable {
