@@ -22,6 +22,14 @@ global {
 	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
 	
 	date lastORPAddition <- starting_date;
+	
+	action addWastesToHeaps {
+		ask ORPHeap {
+			do addWastes;
+		}
+		lastORPAddition <- current_date;
+	}
+	
 }
 
 species ORPHeap {

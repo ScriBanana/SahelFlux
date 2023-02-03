@@ -30,6 +30,8 @@ experiment run type: gui  {
 	parameter "Number of night per paddock cell" category: "Scenario - Herds management" var: maxNbNightsPerCellInPaddock min: 0;
 	
 	parameter "Digestion length (h)" category: "Calibration" var: digestionLengthParamAsInt <- 20 min: 0;
+	parameter "Initial soil carbon stock in croplands (kgC/ha)" category: "Calibration" var: croplandSOChaInit min: 0.0;
+	parameter "Initial soil carbon stock in rangelands (kgC/ha)" category: "Calibration" var: rangelandSOChaInit min: 0.0;
 	
 	output {
 		display mainDisplay type: java2D {
@@ -44,9 +46,18 @@ experiment run type: gui  {
 
 experiment extras parent: run {
 	output {
-		display secondaryGrid type: java2D refresh: secondaryDisplayRefresh {
+		display carbonDisplay type: java2D refresh: secondaryDisplayRefresh {
 			grid landscape;
 			species SOCstock;
+		}
+		
+		display SOCCompartiments refresh: every(1 #week) {
+			chart "Average SOC per compartment (kgC/ha)" type: series {
+				data "Labile C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
+				data "Stable C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
+				data "Labile C rangeland" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
+				data "Stable C rangeland" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
+			}
 		}
 	}
 }

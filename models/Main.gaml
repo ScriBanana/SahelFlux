@@ -90,10 +90,7 @@ global {
 		// Monthly processes
 		write string(date(time), "'		M'M");
 		
-		ask ORPHeap {
-			do addWastes;
-		}
-		lastORPAddition <- current_date;
+		do addWastesToHeaps;
 		ask SOCstock {
 			do updateCarbonPools;
 		}

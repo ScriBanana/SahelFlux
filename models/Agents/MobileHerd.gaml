@@ -173,6 +173,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	reflex herdDigest when: !empty(chymeChunksList) and (time - float(first(chymeChunksList)[0]) > digestionLength) {
 		map excretaOutputs <- excrete(first(chymeChunksList)[1]);
 		currentCell.mySOCstock.periodCInputMap["HerdsDung"] <- currentCell.mySOCstock.periodCInputMap["HerdsDung"] + float(excretaOutputs["excretedCarbon"]);
+		// TODO complexifier pour fitter à l'équation d'émissions de CH4
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <- currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"]);
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <- currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"]);
 		chymeChunksList >- first(chymeChunksList);
