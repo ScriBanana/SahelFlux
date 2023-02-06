@@ -40,7 +40,7 @@ global {
 			// Giving a mobile herd
 			create mobileHerd with: [
 				myHousehold::self,
-				herdSize::round(meanHerdSize),
+				herdSize::round(abs(rnd(meanHerdSize))),
 				herdColour::self.householdColour
 			] {	
 				myHousehold.myMobileHerd <- self;
@@ -55,6 +55,7 @@ global {
 				
 			}
 		}
+		assert mobileHerd min_of each.herdSize > 0;
 		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds.";
 	}
 }

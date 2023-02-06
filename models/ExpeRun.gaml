@@ -57,6 +57,7 @@ experiment extras parent: run {
 				data "Stable C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
 				data "Labile C rangeland" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
 				data "Stable C rangeland" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
+				data "C input" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.periodCinput) / hectareToCell color: #darkgreen;
 			}
 		}
 	}

@@ -12,13 +12,14 @@ import "../Main.gaml"
 
 /* Insert your model definition here */
 global {
-	action unitTests {
+	action inputUnitTests {
 		
 		// Main
 		assert starting_date < endDate;
 		
 		// Parcel
 		assert parcelRadiusDistri.value > 0.0 and parcelRadiusDistri.key >= 0.0;
+		
 	}
 }
 	

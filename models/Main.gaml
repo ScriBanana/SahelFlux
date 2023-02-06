@@ -31,7 +31,7 @@ global {
 	
 	//// Global init ////
 	init {
-		do unitTests;
+		do inputUnitTests;
 		
 		write "=== MODEL INITIALISATION ===";
 		// All actions defined in related species files.
@@ -50,8 +50,9 @@ global {
 	}
 
 	//// Global scheduler ////
-	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 {
+	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and current_date.hour = wakeUpTime and current_date.minute = 0){
 		do updateGlobalBiomassMeanAndSD;
+		do updateSOCStocks;
 	}
 
 	reflex monthStep when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and current_date.hour = wakeUpTime and current_date.minute = 0) {
@@ -91,9 +92,8 @@ global {
 		write string(date(time), "'		M'M");
 		
 		do addWastesToHeaps;
-		ask SOCstock {
-			do updateCarbonPools;
-		}
+		write "Updating C pools";
+//		do updateSOCStocks;
 		ask landscape where each.grazable {
 			do updateColour;
 		}
