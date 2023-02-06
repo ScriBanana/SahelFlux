@@ -55,9 +55,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	list<parcel> remainingPaddocks;
 	
 	// Grazing parameters and variables
-	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize;
-	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize;
-	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize;
+	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize; // kgDM/herd/day
+	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
+	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float satietyMeter <- 0.0;
 	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
 	landscape currentCell update: first(landscape overlapping self);
