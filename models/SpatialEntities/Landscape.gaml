@@ -76,6 +76,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
 	action biomassProduction {
 		// Computes plant biomass production at the end of the rain season
 		
+		// Add photoshynthesis
 	}
 	
 	action drySeasonStartUpdateGrazBiomassContent {

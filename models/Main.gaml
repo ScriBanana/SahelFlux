@@ -44,6 +44,7 @@ global {
 		do placeParcels;
 		do segregateBushFields;
 		do instantiateHouseholds;
+		do resetFlowsMaps;
 		
 		write "=== MODEL INITIALISED ===";
 		write "Start date : " + starting_date;
@@ -104,6 +105,7 @@ global {
 	// Break statement
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";
+		do gatherFlows;
 		do pause;
 	}
 	

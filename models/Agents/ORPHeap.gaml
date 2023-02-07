@@ -21,6 +21,8 @@ global {
 	float kitchenWastesCContent <- 0.6; // kgC/kgDM TODO DUMMY
 	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
 	
+	map<string, float> flowsMapORPHeap <- ["Inflows"::0.0, "ToHomeFields"::0.0, "ToBushFields"::0.0];
+	
 	date lastORPAddition <- starting_date;
 	action addWastesToHeaps {
 		ask ORPHeap {
@@ -48,6 +50,14 @@ species ORPHeap {
 //		ask myHousehold.myHomeParcelsList {
 //			currentCell.mySOCstock.periodCInputMap["ORP"] <- currentCell.mySOCstock.periodCInputMap["ORP"] + heapCContent;
 //		}
+	}
+	
+	float lastORPNStock <- heapNContentInit;
+	float lastORPCStock <- heapCContentInit;
+	action registerORPFlows {
+		
+		lastORPNStock <- heapNContent;
+		lastORPCStock <- heapCContent;
 	}
 }
 
