@@ -15,6 +15,7 @@ global {
 	
 	//int nbHerds <- 10; // TODO DUMMY 84; // (Grillot et al, 2018)
 	float meanHerdSize <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018) TODO DUMMY
+	float SDHerdSize <- 3.7 * 0.4; // TODO DUMMY
 	
 	// Behaviour parameters
 	float herdSpeed <- 0.833; // m/s = 3 km/h Does not account for grazing speed due to scale. (Own GPS data)
@@ -171,12 +172,30 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	
 	// Excretion after digestionLength (Temporality differs with fattened)
 	reflex herdDigest when: !empty(chymeChunksList) and (time - float(first(chymeChunksList)[0]) > digestionLength) {
+		// Compute excreted OM
 		map excretaOutputs <- excrete(first(chymeChunksList)[1]);
+		chymeChunksList >- first(chymeChunksList);
+		
+		// Save N and C in cell
 		currentCell.mySOCstock.periodCInputMap["HerdsDung"] <- currentCell.mySOCstock.periodCInputMap["HerdsDung"] + float(excretaOutputs["excretedCarbon"]);
 		// TODO complexifier pour fitter à l'équation d'émissions de CH4
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <- currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"]);
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <- currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"]);
-		chymeChunksList >- first(chymeChunksList);
+		
+		// Save flows to flows map
+		switch currentCell.cellLU {
+			match "Rangeland" {
+				CFlowsMap["MobileHerds"]["TF-ToRangeland"] <- float(excretaOutputs["excretedCarbon"]);
+			}
+			match "Cropland" {
+				if currentCell.myParcel.homeField {
+					CFlowsMap["MobileHerds"]["TF-ToHomeFields"] <- float(excretaOutputs["excretedCarbon"]);
+				} else {
+					CFlowsMap["MobileHerds"]["TF-ToBushFields"] <- float(excretaOutputs["excretedCarbon"]);
+				}
+			}
+		}
+		
 	}
 	
 	aspect default {

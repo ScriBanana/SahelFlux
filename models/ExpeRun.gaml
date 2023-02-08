@@ -45,7 +45,7 @@ experiment Run type: gui {
 }
 
 experiment FastAutoRun parent: run autorun: true {
-	parameter "Short run" var: endDate <- date([2020, 11, 4, eveningTime + 1, 0, 0]);
+	parameter "Short run" var: endDate <- date([2020, 11, 2, eveningTime + 1, 0, 0]);
 }
 
 experiment SOCDispRun parent: run {
