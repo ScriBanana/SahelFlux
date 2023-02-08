@@ -40,7 +40,7 @@ global {
 			// Giving a mobile herd
 			create mobileHerd with: [
 				myHousehold::self,
-				herdSize::round(abs(rnd(meanHerdSize - 1))) + 1,
+				herdSize::round(abs(gauss(meanHerdSize - 1, SDHerdSize) + 1)),
 				herdColour::self.householdColour
 			] {	
 				myHousehold.myMobileHerd <- self;
