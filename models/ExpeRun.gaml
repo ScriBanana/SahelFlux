@@ -13,7 +13,7 @@ global {
 	bool secondaryDisplayRefresh <- false update: false;
 }
 
-experiment run type: gui  {
+experiment Run type: gui {
 	// Parameters - Tests in UnitTests.gaml
 	parameter "Start date" category: "Scenario - Time" var: starting_date;
 	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;
@@ -44,7 +44,11 @@ experiment run type: gui  {
 	
 }
 
-experiment extras parent: run {
+experiment FastAutoRun parent: run autorun: true {
+	parameter "Short run" var: endDate <- date([2020, 11, 4, eveningTime + 1, 0, 0]);
+}
+
+experiment SOCDispRun parent: run {
 	output {
 		display carbonDisplay type: java2D refresh: secondaryDisplayRefresh {
 			grid landscape;
@@ -62,7 +66,4 @@ experiment extras parent: run {
 		}
 	}
 }
-
-
-
 
