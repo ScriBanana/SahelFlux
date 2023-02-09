@@ -182,16 +182,17 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <- currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"]);
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <- currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"]);
 		
+			
 		// Save flows to flows map
 		switch currentCell.cellLU {
 			match "Rangeland" {
-				CFlowsMap["MobileHerds"]["TF-ToRangeland"] <- float(excretaOutputs["excretedCarbon"]);
+				ask world {	do saveFlowInMap("C", "MobileHerds", "TF-ToRangeland", float(excretaOutputs["excretedCarbon"]));}
 			}
 			match "Cropland" {
-				if currentCell.myParcel.homeField {
-					CFlowsMap["MobileHerds"]["TF-ToHomeFields"] <- float(excretaOutputs["excretedCarbon"]);
+				if currentCell.myParcel != nil and currentCell.myParcel.homeField {
+					ask world {	do saveFlowInMap("C", "MobileHerds", "TF-ToHomeFields", float(excretaOutputs["excretedCarbon"]));}
 				} else {
-					CFlowsMap["MobileHerds"]["TF-ToBushFields"] <- float(excretaOutputs["excretedCarbon"]);
+					ask world {	do saveFlowInMap("C", "MobileHerds", "TF-ToBushFields", float(excretaOutputs["excretedCarbon"]));}
 				}
 			}
 		}

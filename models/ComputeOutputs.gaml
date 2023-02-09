@@ -51,34 +51,34 @@ global {
 	// Resets values of the flows map to 0.0
 	action resetFlowsMaps {
 		NFlowsMap <- [
-				"Household"::flowsMapTemplate,
-				"MobileHerds"::flowsMapTemplate,
-				"FattenedAn"::flowsMapTemplate,
-				"ORPHeap"::flowsMapTemplate,
-				"StrawPile"::flowsMapTemplate,
-				"HomeFields"::flowsMapTemplate,
-				"BushFields"::flowsMapTemplate,
-				"Rangeland"::flowsMapTemplate,
-				"Millet"::flowsMapTemplate,
-				"Groundnut"::flowsMapTemplate,
-				"FallowVeg"::flowsMapTemplate,
-				"SpontVeg"::flowsMapTemplate,
-				"Weeds"::flowsMapTemplate
+				"Household"::copy(flowsMapTemplate),
+				"MobileHerds"::copy(flowsMapTemplate),
+				"FattenedAn"::copy(flowsMapTemplate),
+				"ORPHeap"::copy(flowsMapTemplate),
+				"StrawPile"::copy(flowsMapTemplate),
+				"HomeFields"::copy(flowsMapTemplate),
+				"BushFields"::copy(flowsMapTemplate),
+				"Rangeland"::copy(flowsMapTemplate),
+				"Millet"::copy(flowsMapTemplate),
+				"Groundnut"::copy(flowsMapTemplate),
+				"FallowVeg"::copy(flowsMapTemplate),
+				"SpontVeg"::copy(flowsMapTemplate),
+				"Weeds"::copy(flowsMapTemplate)
 			];
 		CFlowsMap <- [ // Copy(NFlowsMap) doesn't work, apparently
-				"Household"::flowsMapTemplate,
-				"MobileHerds"::flowsMapTemplate,
-				"FattenedAn"::flowsMapTemplate,
-				"ORPHeap"::flowsMapTemplate,
-				"StrawPile"::flowsMapTemplate,
-				"HomeFields"::flowsMapTemplate,
-				"BushFields"::flowsMapTemplate,
-				"Rangeland"::flowsMapTemplate,
-				"Millet"::flowsMapTemplate,
-				"Groundnut"::flowsMapTemplate,
-				"FallowVeg"::flowsMapTemplate,
-				"SpontVeg"::flowsMapTemplate,
-				"Weeds"::flowsMapTemplate
+				"Household"::copy(flowsMapTemplate),
+				"MobileHerds"::copy(flowsMapTemplate),
+				"FattenedAn"::copy(flowsMapTemplate),
+				"ORPHeap"::copy(flowsMapTemplate),
+				"StrawPile"::copy(flowsMapTemplate),
+				"HomeFields"::copy(flowsMapTemplate),
+				"BushFields"::copy(flowsMapTemplate),
+				"Rangeland"::copy(flowsMapTemplate),
+				"Millet"::copy(flowsMapTemplate),
+				"Groundnut"::copy(flowsMapTemplate),
+				"FallowVeg"::copy(flowsMapTemplate),
+				"SpontVeg"::copy(flowsMapTemplate),
+				"Weeds"::copy(flowsMapTemplate)
 			];
 	}
 	
@@ -140,9 +140,19 @@ global {
 		do resetFlowsMaps;
 	}
 	
+	
+	action saveFlowInMap (string flowType, string emittingPool, string flowDestination, float flowValue) {
+		switch flowType {
+			match "C" {
+				CFlowsMap[emittingPool][flowDestination] <- float(CFlowsMap[emittingPool][flowDestination]) + flowValue;
+			}
+			match "N" {
+				NFlowsMap[emittingPool][flowDestination] <- float(NFlowsMap[emittingPool][flowDestination]) + flowValue;
+			}
+		}
+	}
+	
 	// Compute global ENA indicators at the end of the simulation (Stark, 2016; Balandier, 2017, Latham, 2006)
-	
-	
 	
 }
 

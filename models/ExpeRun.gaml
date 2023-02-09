@@ -39,16 +39,14 @@ experiment Run type: gui {
 			species mobileHerd;
 			species parcel;
 		}
-
 	}
-	
 }
 
-experiment FastAutoRun parent: run autorun: true {
-	parameter "Short run" var: endDate <- date([2020, 11, 4, eveningTime + 1, 0, 0]);
+experiment FastAutoRun parent: Run autorun: true {
+	parameter "Short run end date" var: endDate <- date([2020, 11, 4, eveningTime + 1, 0, 0]);
 }
 
-experiment SOCDispRun parent: run {
+experiment SOCDispRun parent: Run {
 	output {
 		display carbonDisplay type: java2D refresh: secondaryDisplayRefresh {
 			grid landscape;
