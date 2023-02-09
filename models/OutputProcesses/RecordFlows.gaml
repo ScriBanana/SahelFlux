@@ -1,14 +1,13 @@
 /**
 * In: SahelFlux
-* Name: ComputeOutputs
-* Soil organic carbon stock
+* Name: RecordFlows
+* Records flows in flow maps and holds a function to transform it in ENA compliant matrixes
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
+model RecordFlows
 
-model ComputeOutputs
-
-import "Main.gaml"
+import "../Main.gaml"
 
 global {
 	
@@ -141,6 +140,7 @@ global {
 	}
 	
 	
+	// Used by agents in ask world statement to save emitted flows in the flows maps
 	action saveFlowInMap (string flowType, string emittingPool, string flowDestination, float flowValue) {
 		// Tests for typo
 		assert flowType in ["C", "N"];
@@ -162,4 +162,5 @@ global {
 	// Compute global ENA indicators at the end of the simulation (Stark, 2016; Balandier, 2017, Latham, 2006)
 	
 }
+
 

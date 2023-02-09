@@ -172,7 +172,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		// Save flows to flows map
 		float biomassDummyCContent <- 0.8; //TODO DUMMY mettre dans input qqpart
 		float biomassDummyNContent <- 0.1; //TODO DUMMY mettre dans input qqpart
-		string emittingPool <- eatenBiomassType = "Rangeland" ? "Rangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "Bushfields");
+		string emittingPool <- eatenBiomassType = "Rangeland" ? "Rangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyCContent);}
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyNContent);}
 	}

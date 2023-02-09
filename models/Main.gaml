@@ -13,7 +13,8 @@ import "SpatialEntities/Landscape.gaml"
 import "Agents/AnimalGroup.gaml"
 import "Agents/Household.gaml"
 import "ExpeRun.gaml"
-import "ComputeOutputs.gaml"
+import "OutputProcesses/RecordFlows.gaml"
+import "OutputProcesses/ComputeOutputs.gaml"
 
 global {
 	
