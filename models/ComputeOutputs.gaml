@@ -21,14 +21,14 @@ global {
 		"IF-FromMarket"::0.0,
 		"IF-FromAtmo"::0.0,
 		// Throughflows
-		"TF-ToHousehold"::0.0,
+		"TF-ToHouseholds"::0.0,
 		"TF-ToMobileHerds"::0.0,
 		"TF-ToFattenedAn"::0.0,
-		"TF-ToORPHeap"::0.0,
-		"TF-ToStrawPile"::0.0,
+		"TF-ToORPHeaps"::0.0,
+		"TF-ToStrawPiles"::0.0,
 		"TF-ToHomeFields"::0.0,
 		"TF-ToBushFields"::0.0,
-		"TF-ToRangeland"::0.0,
+		"TF-ToRangelands"::0.0,
 		"TF-ToMillet"::0.0,
 		"TF-ToGroundnut"::0.0,
 		"TF-ToFallowVeget"::0.0,
@@ -51,14 +51,14 @@ global {
 	// Resets values of the flows map to 0.0
 	action resetFlowsMaps {
 		NFlowsMap <- [
-				"Household"::copy(flowsMapTemplate),
+				"Households"::copy(flowsMapTemplate),
 				"MobileHerds"::copy(flowsMapTemplate),
 				"FattenedAn"::copy(flowsMapTemplate),
-				"ORPHeap"::copy(flowsMapTemplate),
-				"StrawPile"::copy(flowsMapTemplate),
+				"ORPHeaps"::copy(flowsMapTemplate),
+				"StrawPiles"::copy(flowsMapTemplate),
 				"HomeFields"::copy(flowsMapTemplate),
 				"BushFields"::copy(flowsMapTemplate),
-				"Rangeland"::copy(flowsMapTemplate),
+				"Rangelands"::copy(flowsMapTemplate),
 				"Millet"::copy(flowsMapTemplate),
 				"Groundnut"::copy(flowsMapTemplate),
 				"FallowVeg"::copy(flowsMapTemplate),
@@ -66,14 +66,14 @@ global {
 				"Weeds"::copy(flowsMapTemplate)
 			];
 		CFlowsMap <- [ // Copy(NFlowsMap) doesn't work, apparently
-				"Household"::copy(flowsMapTemplate),
+				"Households"::copy(flowsMapTemplate),
 				"MobileHerds"::copy(flowsMapTemplate),
 				"FattenedAn"::copy(flowsMapTemplate),
-				"ORPHeap"::copy(flowsMapTemplate),
-				"StrawPile"::copy(flowsMapTemplate),
+				"ORPHeaps"::copy(flowsMapTemplate),
+				"StrawPiles"::copy(flowsMapTemplate),
 				"HomeFields"::copy(flowsMapTemplate),
 				"BushFields"::copy(flowsMapTemplate),
-				"Rangeland"::copy(flowsMapTemplate),
+				"Rangelands"::copy(flowsMapTemplate),
 				"Millet"::copy(flowsMapTemplate),
 				"Groundnut"::copy(flowsMapTemplate),
 				"FallowVeg"::copy(flowsMapTemplate),
@@ -142,6 +142,13 @@ global {
 	
 	
 	action saveFlowInMap (string flowType, string emittingPool, string flowDestination, float flowValue) {
+		// Tests for typo
+		assert flowType in ["C", "N"];
+		assert emittingPool in NFlowsMap.keys;
+		assert flowDestination in flowsMapTemplate.keys;
+		
+		// Assign to flows map
+		// (Switch more robust and allows addition of a flow type)
 		switch flowType {
 			match "C" {
 				CFlowsMap[emittingPool][flowDestination] <- float(CFlowsMap[emittingPool][flowDestination]) + flowValue;

@@ -168,6 +168,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
+		
+		// Save flows to flows map
+		float biomassDummyCContent <- 0.8; //TODO DUMMY mettre dans input qqpart
+		float biomassDummyNContent <- 0.1; //TODO DUMMY mettre dans input qqpart
+		string emittingPool <- eatenBiomassType = "Rangeland" ? "Rangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "Bushfields");
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyCContent);}
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyNContent);}
 	}
 	
 	// Excretion after digestionLength (Temporality differs with fattened)
@@ -182,20 +189,10 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <- currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"]);
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <- currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"]);
 		
-			
 		// Save flows to flows map
-		switch currentCell.cellLU {
-			match "Rangeland" {
-				ask world {	do saveFlowInMap("C", "MobileHerds", "TF-ToRangeland", float(excretaOutputs["excretedCarbon"]));}
-			}
-			match "Cropland" {
-				if currentCell.myParcel != nil and currentCell.myParcel.homeField {
-					ask world {	do saveFlowInMap("C", "MobileHerds", "TF-ToHomeFields", float(excretaOutputs["excretedCarbon"]));}
-				} else {
-					ask world {	do saveFlowInMap("C", "MobileHerds", "TF-ToBushFields", float(excretaOutputs["excretedCarbon"]));}
-				}
-			}
-		}
+		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");
+		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool , float(excretaOutputs["excretedCarbon"]));}
+		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool, float(excretaOutputs["excretedCarbon"]));}
 		
 	}
 	
