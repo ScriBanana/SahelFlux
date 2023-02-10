@@ -1,14 +1,14 @@
 /**
+* In: SahelFlux
 * Name: UnitTests
-* Based on the internal empty template. 
-* Author: AS
-* Tags: 
+* Unit tests on input parameter
+* Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
 model UnitTests
 
-import "../Main.gaml"
+import "../Models/Main.gaml"
 
 /* Insert your model definition here */
 global {

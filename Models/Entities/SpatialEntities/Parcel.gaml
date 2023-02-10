@@ -1,14 +1,18 @@
 /**
 * In: SahelFlux
 * Name: Parcel
-* Based on the internal empty template. 
+* Parcels
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 model Parcel
 
 import "Landscape.gaml"
+import "../Household.gaml"
 
 global {
+	
+	//// Global parcels parameters
+	
 	int maxNbCroplandParcels <- 10000;
 	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
@@ -17,6 +21,8 @@ global {
 	// Variables
 	list<parcel> listAllHomeParcels;
 	list<parcel> listAllBushParcels;
+	
+	//// Global parcels functions
 	
 	action placeParcels {		
 		// Instantiate parcels
@@ -88,6 +94,9 @@ global {
 }
 
 species parcel parallel: true schedules: [] {
+	
+	//// Parameters
+	
 	list<landscape> myCells;
 	household myOwner;
 	bool homeField <- false;

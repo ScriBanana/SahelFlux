@@ -1,17 +1,18 @@
 /**
 * In: SahelFlux
 * Name: ImportZoning
+* Generates grid layout based on input data
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 model ImportZoning
 
-import "../SupportFunctions.gaml"
-import "../SpatialEntities/Landscape.gaml"
+import "../Utilities/SupportFunctions.gaml"
+import "../Models/Entities/SpatialEntities/Landscape.gaml"
 
 global {
 	// Import land unit layout
-	file gridLayout <- image_file("../includes/SpatialInputs/ZonageReduitDiohineAudouinEtAl2015_LowRes_Corrected.png");
+	file gridLayout <- image_file("../Inputs/SpatialInputs/ZonageReduitDiohineAudouinEtAl2015_LowRes_Corrected.png");
 	
 	// Grid parameters and units
 	//geometry shape <- envelope(gridLayout);

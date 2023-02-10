@@ -1,17 +1,21 @@
 /**
 * In: SahelFlux
 * Name: FattenedAnimal
-* Based on the internal empty template. 
+* Fattened animals mechanisms
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
 model FattenedAnimal
 
-
 import "AnimalGroup.gaml"
 
 species fattenedAnimal parent: animalGroup schedules: [] {
+	
+	//// Parameters
+	
+	
+	//// Functions
 	
 	action eat { // reflex ou scheduler?
 		float eatenQuantity <- 6.0; //TODO DUMMY

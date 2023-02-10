@@ -1,23 +1,27 @@
 /**
 * In: SahelFlux
 * Name: Household
+* Central entity owning animals, parcels and ORP heap
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
-* Tags: 
 */
 
 
 model Household
 
-import "../SpatialEntities/Parcel.gaml"
-import "Household.gaml"
-import "AnimalGroup.gaml"
+import "SpatialEntities/Parcel.gaml"
+import "MobileHerd.gaml"
+import "FattenedAnimal.gaml"
 import "ORPHeap.gaml"
 
 global {
 	
+	//// Global households parameters
+	
 	int nbHousehold; // Parameter
 	int nbBushFieldsPerHh <- 10; // TODO Dummy
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
+	
+	//// Global households functions
 	
 	action instantiateHouseholds {
 		write "Populating the village.";
@@ -61,6 +65,9 @@ global {
 }
 
 species household schedules: [] {
+	
+	//// Parameters
+	
 	rgb householdColour;
 	// Links to other agents
 	list<parcel> myBushParcelsList;

@@ -1,26 +1,29 @@
 /**
 * In: SahelFlux
 * Name: Landscape
-* Based on the internal empty template. 
+* Landscape grid
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
 model Landscape
 
-import "../Main.gaml"
-import "../InitProcesses/ImportZoning.gaml"
+import "../../../Utilities/ImportZoning.gaml"
 import "Parcel.gaml"
 import "SOCstock.gaml"
 import "SoilNProcesses.gaml"
 
 global {
 	
-	// landscape parameters
+	//// Global landscape parameters
+	
 	float maxCropBiomassContentHa <- 351.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; weeds and crop residues
 	float maxRangelandBiomassContentHa <- 375.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; grass and shrubs
 	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
+	
+	
+	//// Global landscape functions
 	
 	action initGrazableCells {
 		ask landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland") {
@@ -60,6 +63,8 @@ global {
 
 grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 schedules: [] use_regular_agents: false {
 	
+	//// Parameters
+	
 	// Land unit
 	string cellLU;
 	bool grazable <- false;
@@ -72,6 +77,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	
 	// Grazable biomass
 	float biomassContent min: 0.0 max: max(maxCropBiomassContent, maxRangelandBiomassContent); // TODO hmmmmm
+	
+	//// Functions
 	
 	action biomassProduction {
 		// Computes plant biomass production at the end of the rain season

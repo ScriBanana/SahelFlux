@@ -7,8 +7,6 @@
 
 model RecordFlows
 
-import "../Main.gaml"
-
 global {
 	
 	//// Initiate data gathering tools ////

@@ -8,10 +8,12 @@
 
 model AnimalGroup
 
-import "MobileHerd.gaml"
-import "FattenedAnimal.gaml"
+import "Household.gaml"
 
 global {
+	
+	//// Global Animals parameters
+	
 	// Digestion parameters
 	int digestionLengthParamAsInt; // More readable
 	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals
@@ -24,8 +26,15 @@ global {
 
 species animalGroup virtual: true schedules: [] { // Not sure if schedules is not already empty if virtual is true.
 	
+	//// Parameters
+	
+	// Ownership
+	household myHousehold;
+	
 	// Digestion process and continuous emissions
 	list chymeChunksList;
+	
+	//// Functions
 	
 	action emitMetabo {
 		// TODO emit CH4 and CO2

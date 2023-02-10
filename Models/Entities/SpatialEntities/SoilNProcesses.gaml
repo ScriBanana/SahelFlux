@@ -9,8 +9,12 @@
 model SoilNProcesses
 
 import "Landscape.gaml"
+import "../../OutputProcesses/RecordFlows.gaml"
 
 global {
+	
+	//// Global soil N parameters
+	
 	map<string, list> dungMineraPercentMatrix <- [ // N available over the years for : 
 		"HerdsDung"::[0.6, 0.4, 0.0],
 		"HerdsUrine"::[1.0, 0.0, 0.0],
@@ -27,12 +31,17 @@ global {
 }
 
 species soilNProcesses parallel: true schedules: [] {
+	
+	//// Parameters
+	
 	landscape myCell;
 	// Inflows of N within all other processes (public)
 	map<string, float> NInflows <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	// Memory variables
 	map<string, float> thisYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	map<string, float> nextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
+	
+	//// Functions
 	
 	float computeNAvailable {
 		

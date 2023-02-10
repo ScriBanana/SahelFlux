@@ -7,3 +7,5 @@
 
 
 model ComputeOutputs
+
+import "RecordFlows.gaml"

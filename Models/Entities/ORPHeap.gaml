@@ -1,7 +1,7 @@
-
 /**
 * In: SahelFlux
 * Name: ORPHeap
+* Manure and human wastes heap
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
@@ -11,6 +11,9 @@ model ORPHeap
 import "Household.gaml"
 
 global {
+	
+	//// Global manure heap parameters
+	
 	float heapNContentInit <- 0.0; // kgN Init value is 0 because start of dry season?
 	float heapCContentInit <- 0.0; // kgC Init value is 0 because start of dry season?
 	
@@ -22,6 +25,8 @@ global {
 	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
 	
 	map<string, float> flowsMapORPHeap <- ["Inflows"::0.0, "ToHomeFields"::0.0, "ToBushFields"::0.0];
+	
+	//// Global manure heap functions
 	
 	date lastORPAddition <- starting_date;
 	action addWastesToHeaps {
@@ -36,10 +41,14 @@ global {
 
 species ORPHeap schedules: [] {
 	
+	//// Parameters
+	
 	household myHousehold;
 	
 	float heapNContent;
 	float heapCContent;
+	
+	//// Functions
 	
 	action addWastes {
 		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days

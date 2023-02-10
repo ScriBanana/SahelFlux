@@ -1,7 +1,7 @@
 /**
 * In: SahelFlux
 * Name: MobileHerds
-* Mobile herds.
+* Mobile herds processes and finite state machine
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
@@ -9,9 +9,11 @@
 model MobileHerd
 
 import "AnimalGroup.gaml"
-import "../SpatialEntities/Landscape.gaml"
+import "SpatialEntities/Landscape.gaml"
 
 global {
+	
+	//// Global mobile herds parameters
 	
 	//int nbHerds <- 10; // TODO DUMMY 84; // (Grillot et al, 2018)
 	float meanHerdSize <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018) TODO DUMMY
@@ -38,11 +40,11 @@ global {
 }
 
 species mobileHerd parent: animalGroup control: fsm skills: [moving] {
+	
+	//// Parameters
+	
 	rgb herdColour;
 	int herdSize min: 1; // TLU
-	
-	// Ownership
-	household myHousehold;
 	
 	// FSM parameters and variables
 	landscape targetCell;
@@ -68,6 +70,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	}
 	
 	//// FSM behaviour ////
+	
 	state isGoingToSleepSpot {
 		do goto on:(landscape where each.grazable) target: currentSleepSpot;
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
@@ -124,14 +127,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		transition to: isGrazing when: !restTime and hungry;
 	}
 	
-	//// Transhumance functions ////
+	//// Functions
+	
 	// TODO Utiliser capture, release, migrate ?
 	// species transhumance {
 	// 	species transhumingHerd parent: mobileHerd {}
 	// }
 	
-	
-	//// Functions ////
 	// Identify if current cell is suitable enough, in comparison to neighbouring cells.
 	list<landscape> checkSpotQuality { // and return visible cells.
 		list<landscape> cellsAround <- landscape at_distance herdVisionRadius; // TODO Seems to cause slow down

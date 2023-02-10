@@ -1,15 +1,18 @@
 /**
 * In: SahelFlux
-* Name: ExpeRun
-* Based on the internal empty template. 
+* Name: BasicRuns
+* Simplest experiments
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-model ExpeRun
+model BasicRuns
 
-import "Main.gaml"
+import "../Main.gaml"
 
 global {
+	
+	//// Global parameters
+	
 	bool secondaryDisplayRefresh <- false update: false;
 }
 

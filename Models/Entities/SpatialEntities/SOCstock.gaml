@@ -8,9 +8,13 @@
 
 model SOCstock
 
-import "../Main.gaml"
+import "Landscape.gaml"
+import "../../OutputProcesses/RecordFlows.gaml"
 
 global {
+	
+	//// Global SOC parameters
+	
 	// SOC model (ICBM) parameters
 	float edaphicClimateFactor <- 3.0; // Dimensionless; own regression
 	float kineticLabile <- 0.8; // Dimensionless; own regression
@@ -28,6 +32,8 @@ global {
 	
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
+	//// Global SOC functions
+	
 	date lastSOCComputation <- starting_date;
 	action updateSOCStocks {
 		write "Updating soils C pools.";
@@ -39,6 +45,8 @@ global {
 }
 
 species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégrer à Landscape???
+	
+	//// Parameters
 	
 	landscape myCell;
 	map<string, float> periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0]; // kg/cell
@@ -54,7 +62,9 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 //		diff(stableCPool, SOCProcessesPeriodLength) = humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool - kineticStable * edaphicClimateFactor * stableCPool;
 //	}
 	
-	action updateCarbonPools {
+	//// Functions
+	
+	action updateCarbonPools {		
 		SOCProcessesPeriodLength <- (current_date - lastSOCComputation);
 		
 		// Compute input // TODO very DUMMY

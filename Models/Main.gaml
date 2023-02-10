@@ -1,22 +1,26 @@
 /**
 * In: SahelFlux
 * Name: Main
-* Model main file.
+* SahelFlux model main file.
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
+* Find readme and up to date code at https://github.com/ScriBanana/SahelFlux.
 */
 
 
 model SahelFlux
 
-import "InitProcesses/UnitTests.gaml"
-import "SpatialEntities/Landscape.gaml"
-import "Agents/AnimalGroup.gaml"
-import "Agents/Household.gaml"
-import "ExpeRun.gaml"
-import "OutputProcesses/RecordFlows.gaml"
-import "OutputProcesses/ComputeOutputs.gaml"
+import "../Utilities/UnitTests.gaml"
+import "../Utilities/GenerateExportFiles.gaml"
+import "Entities/SpatialEntities/Landscape.gaml"
+import "Entities/AnimalGroup.gaml"
+import "Entities/Household.gaml"
+import "Experiments/BasicRuns.gaml"
 
 global {
+	
+	////	--------------------------	////
+	////	Global parameters	////
+	////	--------------------------	////
 	
 	// Simulation calendar
 	date starting_date <- date([2020, 11, 1, wakeUpTime - 1, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
@@ -30,7 +34,9 @@ global {
 	float visualUpdate <- 7.0 #week;
 	bool drySeason <- true; // If first day during dry season
 	
-	//// Global init ////
+	////	--------------------------	////
+	////			Global init			////
+	////	--------------------------	////
 	init {
 		do inputUnitTests;
 		
@@ -51,7 +57,9 @@ global {
 		write "Start date : " + starting_date;
 	}
 
-	//// Global scheduler ////
+	////	--------------------------	////
+	////	Global scheduler		////
+	////	--------------------------	////
 	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and current_date.hour = wakeUpTime and current_date.minute = 0){
 		do updateGlobalBiomassMeanAndSD;
 	}
@@ -102,11 +110,15 @@ global {
 		secondaryDisplayRefresh <- true;
 		
 	}
+
+	////	--------------------------	////
+	////		End statements		////
+	////	--------------------------	////
 	
-	// Break statement
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";
 		do gatherFlows;
+		do exportOutputData;
 		do pause;
 	}
 	
