@@ -84,7 +84,7 @@ global {
 			
 			match rainySeasonFirstMonth {
 			// Rainy season processes
-				write "	Rain season starts.";
+				write "	Rainy season starts.";
 				drySeason <- false;
 			}
 		}

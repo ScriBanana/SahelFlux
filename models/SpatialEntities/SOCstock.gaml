@@ -30,7 +30,7 @@ global {
 	
 	date lastSOCComputation <- starting_date;
 	action updateSOCStocks {
-		write "Updating C pools";
+		write "Updating soils C pools.";
 		ask SOCstock {
 			do updateCarbonPools;
 		}
@@ -41,8 +41,7 @@ global {
 species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégrer à Landscape???
 	
 	landscape myCell;
-	map<string, float> periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0]; // kg/ha
-	float periodCinput;
+	map<string, float> periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0]; // kg/cell
 	float labileCPool; // kgC/cell
 	float stableCPool; // kgC/cell
 	float totalSOC; // kgC/cell
@@ -57,11 +56,12 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 	
 	action updateCarbonPools {
 		SOCProcessesPeriodLength <- (current_date - lastSOCComputation);
-		// Compute input
-		// TODO very DUMMY
+		
+		// Compute input // TODO very DUMMY
 		CToBeEmittedInRainySeason <- periodCInputMap["HerdsDung"] * dummyCEmittedAtDungDepositFactor;
 		periodCInputMap["HerdsDung"] <- periodCInputMap["HerdsDung"] - CToBeEmittedInRainySeason;
-		periodCinput <- sum(periodCInputMap);
+		float periodCinput <- sum(periodCInputMap);
+		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
 		
 		// Flows to and from the two pools
 		float humifiedC <- (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
@@ -72,15 +72,13 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 		labileCPool <- labileCPool + periodCinput - humifiedC - emissionsFromLabile;
 		stableCPool <- stableCPool + humifiedC - emissionsFromStable;
 		totalSOC <- labileCPool + stableCPool;
+//		float periodSOCVar <- periodCinput - emissionsFromLabile - emissionsFromStable; // TODO a modifier selon le modèle de SCS?
 		
-		// Return flows for output indicators computation
-		return ["periodCinput"::periodCinput, "humifiedC"::humifiedC, "emissionsFromStable"::emissionsFromStable, "emissionsFromLabile"::emissionsFromLabile, "periodStableCVar"::(humifiedC - emissionsFromStable), "periodLabileCVar"::(periodCinput - humifiedC - emissionsFromLabile), "periodSOCVar"::periodCinput - emissionsFromLabile - emissionsFromStable]; // TODO periodSOCVar a modifier selon le modèle de SCS?
-		
-		// Reset input
-		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
-		periodCinput <- 0.0;
+		// Return flows for output indicators computation and save in flows map
+		// TODO scinder pertes et GHG
+		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
 	}
-
 	
 	aspect default {
 		location <- myCell.location;

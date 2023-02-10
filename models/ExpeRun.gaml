@@ -43,7 +43,7 @@ experiment Run type: gui {
 }
 
 experiment FastAutoRun parent: Run autorun: true {
-	parameter "Short run end date" var: endDate <- date([2020, 11, 4, eveningTime + 1, 0, 0]);
+	parameter "Short run end date" var: endDate <- date([2020, 12, 2, eveningTime + 1, 0, 0]);
 }
 
 experiment SOCDispRun parent: Run {
@@ -59,7 +59,6 @@ experiment SOCDispRun parent: Run {
 				data "Stable C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
 				data "Labile C rangeland" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
 				data "Stable C rangeland" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
-				data "C input" value: (SOCstock where (each.myCell.cellLU = "Rangeland")  mean_of each.periodCinput) / hectareToCell color: #darkgreen;
 			}
 		}
 	}
