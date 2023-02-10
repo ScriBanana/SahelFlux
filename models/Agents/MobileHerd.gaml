@@ -91,7 +91,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 
 	state isChangingSite {
 		enter {
-			targetCell <- one_of(landscape where (each.cellLU = "Rangeland"));
+			targetCell <- shuffle(landscape) first_with (each.cellLU = "Rangeland");
 		}
 
 		do checkSpotQuality;
@@ -103,7 +103,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 
 	state isGrazing {
 		enter {
-			landscape currentGrazingCell <- one_of(landscape overlapping self);
+			landscape currentGrazingCell <- first(landscape overlapping self);
 		}
 
 		list<landscape> cellsAround <- checkSpotQuality();

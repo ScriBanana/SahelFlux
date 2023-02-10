@@ -87,7 +87,7 @@ global {
 	}
 }
 
-species parcel parallel: true {
+species parcel parallel: true schedules: [] {
 	list<landscape> myCells;
 	household myOwner;
 	bool homeField <- false;

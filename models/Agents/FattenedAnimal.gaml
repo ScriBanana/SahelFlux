@@ -11,7 +11,7 @@ model FattenedAnimal
 
 import "AnimalGroup.gaml"
 
-species fattenedAnimal parent: animalGroup {
+species fattenedAnimal parent: animalGroup schedules: [] {
 	
 	action eat { // reflex ou scheduler?
 		float eatenQuantity <- 6.0; //TODO DUMMY

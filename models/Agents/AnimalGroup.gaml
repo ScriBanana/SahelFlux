@@ -22,7 +22,7 @@ global {
 	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
 }
 
-species animalGroup virtual: true {
+species animalGroup virtual: true schedules: [] { // Not sure if schedules is not already empty if virtual is true.
 	
 	// Digestion process and continuous emissions
 	list chymeChunksList;

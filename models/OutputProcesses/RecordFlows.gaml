@@ -39,9 +39,9 @@ global {
 		"OF-AtmoLosses"::0.0
 	];
 	int nbFlows <- length(flowsMapTemplate);
-	int nbInflows <- length(map(flowsMapTemplate.pairs where (each.key contains "IF-")));
-	int nbThroughflows <- length(map(flowsMapTemplate.pairs where (each.key contains "TF-")));
-	int nbOutflows <- length(map(flowsMapTemplate.pairs where (each.key contains "OF-")));
+	int nbInflows <- flowsMapTemplate.pairs count (each.key contains "IF-");
+	int nbThroughflows <- flowsMapTemplate.pairs count (each.key contains "TF-");
+	int nbOutflows <- flowsMapTemplate.pairs count (each.key contains "OF-");
 	
 	// Maps of flows for each pool
 	map<string, map> NFlowsMap;

@@ -26,7 +26,7 @@ global {
 	
 }
 
-species soilNProcesses parallel: true {
+species soilNProcesses parallel: true schedules: [] {
 	landscape myCell;
 	// Inflows of N within all other processes (public)
 	map<string, float> NInflows <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];

@@ -60,7 +60,7 @@ global {
 	}
 }
 
-species household {
+species household schedules: [] {
 	rgb householdColour;
 	// Links to other agents
 	list<parcel> myBushParcelsList;

@@ -58,7 +58,7 @@ global {
 	
 }
 
-grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 {
+grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 schedules: [] use_regular_agents: false {
 	
 	// Land unit
 	string cellLU;

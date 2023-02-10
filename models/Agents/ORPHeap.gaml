@@ -33,7 +33,7 @@ global {
 	
 }
 
-species ORPHeap {
+species ORPHeap schedules: [] {
 	
 	household myHousehold;
 	
