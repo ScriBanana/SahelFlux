@@ -110,9 +110,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent { // TODO Bon, à voir...
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
+			do goto on:(landscape where each.grazable) target: currentGrazingCell;
 		}
 
-		do goto on:(landscape where each.grazable) target: currentGrazingCell;
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isResting when: restTime or !hungry;
