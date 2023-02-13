@@ -76,6 +76,7 @@ global {
 			match drySeasonFirstMonth {
 			// Dry season processes
 				write "	Dry season starts.";
+				do updateParcelsCovers;
 				drySeason <- true;
 
 				// Compute grazable biomass contents

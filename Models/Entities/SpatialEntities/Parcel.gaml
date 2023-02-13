@@ -25,7 +25,9 @@ global {
 	
 	//// Global parcels functions
 	
-	action placeParcels {		
+	// Init functions
+	
+	action placeParcels {
 		// Instantiate parcels
 		write "Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
 
@@ -85,6 +87,7 @@ global {
 		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
 				self.homeField <- true;
+				parcelColour <- parcelColour / 1.6; // Arbitrary esthetic factor
 				listAllHomeParcels <+ self;
 				listAllBushParcels >- self;
 			}
@@ -101,6 +104,7 @@ global {
 				if homeField {
 					myRotation <- ["Millet"];
 					currentYearCover <- one_of(myRotation);
+					coverColourMap[currentYearCover] <- coverColourMap[currentYearCover] / 1.05; // Arbitrary esthetic factor
 				} else {
 					myRotation <- ["Millet", "Groundnut", "Fallow"];
 					float midXaxis <- centroid(world).x;
@@ -115,6 +119,16 @@ global {
 					}
 				}
 			}
+			rotationLength <- length(myRotation);
+		}
+	}
+	
+	// State update functions
+	
+	action updateParcelsCovers {
+		ask parcel {
+			int coverIdInRot <- myRotation index_of currentYearCover;
+			currentYearCover <- coverIdInRot >= rotationLength - 1 ? myRotation[0] : myRotation[coverIdInRot + 1];
 		}
 	}
 }
@@ -129,6 +143,7 @@ species parcel parallel: true schedules: [] {
 	bool partOfFallow <- false;
 	
 	list<string> myRotation;
+	int rotationLength;
 	string currentYearCover;
 	
 	rgb parcelColour;
@@ -137,11 +152,9 @@ species parcel parallel: true schedules: [] {
 		shape <- union(myCells);
 		switch parcelsAspect {
 			match "Owner" {
-				parcelColour <- homeField ? parcelColour / 1.6 : parcelColour; // Empirical esthetic factor
 				draw shape color: #transparent border: parcelColour;
 			}
 			match "Cover" {
-				coverColourMap[currentYearCover] <- homeField ? coverColourMap[currentYearCover] / 1.05 : coverColourMap[currentYearCover]; // Empirical esthetic factor
 				draw shape color: #transparent border: coverColourMap[currentYearCover];
 			}
 		}
