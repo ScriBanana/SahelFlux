@@ -21,6 +21,7 @@ global {
 	// Variables
 	list<parcel> listAllHomeParcels;
 	list<parcel> listAllBushParcels;
+	string parcelsAspect;
 	
 	//// Global parcels functions
 	
@@ -91,6 +92,13 @@ global {
 		}
 		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
 	}
+	
+	action initiateRotations {
+		ask parcel {
+			myRotation <- homeField ? ["Millet"] : (partOfFallow ? ["Millet", "Groundnut", "Fallow"] : ["Millet", "Groundnut"]);
+			currentYearCover <- one_of(myRotation);
+		}
+	}
 }
 
 species parcel parallel: true schedules: [] {
@@ -100,10 +108,23 @@ species parcel parallel: true schedules: [] {
 	list<landscape> myCells;
 	household myOwner;
 	bool homeField <- false;
+	bool partOfFallow <- false;
+	
+	list<string> myRotation;
+	string currentYearCover;
+	
 	rgb parcelColour;
+	map<string, rgb> coverColourMap <- ["Millet"::#yellow, "Groundnut"::#brown, "Fallow"::#green];
 	aspect default {
 		shape <- union(myCells);
-		draw shape color: #transparent border: parcelColour;
+		switch parcelsAspect {
+			match "Owner" {
+				draw shape color: #transparent border: parcelColour;
+			}
+			match "Cover" {
+				draw shape color: #transparent border: coverColourMap[currentYearCover];
+			}
+		}
 	}
 }
 

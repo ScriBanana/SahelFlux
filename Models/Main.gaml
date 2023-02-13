@@ -51,6 +51,7 @@ global {
 		do placeParcels;
 		do segregateBushFields;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
+		do initiateRotations;
 		do resetFlowsMaps;
 		
 		write "=== MODEL INITIALISED ===";

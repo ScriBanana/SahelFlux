@@ -36,11 +36,13 @@ experiment Run type: gui {
 	parameter "Initial soil carbon stock in croplands (kgC/ha)" category: "Calibration" var: croplandSOChaInit min: 0.0;
 	parameter "Initial soil carbon stock in rangelands (kgC/ha)" category: "Calibration" var: rangelandSOChaInit min: 0.0;
 	
+	parameter "Parcels borders as" category: "Display options" var: parcelsAspect <- "Owner" among: ["Owner", "Cover"];
+	
 	output {
 		display mainDisplay type: java2D {
 			grid landscape;
-			species mobileHerd;
 			species parcel;
+			species mobileHerd;
 		}
 	}
 }
