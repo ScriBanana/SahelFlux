@@ -51,9 +51,13 @@ species ORPHeap schedules: [] {
 	//// Functions
 	
 	action addWastes {
-		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days
-		heapNContent <- heapNContent + (kitchenWastesNInputRate + otherWastesInputRate * otherWastesNContent) * ORPAccumulationPeriodLength;
-		heapCContent <- heapCContent + (kitchenWasteInputRate * kitchenWastesCContent + otherWastesInputRate * otherWastesCContent) * ORPAccumulationPeriodLength;
+		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days TODO utiliser time
+		float wastesNAddition <- (kitchenWastesNInputRate + otherWastesInputRate * otherWastesNContent) * ORPAccumulationPeriodLength;
+		float wastesCAddition <- (kitchenWasteInputRate * kitchenWastesCContent + otherWastesInputRate * otherWastesCContent) * ORPAccumulationPeriodLength;
+		heapNContent <- heapNContent + wastesNAddition;
+		heapCContent <- heapCContent + wastesCAddition;
+		ask world {	do saveFlowInMap("N", "Households", "TF-ToORPHeaps" , wastesNAddition);}
+		ask world {	do saveFlowInMap("C", "Households", "TF-ToORPHeaps" , wastesCAddition);}
 	}
 	
 	action spreadORPOnParcels {
