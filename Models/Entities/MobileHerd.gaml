@@ -194,7 +194,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		// Save flows to flows map
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");
 		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool , float(excretaOutputs["excretedCarbon"]));}
-		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool, float(excretaOutputs["excretedCarbon"]));}
+		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool, float(excretaOutputs["faecesNitrogen"]) + float(excretaOutputs["urineNitrogen"]));}
 		
 	}
 	

@@ -32,7 +32,7 @@ global {
 		"TF-ToSpontVeget"::0.0,
 		"TF-ToWeeds"::0.0,
 		// Outflows
-		"OF-soldOnMarket"::0.0,
+		"OF-SoldOnMarket"::0.0,
 		"OF-GHG"::0.0,
 		"OF-AtmoLosses"::0.0
 	];
@@ -45,7 +45,7 @@ global {
 	map<string, map> NFlowsMap;
 	map<string, map> CFlowsMap;
 	
-	// Resets values of the flows map to 0.0
+	// Resets values of the flows map to 0.0, after data is gathered in the relevant matrix
 	action resetFlowsMaps {
 		NFlowsMap <- [
 				"Households"::copy(flowsMapTemplate),
@@ -81,7 +81,7 @@ global {
 	
 	// Flows matrix creation
 	matrix<float> NFlowsMatrix <- {nbFlows - nbOutflows, nbFlows - nbInflows} matrix_with 0.0;
-	matrix<float> CFlowsMatrix  <- {nbFlows - nbOutflows, nbFlows - nbInflows} matrix_with 0.0; // <- copy(NFlowsMatrix) might not work
+	matrix<float> CFlowsMatrix  <- {nbFlows - nbOutflows, nbFlows - nbInflows} matrix_with 0.0; // I'm scared of copy(NFlowsMatrix) now
 	
 	
 	//// Functions ////
@@ -93,19 +93,19 @@ global {
 		// N flows
 		int originPoolId <- 0;
 		loop poolFlowsMap over: NFlowsMap.pairs {
-			// In and throughflows on each line
-			map poolInAndThroughflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains_any ["IF-", "TF-"]));
-			loop recievingPoolId from: 0 to: nbInflows + nbThroughflows - 1 {
-				NFlowsMatrix[{recievingPoolId, originPoolId}] <-
-					NFlowsMatrix[{recievingPoolId, originPoolId}] +
-					float(poolInAndThroughflowsMap.values[recievingPoolId]);
+			// Inflows on each column of the pool's row
+			map poolInflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains "IF-"));
+			loop inflowId from: 0 to: nbInflows - 1 {
+				NFlowsMatrix[{inflowId, originPoolId}] <- // originPoolId is here actually the id of the receiving pool
+					NFlowsMatrix[{inflowId, originPoolId}] +
+					float(poolInflowsMap.values[inflowId]);
 			}
-			// Outflows on the relevant column
-			map poolOutflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains "OF-"));
-			loop recevingPoolId from: 0 to: nbOutflows - 1 {
-				NFlowsMatrix[{nbInflows + originPoolId, nbThroughflows + recevingPoolId}]  <-
-					NFlowsMatrix[{nbInflows + originPoolId, nbThroughflows + recevingPoolId}] +
-					int(poolOutflowsMap.values[recevingPoolId]);
+			// Outflows and throughflow on each line the pool's column
+			map poolThroughAndOutflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains_any ["TF-", "OF-"]));
+			loop recevingPoolId from: 0 to: nbThroughflows + nbOutflows - 1 {
+				NFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}]  <-
+					NFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}] +
+					int(poolThroughAndOutflowsMap.values[recevingPoolId]);
 			}
 			originPoolId <- originPoolId + 1;
 		}
@@ -115,19 +115,19 @@ global {
 		// C flows
 		originPoolId <- 0;
 		loop poolFlowsMap over: CFlowsMap.pairs {
-			// In and throughflows on each line
-			map poolInAndThroughflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains_any ["IF-", "TF-"]));
-			loop recievingPoolId from: 0 to: nbInflows + nbThroughflows - 1 {
-				CFlowsMatrix[{recievingPoolId, originPoolId}] <-
-					CFlowsMatrix[{recievingPoolId, originPoolId}] +
-					float(poolInAndThroughflowsMap.values[recievingPoolId]);
+			// Inflows on each column of the pool's row
+			map poolInflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains "IF-"));
+			loop inflowId from: 0 to: nbInflows - 1 {
+				CFlowsMatrix[{inflowId, originPoolId}] <- // originPoolId is here actually the id of the receiving pool
+					CFlowsMatrix[{inflowId, originPoolId}] +
+					float(poolInflowsMap.values[inflowId]);
 			}
-			// Outflows on the relevant column
-			map poolOutflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains "OF-"));
-			loop recevingPoolId from: 0 to: nbOutflows - 1 {
-				CFlowsMatrix[{nbInflows + originPoolId, nbThroughflows + recevingPoolId}]  <-
-					CFlowsMatrix[{nbInflows + originPoolId, nbThroughflows + recevingPoolId}] +
-					int(poolOutflowsMap.values[recevingPoolId]);
+			// Outflows and throughflow on each line the pool's column
+			map poolThroughAndOutflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains_any ["TF-", "OF-"]));
+			loop recevingPoolId from: 0 to: nbThroughflows + nbOutflows - 1 {
+				CFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}]  <-
+					CFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}] +
+					int(poolThroughAndOutflowsMap.values[recevingPoolId]);
 			}
 			originPoolId <- originPoolId + 1;
 		}
