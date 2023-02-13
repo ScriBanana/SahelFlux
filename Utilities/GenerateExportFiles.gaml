@@ -40,6 +40,6 @@ global {
 			save lineToSave to: outputDirectory + "SahelFlux-Out_CFlowsMatrix.csv" type: csv rewrite: false;
 			outputId <- outputId +1;
 		}
-		
+		write "... Done";
 	}
 }

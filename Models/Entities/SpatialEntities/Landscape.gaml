@@ -30,6 +30,7 @@ global {
 			grazable <- true;
 			create SOCstock with: [myCell::self] {
 				myself.mySOCstock <- self;
+				location <- myself.location;
 				
 				labileCPool <- myself.cellLU = "Cropland" ?
 					gauss(croplandSOCInit * labileCPoolProportionInit, croplandSOCInit * labileCPoolProportionInit * 0.1) : 
@@ -43,6 +44,7 @@ global {
 			}
 			create soilNProcesses with: [myCell::self] {
 				myself.mySoilNProcesses <- self;
+				location <- myself.location;
 			}
 		}
 	}
@@ -82,6 +84,32 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	
 	action biomassProduction {
 		// Computes plant biomass production at the end of the rain season
+		float thisYearNAvailable;
+		ask mySoilNProcesses {
+			thisYearNAvailable <- computeNAvailable();
+		}
+		
+		// Save flow in matrix
+		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
+		string receivingPool;
+		if cellLU = "Rangeland" {
+			receivingPool <- "TF-ToSpontVeget";
+		} else if myParcel != nil {
+			switch myParcel.currentYearCover {
+				match "Millet" {
+					receivingPool <- "TF-ToMillet";
+				}
+				match "Groundnut" {
+					receivingPool <- "TF-ToGroundnut";
+				}
+				match "Fallow" {
+					receivingPool <- "TF-ToFallowVeget";
+				}
+			}
+		} else {
+			receivingPool <- "TF-ToWeeds"; // TODO Gros bullshit
+		}
+		ask world {	do saveFlowInMap("N", emittingPool, receivingPool , thisYearNAvailable);} // TODO Assumes all N available is consumed...
 		
 		// Add photoshynthesis
 	}
@@ -100,7 +128,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	
 	// Colouring
 	action updateColour {
-		if cellLU = "Cropland" { // Ternary possible, but if statement more secure
+		if cellLU = "Cropland" { // Ternary possible, but if statement more secure and readable
 			color <- rgb(255 + (216 - 255) / maxCropBiomassContent * biomassContent, 255 + (232 - 255) / maxCropBiomassContent * biomassContent, 180);
 		} else if cellLU = "Rangeland" {
 			color <-

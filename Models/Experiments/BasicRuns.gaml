@@ -59,7 +59,7 @@ experiment SOCDispRun parent: Run {
 			species SOCstock;
 		}
 		
-		display SOCCompartiments refresh: every(1 #week) {
+		display SOCCompartiments refresh: secondaryDisplayRefresh {
 			chart "Average SOC per compartment (kgC/ha)" type: series {
 				data "Labile C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
 				data "Stable C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;

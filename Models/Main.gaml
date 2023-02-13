@@ -81,7 +81,7 @@ global {
 
 				// Compute grazable biomass contents
 				write "Computing plant biomass production.";
-				ask landscape where (each.cellLU = "Rangeland" or "Cropland") { // TODO grazable?
+				ask landscape where (each.cellLU = "Rangeland" or each.cellLU = "Cropland") { // TODO grazable?
 					do biomassProduction;
 				}
 
@@ -101,6 +101,10 @@ global {
 		
 		// Monthly processes
 		write string(date(time), "'		'M'/'y");
+				write "Computing plant biomass production.";
+				ask landscape where (each.cellLU = "Rangeland" or each.cellLU = "Cropland") { // TODO grazable?
+					do biomassProduction;
+				}
 		
 		do addWastesToHeaps;
 		do updateSOCStocks;

@@ -91,11 +91,8 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 	}
 	
 	aspect default {
-		location <- myCell.location;
-		
 		rgb carbonColourValue <- rgb(int(255 + (75 - 255) / maxCColor * totalSOC), int(255 + (52 - 255) / maxCColor * totalSOC), int(255 + (0 - 255) / maxCColor * totalSOC)); // TODO Not efficient, probably
 		draw rectangle(cellWidth, cellHeight) color: carbonColourValue;
-		
 	}
 	
 }

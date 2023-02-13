@@ -22,10 +22,14 @@ global {
 		"MineralFerti"::[1.0, 0.0, 0.0]
 	];
 	
-	float baseNFromSoilHomefields <- 27.5; // kgN/ha; Grillot et al., 2018
-	float baseNFromSoilBushfields <- 12.0; // kgN/ha; Grillot et al., 2018
-	float baseNAtmoMicroOrga <- 7.5; // kgN/ha; Grillot et al., 2018
-	float baseNAtmoGroundnut <- 20.0; // kgN/ha; Grillot et al., 2018
+	float baseNFromSoilHomefieldsHa <- 27.5; // kgN/ha; Grillot et al., 2018
+	float baseNFromSoilBushfieldsHa <- 12.0; // kgN/ha; Grillot et al., 2018
+	float baseNAtmoMicroOrgaHa <- 7.5; // kgN/ha; Grillot et al., 2018
+	float baseNAtmoGroundnutHa <- 20.0; // kgN/ha; Grillot et al., 2018
+	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectareToCell; // kgN/cell
+	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectareToCell; // kgN/cell
+	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell; // kgN/cell
+	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell; // kgN/cell
 	float baseNAtmoPerTree <- 4.0; // kgN; Grillot et al., 2018
 	
 }
@@ -49,12 +53,12 @@ species soilNProcesses parallel: true schedules: [] {
 		list<float> NAtmo <- computeNAtmo();
 		map<string, float> NFromDepositsAndAfterEffect<- computeNDepositsAndAfterEffect();
 		
-		float NAvailble <- NFromSoil + sum(NAtmo) + sum(NFromDepositsAndAfterEffect);
-		return NAvailble;
+		float NAvailable <- NFromSoil + sum(NAtmo) + sum(NFromDepositsAndAfterEffect);
+		return NAvailable;
 	}
 	
 	float computeNFromSoil {
-		float NFromSoil <- myCell.myParcel.homeField ? baseNFromSoilHomefields : baseNFromSoilBushfields; // Will return the value for bushfields in cropland not part of a parcel and rangeland.
+		float NFromSoil <- (myCell.myParcel != nil and myCell.myParcel.homeField) ? baseNFromSoilHomefields : baseNFromSoilBushfields; // Will return the value for bushfields in cropland not part of a parcel and rangeland.
 		// TODO Value for rangeland?
 		return NFromSoil;
 	}
