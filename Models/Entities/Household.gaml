@@ -25,7 +25,9 @@ global {
 	
 	action instantiateHouseholds {
 		write "Populating the village.";
-		assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
+		if nbHomeFieldsPerHh != 0 {
+			assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
+		}
 		create household number: nbHousehold {
 			householdColour <- rnd_color(255);
 			
@@ -33,7 +35,7 @@ global {
 			ask nbHomeFieldsPerHh among (listAllHomeParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;
 				myOwner.myHomeParcelsList <+ self;
-				self.parcelColour <- myself.householdColour / homeParcelsDimmingFactor;
+				self.parcelColour <- myself.householdColour;
 			}
 			ask nbBushFieldsPerHh among (listAllBushParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;

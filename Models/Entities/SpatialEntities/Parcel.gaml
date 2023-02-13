@@ -16,7 +16,7 @@ global {
 	int maxNbCroplandParcels <- 10000;
 	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
-	float homeParcelsDimmingFactor <- 1.6; // Mere esthetic parameter
+	bool fallowEnabled;
 	
 	// Variables
 	list<parcel> listAllHomeParcels;
@@ -85,18 +85,36 @@ global {
 		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
 				self.homeField <- true;
-				self.parcelColour <- self.parcelColour / homeParcelsDimmingFactor;
 				listAllHomeParcels <+ self;
 				listAllBushParcels >- self;
 			}
 		}
 		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
 	}
-	
+		
 	action initiateRotations {
 		ask parcel {
-			myRotation <- homeField ? ["Millet"] : (partOfFallow ? ["Millet", "Groundnut", "Fallow"] : ["Millet", "Groundnut"]);
-			currentYearCover <- one_of(myRotation);
+			if !fallowEnabled {
+				myRotation <- homeField ? ["Millet"] : ["Millet", "Groundnut"];
+				currentYearCover <- one_of(myRotation);
+			} else {
+				if homeField {
+					myRotation <- ["Millet"];
+					currentYearCover <- one_of(myRotation);
+				} else {
+					myRotation <- ["Millet", "Groundnut", "Fallow"];
+					float midXaxis <- centroid(world).x;
+					float midYaxis <- centroid(world).y;
+					// Divides the map into three quadrants, using the less flexible function to ever be written, because my last math lesson is far away
+					if location.x < midXaxis and (location.y < - sqrt(3) * (location.x - midXaxis) + midYaxis) and (location.y > sqrt(3) * (location.x - midXaxis) + midYaxis) { // Ugly as all hell and an insult to my all my math teachers. Sorry.
+						currentYearCover <- myRotation[0];
+					} else if location.y < midYaxis {
+						currentYearCover <- myRotation[1];
+					} else {
+						currentYearCover <- myRotation[2];
+					}
+				}
+			}
 		}
 	}
 }
@@ -119,9 +137,11 @@ species parcel parallel: true schedules: [] {
 		shape <- union(myCells);
 		switch parcelsAspect {
 			match "Owner" {
+				parcelColour <- homeField ? parcelColour / 1.6 : parcelColour; // Empirical esthetic factor
 				draw shape color: #transparent border: parcelColour;
 			}
 			match "Cover" {
+				coverColourMap[currentYearCover] <- homeField ? coverColourMap[currentYearCover] / 1.05 : coverColourMap[currentYearCover]; // Empirical esthetic factor
 				draw shape color: #transparent border: coverColourMap[currentYearCover];
 			}
 		}

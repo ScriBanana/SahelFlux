@@ -22,6 +22,7 @@ experiment Run type: gui {
 	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;
 	
 	parameter "Landscape layout" category: "Scenario - Spatial layout" var: gridLayout;
+	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- false;
 	parameter "Maximum numbre of parcels to place" category: "Scenario - Spatial layout" var: maxNbCroplandParcels min: 0;
 	parameter "Parcels radius (m) : Mean :: SD" category: "Scenario - Spatial layout" var: parcelRadiusDistri;
 	parameter "Home fields area radius (m)" category: "Scenario - Spatial layout" var: homeFieldsRadius min: 0.0;
