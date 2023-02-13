@@ -62,7 +62,7 @@ global {
 				"SpontVeg"::copy(flowsMapTemplate),
 				"Weeds"::copy(flowsMapTemplate)
 			];
-		CFlowsMap <- [ // Copy(NFlowsMap) doesn't work, apparently
+		CFlowsMap <- [ // Copy(a template) doesn't work, apparently
 				"Households"::copy(flowsMapTemplate),
 				"MobileHerds"::copy(flowsMapTemplate),
 				"FattenedAn"::copy(flowsMapTemplate),
