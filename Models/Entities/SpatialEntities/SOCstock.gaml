@@ -74,9 +74,9 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
 		
 		// Flows to and from the two pools
-		float humifiedC <- (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
-		float emissionsFromLabile <- ((1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
-		float emissionsFromStable <- (kineticStable * edaphicClimateFactor * stableCPool) / SOCProcessesPeriodLength;
+		float humifiedC <- humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool * SOCProcessesPeriodLength;
+		float emissionsFromLabile <- (1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool * SOCProcessesPeriodLength;
+		float emissionsFromStable <- kineticStable * edaphicClimateFactor * stableCPool * SOCProcessesPeriodLength;
 
 		// Update pools SOC content
 		labileCPool <- labileCPool + periodCinput - humifiedC - emissionsFromLabile;
