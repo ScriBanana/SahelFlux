@@ -21,8 +21,8 @@ global {
 	float kineticStable <- 0.01; // Dimensionless; own regression
 	float humificationCoef <- 0.05; // Dimensionless; own regression
 	
-	float croplandSOChaInit <- 8900.0; // kgC/ha; Loum selon Ndour TODO sourcer + à assigner aux LU
-	float rangelandSOChaInit <- 11100.0; // kgC/ha; Loum selon Ndour TODO sourcer + à assigner aux LU
+	float croplandSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020 TODO sourcer + à assigner aux LU
+	float rangelandSOChaInit <- 11100.0; // kgC/ha; Loum selon Ndour 2020 TODO sourcer + à assigner aux LU
 	float croplandSOCInit <- croplandSOChaInit * hectareToCell; // kgC/cell
 	float rangelandSOCInit <- rangelandSOChaInit * hectareToCell; // kgC/cell
 	float labileCPoolProportionInit <- 0.2; // own regression
@@ -74,13 +74,13 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
 		
 		// Flows to and from the two pools
-		float humifiedC <- humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool * SOCProcessesPeriodLength;
-		float emissionsFromLabile <- (1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool * SOCProcessesPeriodLength;
-		float emissionsFromStable <- kineticStable * edaphicClimateFactor * stableCPool * SOCProcessesPeriodLength;
+		float humifiedC <- (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
+		float emissionsFromLabile <- ((1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
+		float emissionsFromStable <- (kineticStable * edaphicClimateFactor * stableCPool) / SOCProcessesPeriodLength;
 
 		// Update pools SOC content
-		labileCPool <- labileCPool + periodCinput - humifiedC - emissionsFromLabile;
-		stableCPool <- stableCPool + humifiedC - emissionsFromStable;
+		labileCPool <- labileCPool + periodCinput - (humifiedC + emissionsFromLabile) * SOCProcessesPeriodLength;
+		stableCPool <- stableCPool + (humifiedC - emissionsFromStable) * SOCProcessesPeriodLength;
 		totalSOC <- labileCPool + stableCPool;
 //		float periodSOCVar <- periodCinput - emissionsFromLabile - emissionsFromStable; // TODO a modifier selon le modèle de SCS?
 		
