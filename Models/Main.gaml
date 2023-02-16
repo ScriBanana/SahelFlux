@@ -11,6 +11,7 @@ model SahelFlux
 
 import "../Utilities/UnitTests.gaml"
 import "../Utilities/GenerateExportFiles.gaml"
+import "Entities/GlobalProcesses.gaml"
 import "Entities/SpatialEntities/Landscape.gaml"
 import "Entities/AnimalGroup.gaml"
 import "Entities/Household.gaml"
