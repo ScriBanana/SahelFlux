@@ -28,6 +28,7 @@ global {
 	date endDate <- date([2022, 10, 31, eveningTime + 1, 0, 0]);
 	int drySeasonFirstMonth <- 11;
 	int rainySeasonFirstMonth <- 7;
+	int lengthRainySeason <- drySeasonFirstMonth - rainySeasonFirstMonth;
 	
 	// Time step parameters
 	float step <- 30.0 #minutes;
@@ -45,10 +46,6 @@ global {
 		// All actions defined in related species files.
 		do assignLUFromRaster;
 		do initGrazableCells;
-		ask landscape where each.grazable {
-			do drySeasonStartUpdateGrazBiomassContent; // Redundant with first month, but allows clean init
-			do updateColour;
-		}
 		do placeParcels;
 		do segregateBushFields;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
@@ -60,10 +57,17 @@ global {
 	}
 
 	////	--------------------------	////
-	////	Global scheduler		////
+	////	Global scheduler	////
 	////	--------------------------	////
+	
 	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and current_date.hour = wakeUpTime and current_date.minute = 0){
 		do updateGlobalBiomassMeanAndSD;
+		
+		if !drySeason { // TODO faire gaffe au scheduling, notamment en début de saison
+			ask landscape where each.biomassProducer {
+					do growBiomass;
+			}
+		}
 	}
 
 	reflex monthStep when: (current_date != (starting_date add_hours 1) and (current_date.day = 1 and current_date.hour = wakeUpTime and current_date.minute = 0)) {
@@ -79,24 +83,19 @@ global {
 				write "	Dry season starts.";
 				do updateParcelsCovers;
 				drySeason <- true;
-
-				// Compute grazable biomass contents
-				write "Computing plant biomass production.";
-				ask landscape where (each.cellLU = "Rangeland" or each.cellLU = "Cropland") { // TODO grazable?
-					do biomassProduction;
-				}
-
-				// Compute grazable biomass contents
-				write "Computing grazable biomass contents.";
-				ask landscape where each.grazable {
-					do drySeasonStartUpdateGrazBiomassContent;
-				}
+				
 			}
 			
 			match rainySeasonFirstMonth {
 			// Rainy season processes
 				write "	Rainy season starts.";
 				drySeason <- false;
+				
+				write "Computing plant biomass production for the upcoming rainy season.";
+				ask landscape where each.biomassProducer {
+					do computeYearlyBiomassProduction;
+				}
+				
 			}
 		}
 		
@@ -105,7 +104,7 @@ global {
 		
 		do addWastesToHeaps;
 		do updateSOCStocks;
-		ask landscape where each.grazable {
+		ask landscape where each.biomassProducer {
 			do updateColour;
 		}
 		

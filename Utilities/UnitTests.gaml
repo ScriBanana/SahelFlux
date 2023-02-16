@@ -16,6 +16,7 @@ global {
 		
 		// Main
 		assert starting_date < endDate;
+		assert lengthRainySeason > 0;
 		
 		// Parcel
 		assert parcelRadiusDistri.value > 0.0 and parcelRadiusDistri.key >= 0.0;

@@ -54,6 +54,7 @@ species soilNProcesses parallel: true schedules: [] {
 		map<string, float> NFromDepositsAndAfterEffect<- computeNDepositsAndAfterEffect();
 		
 		float NAvailable <- NFromSoil + sum(NAtmo) + sum(NFromDepositsAndAfterEffect);
+		assert NAvailable >=0;
 		return NAvailable;
 	}
 	

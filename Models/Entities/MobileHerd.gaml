@@ -72,7 +72,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	//// FSM behaviour ////
 	
 	state isGoingToSleepSpot {
-		do goto on:(landscape where each.grazable) target: currentSleepSpot;
+		do goto on:(landscape where each.crossableByHerds) target: currentSleepSpot;
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}
 
@@ -98,7 +98,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		}
 
 		do checkSpotQuality;
-		do goto on:(landscape where each.grazable) target: targetCell;
+		do goto on:(landscape where each.crossableByHerds) target: targetCell;
 		
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isGrazing when: isInGoodSpot;
@@ -113,7 +113,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent { // TODO Bon, à voir...
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
-			do goto on:(landscape where each.grazable) target: currentGrazingCell;
+			do goto on:(landscape where each.crossableByHerds) target: currentGrazingCell;
 		}
 
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
@@ -166,6 +166,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		string eatenBiomassType <- currentCell.cellLU;
 		float eatenQuantity <- eatenBiomassType = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd;
 		ask cellToGraze {
+			// TODO manque un failsafe quand la BM est à zero
 			self.biomassContent <- self.biomassContent - eatenQuantity;
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;

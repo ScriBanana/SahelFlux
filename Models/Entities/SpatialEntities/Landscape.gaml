@@ -12,6 +12,7 @@ import "../../../Utilities/ImportZoning.gaml"
 import "Parcel.gaml"
 import "SOCstock.gaml"
 import "SoilNProcesses.gaml"
+import "../GlobalProcesses.gaml"
 
 global {
 	
@@ -22,12 +23,21 @@ global {
 	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
 	
+	int minimumRainfallYieldInflexion <- 317; // mm
+	int maximumRainfallYieldInflexion <- 805; // mm
+	int minimumNAvailableNRFInflexion <- 18; // kgN/ha
+	int maximumNAvailableNRFInflexion <- 83; // kgN/ha
+	
 	
 	//// Global landscape functions
 	
 	action initGrazableCells {
 		ask landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland") {
-			grazable <- true;
+			crossableByHerds <- true;
+			biomassProducer <- true;
+			
+			biomassContent <- cellLU = "Cropland" ? gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1) : gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1);
+			
 			create SOCstock with: [myCell::self] {
 				myself.mySOCstock <- self;
 				location <- myself.location;
@@ -46,7 +56,9 @@ global {
 				myself.mySoilNProcesses <- self;
 				location <- myself.location;
 			}
-		}
+			
+			do updateColour;
+		}	
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze
@@ -54,7 +66,7 @@ global {
 	float biomassContentSD;
 	action updateGlobalBiomassMeanAndSD {
 		list<float> allCellsBiomass;
-		ask landscape where (each.grazable) {
+		ask landscape where each.biomassProducer {
 			allCellsBiomass <+ self.biomassContent;
 		}
 		meanBiomassContent <- mean(allCellsBiomass);
@@ -69,7 +81,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	
 	// Land unit
 	string cellLU;
-	bool grazable <- false;
+	bool biomassProducer <- false;
+	bool crossableByHerds <- false;
 	int nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY
 	// Part of a parcel
 	parcel myParcel;
@@ -79,51 +92,119 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	
 	// Grazable biomass
 	float biomassContent min: 0.0 max: max(maxCropBiomassContent, maxRangelandBiomassContent); // TODO hmmmmm
+	float yearlyBiomassToBeProduced;
 	
 	//// Functions
 	
-	action biomassProduction {
-		// Computes plant biomass production at the end of the rain season
+	action growBiomass {
+		// To be called regularly during the rainy season
+		
+	}
+	
+	action computeYearlyBiomassProduction {
+		// Computes plant biomass production at the start of the rainy season
+		
+		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
+		string receivingPool;
+		
 		float thisYearNAvailable;
 		ask mySoilNProcesses {
 			thisYearNAvailable <- computeNAvailable();
 		}
 		
-		// Save flow in matrix
-		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
-		string receivingPool;
+		float waterLimitedYieldHa;
+		float nitrogenReductionFactor;
+		
 		if cellLU = "Rangeland" {
 			receivingPool <- "TF-ToSpontVeget";
+			
+			switch yearRainfall {
+				match_between [-#infinity, minimumRainfallYieldInflexion - 1] {
+					waterLimitedYieldHa <- 0.0;
+				} match_between [minimumRainfallYieldInflexion, maximumRainfallYieldInflexion] {
+					waterLimitedYieldHa <- 1000 * (0.4322 * ln (yearRainfall) - 1.195);
+				} match_between [maximumRainfallYieldInflexion + 1, #infinity] {
+					waterLimitedYieldHa <- 3775.0;
+				}
+			}
+			
+			switch thisYearNAvailable {
+				match_between [-#infinity, minimumNAvailableNRFInflexion - 1] {
+					nitrogenReductionFactor <- 0.25;
+				} match_between [minimumNAvailableNRFInflexion, maximumNAvailableNRFInflexion] {
+					nitrogenReductionFactor <- 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012;
+				} match_between [maximumNAvailableNRFInflexion + 1, #infinity] {
+					nitrogenReductionFactor <- 1.0;
+				}
+			}
+			
 		} else if myParcel != nil {
 			switch myParcel.currentYearCover {
+				
 				match "Millet" {
 					receivingPool <- "TF-ToMillet";
-				}
-				match "Groundnut" {
+					switch yearRainfall {
+						match_between [-#infinity, minimumRainfallYieldInflexion - 1] {
+							waterLimitedYieldHa <- 0.0;
+						} match_between [minimumRainfallYieldInflexion, maximumRainfallYieldInflexion] {
+							waterLimitedYieldHa <- 950 * (1.8608 * ln (yearRainfall) - 8.6756);
+						} match_between [maximumRainfallYieldInflexion + 1, #infinity] {
+							waterLimitedYieldHa <- 3775.0;
+						}
+					}
+					
+					switch thisYearNAvailable {
+						match_between [-#infinity, minimumNAvailableNRFInflexion - 1] {
+							nitrogenReductionFactor <- 0.25;
+						} match_between [minimumNAvailableNRFInflexion, maximumNAvailableNRFInflexion] {
+							nitrogenReductionFactor <- 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179;
+						} match_between [maximumNAvailableNRFInflexion + 1, #infinity] {
+							nitrogenReductionFactor <- 1.0;
+						}
+					}
+					
+				} match "Groundnut" {
 					receivingPool <- "TF-ToGroundnut";
-				}
-				match "Fallow" {
+					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
+					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
+					
+				} match "Fallow" {
 					receivingPool <- "TF-ToFallowVeget";
+					// Same as rangeland veg
+					switch yearRainfall {
+						match_between [-#infinity, minimumRainfallYieldInflexion - 1] {
+							waterLimitedYieldHa <- 0.0;
+						} match_between [minimumRainfallYieldInflexion, maximumRainfallYieldInflexion] {
+							waterLimitedYieldHa <- 1000 * (0.4322 * ln (yearRainfall) - 1.195);
+						} match_between [maximumRainfallYieldInflexion + 1, #infinity] {
+							waterLimitedYieldHa <- 3775.0;
+						}
+					}
+					
+					switch thisYearNAvailable {
+						match_between [-#infinity, minimumNAvailableNRFInflexion - 1] {
+							nitrogenReductionFactor <- 0.25;
+						} match_between [minimumNAvailableNRFInflexion, maximumNAvailableNRFInflexion] {
+							nitrogenReductionFactor <- 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012;
+						} match_between [maximumNAvailableNRFInflexion + 1, #infinity] {
+							nitrogenReductionFactor <- 1.0;
+						}
+					}
+					
 				}
 			}
 		} else {
 			receivingPool <- "TF-ToWeeds"; // TODO Gros bullshit
 		}
-		ask world {	do saveFlowInMap("N", emittingPool, receivingPool , thisYearNAvailable);} // TODO Assumes all N available is consumed...
 		
-		// Add photoshynthesis
-	}
-	
-	action drySeasonStartUpdateGrazBiomassContent {
-		// Updates biomass content in cells at the start of the dry season
-		// TODO ajouter la weed en addition
-		if cellLU = "Cropland" {
-			//TODO
-			biomassContent <- gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1);
-		} else if cellLU = "Rangeland" {
-			//TODO
-			biomassContent <- gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1);
-		}
+		// Registering N flows
+		ask world {	do saveFlowInMap("N", emittingPool, receivingPool , thisYearNAvailable);} // Assumes all N available is consumed.
+		
+		// TODO Add photoshynthesis
+		
+		// Producing biomass
+		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
+		assert yearlyBiomassToBeProduced >= 0;
 	}
 	
 	// Colouring
