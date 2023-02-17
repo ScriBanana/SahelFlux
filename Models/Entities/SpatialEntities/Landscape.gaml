@@ -91,33 +91,41 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	soilNProcesses mySoilNProcesses;
 	
 	// Grazable biomass
-	float biomassContent min: 0.0 max: max(maxCropBiomassContent, maxRangelandBiomassContent); // TODO hmmmmm
+	float biomassContent min: 0.0;
+	float thisYearNAvailable;
+	string thisYearReceivingPool;
 	float yearlyBiomassToBeProduced;
-	float yearlyWeedsBiomass;
+	float yearlyWeedsBiomassToBeProduced;
 	
 	//// Functions
 	
-	action growBiomass {
+	action growBiomass (int nbBiophUpdatesDuringRainySeason) {
 		// To be called regularly during the rainy season
 		
+		// Grow biomass
+		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
+		
+		// Registering N flows
+		float NFlowsToSaveEachCall <- thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
+		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearReceivingPool , NFlowsToSaveEachCall);} // Assumes all N available is consumed.
+		
+		// TODO Add photoshynthesis
 	}
 	
 	action computeYearlyBiomassProduction {
 		// Computes plant biomass production at the start of the rainy season
 		
-		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
-		string receivingPool;
 		
-		float thisYearNAvailable;
 		ask mySoilNProcesses {
-			thisYearNAvailable <- computeNAvailable();
+			myself.thisYearNAvailable <- computeNAvailable();
 		}
 		
 		float waterLimitedYieldHa;
 		float nitrogenReductionFactor;
 		
 		if cellLU = "Rangeland" {
-			receivingPool <- "TF-ToSpontVeget";
+			thisYearReceivingPool <- "TF-ToSpontVeget";
 			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 			
@@ -125,17 +133,17 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 			switch myParcel.currentYearCover {
 				
 				match "Millet" {
-					receivingPool <- "TF-ToMillet";
+					thisYearReceivingPool <- "TF-ToMillet";
 					waterLimitedYieldHa <- max(0.0, min(3775.0, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
 				
 				} match "Groundnut" {
-					receivingPool <- "TF-ToGroundnut";
+					thisYearReceivingPool <- "TF-ToGroundnut";
 					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
 					
 				} match "Fallow" {
-					receivingPool <- "TF-ToFallowVeget";
+					thisYearReceivingPool <- "TF-ToFallowVeget";
 					// Same as rangeland veg
 				waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 				nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
@@ -143,18 +151,14 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 				}
 			}
 		} else {
-			receivingPool <- "TF-ToWeeds"; // TODO Gros bullshit
+			thisYearReceivingPool <- "TF-ToWeeds"; // TODO Gros bullshit
 		}
-		
-		// Registering N flows
-		ask world {	do saveFlowInMap("N", emittingPool, receivingPool , thisYearNAvailable);} // Assumes all N available is consumed.
-		
-		// TODO Add photoshynthesis
 		
 		// Producing biomass
 		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
 		assert yearlyBiomassToBeProduced >= 0;
-		yearlyWeedsBiomass <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
+		yearlyWeedsBiomassToBeProduced <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
+		
 	}
 	
 	// Colouring

@@ -26,15 +26,17 @@ global {
 	// Simulation calendar
 	date starting_date <- date([2020, 11, 1, wakeUpTime - 1, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
 	date endDate <- date([2022, 10, 31, eveningTime + 1, 0, 0]);
-	int drySeasonFirstMonth <- 11;
+	int drySeasonFirstMonth <- 11; // Tweaks have to be made to run with new year during the rainy season
 	int rainySeasonFirstMonth <- 7;
-	int lengthRainySeason <- drySeasonFirstMonth - rainySeasonFirstMonth;
 	
 	// Time step parameters
 	float step <- 30.0 #minutes;
-	int biophysicalProcessesUpdateFreq <- 14; // In days
-	float visualUpdate <- 7.0 #week;
-	bool drySeason <- true; // If first day during dry season
+	int biophysicalProcessesUpdateFreq <- 15; // In days
+	
+	// Time related variables
+	bool drySeason;
+	int lengthRainySeason <- int(milliseconds_between(date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])) / 86400000.0); // days. Weird, but hard to find better
+	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
 	
 	////	--------------------------	////
 	////			Global init			////
@@ -43,7 +45,8 @@ global {
 		do inputUnitTests;
 		
 		write "=== MODEL INITIALISATION ===";
-		// All actions defined in related species files.
+		drySeason <- !(starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth);
+		// All init actions defined in related species files.
 		do assignLUFromRaster;
 		do initGrazableCells;
 		do placeParcels;
@@ -58,7 +61,7 @@ global {
 	}
 
 	////	--------------------------	////
-	////	Global scheduler	////
+	////	Global scheduler		////
 	////	--------------------------	////
 	
 	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and current_date.hour = wakeUpTime and current_date.minute = 0){
@@ -66,7 +69,7 @@ global {
 		
 		if !drySeason { // TODO faire gaffe au scheduling, notamment en début de saison
 			ask landscape where each.biomassProducer {
-					do growBiomass;
+					do growBiomass(nbBiophUpdatesDuringRainySeason);
 			}
 		}
 	}
