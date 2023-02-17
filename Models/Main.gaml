@@ -50,6 +50,7 @@ global {
 		do segregateBushFields;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
 		do initiateRotations;
+		do updateMeteo;
 		do resetFlowsMaps;
 		
 		write "=== MODEL INITIALISED ===";
@@ -76,6 +77,7 @@ global {
 			match 1 {
 			// New year processes
 				write string(current_date, "'	Y'y");
+				do updateMeteo;
 			}
 
 			match drySeasonFirstMonth {

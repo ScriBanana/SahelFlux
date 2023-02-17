@@ -23,10 +23,10 @@ global {
 	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
 	
-	int minimumRainfallYieldInflexion <- 317; // mm
-	int maximumRainfallYieldInflexion <- 805; // mm
-	int minimumNAvailableNRFInflexion <- 18; // kgN/ha
-	int maximumNAvailableNRFInflexion <- 83; // kgN/ha
+	float weedProdRangelandHa <- 475.0; // kgDM/ha Grillot 2018
+	float weedProdCroplandHa <- 100.0; // kgDM/ha Grillot 2018
+	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
+	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	
 	
 	//// Global landscape functions
@@ -93,6 +93,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	// Grazable biomass
 	float biomassContent min: 0.0 max: max(maxCropBiomassContent, maxRangelandBiomassContent); // TODO hmmmmm
 	float yearlyBiomassToBeProduced;
+	float yearlyWeedsBiomass;
 	
 	//// Functions
 	
@@ -117,52 +118,17 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 		
 		if cellLU = "Rangeland" {
 			receivingPool <- "TF-ToSpontVeget";
-			
-			switch yearRainfall {
-				match_between [-#infinity, minimumRainfallYieldInflexion - 1] {
-					waterLimitedYieldHa <- 0.0;
-				} match_between [minimumRainfallYieldInflexion, maximumRainfallYieldInflexion] {
-					waterLimitedYieldHa <- 1000 * (0.4322 * ln (yearRainfall) - 1.195);
-				} match_between [maximumRainfallYieldInflexion + 1, #infinity] {
-					waterLimitedYieldHa <- 3775.0;
-				}
-			}
-			
-			switch thisYearNAvailable {
-				match_between [-#infinity, minimumNAvailableNRFInflexion - 1] {
-					nitrogenReductionFactor <- 0.25;
-				} match_between [minimumNAvailableNRFInflexion, maximumNAvailableNRFInflexion] {
-					nitrogenReductionFactor <- 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012;
-				} match_between [maximumNAvailableNRFInflexion + 1, #infinity] {
-					nitrogenReductionFactor <- 1.0;
-				}
-			}
+			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
+			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 			
 		} else if myParcel != nil {
 			switch myParcel.currentYearCover {
 				
 				match "Millet" {
 					receivingPool <- "TF-ToMillet";
-					switch yearRainfall {
-						match_between [-#infinity, minimumRainfallYieldInflexion - 1] {
-							waterLimitedYieldHa <- 0.0;
-						} match_between [minimumRainfallYieldInflexion, maximumRainfallYieldInflexion] {
-							waterLimitedYieldHa <- 950 * (1.8608 * ln (yearRainfall) - 8.6756);
-						} match_between [maximumRainfallYieldInflexion + 1, #infinity] {
-							waterLimitedYieldHa <- 3775.0;
-						}
-					}
-					
-					switch thisYearNAvailable {
-						match_between [-#infinity, minimumNAvailableNRFInflexion - 1] {
-							nitrogenReductionFactor <- 0.25;
-						} match_between [minimumNAvailableNRFInflexion, maximumNAvailableNRFInflexion] {
-							nitrogenReductionFactor <- 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179;
-						} match_between [maximumNAvailableNRFInflexion + 1, #infinity] {
-							nitrogenReductionFactor <- 1.0;
-						}
-					}
-					
+					waterLimitedYieldHa <- max(0.0, min(3775.0, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
+					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
+				
 				} match "Groundnut" {
 					receivingPool <- "TF-ToGroundnut";
 					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
@@ -171,26 +137,9 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 				} match "Fallow" {
 					receivingPool <- "TF-ToFallowVeget";
 					// Same as rangeland veg
-					switch yearRainfall {
-						match_between [-#infinity, minimumRainfallYieldInflexion - 1] {
-							waterLimitedYieldHa <- 0.0;
-						} match_between [minimumRainfallYieldInflexion, maximumRainfallYieldInflexion] {
-							waterLimitedYieldHa <- 1000 * (0.4322 * ln (yearRainfall) - 1.195);
-						} match_between [maximumRainfallYieldInflexion + 1, #infinity] {
-							waterLimitedYieldHa <- 3775.0;
-						}
-					}
-					
-					switch thisYearNAvailable {
-						match_between [-#infinity, minimumNAvailableNRFInflexion - 1] {
-							nitrogenReductionFactor <- 0.25;
-						} match_between [minimumNAvailableNRFInflexion, maximumNAvailableNRFInflexion] {
-							nitrogenReductionFactor <- 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012;
-						} match_between [maximumNAvailableNRFInflexion + 1, #infinity] {
-							nitrogenReductionFactor <- 1.0;
-						}
-					}
-					
+				waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
+				nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
+				
 				}
 			}
 		} else {
@@ -205,6 +154,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 		// Producing biomass
 		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
 		assert yearlyBiomassToBeProduced >= 0;
+		yearlyWeedsBiomass <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
 	}
 	
 	// Colouring

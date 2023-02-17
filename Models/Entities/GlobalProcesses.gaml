@@ -23,6 +23,7 @@ global {
 	//// Global external processes functions
 	
 	action updateMeteo {
+		write "Setting meteorological conditions for the year to come.";
 		switch meteoUpdateType {
 			match "Fixed" {
 				yearRainfall <- meanRainfall;
