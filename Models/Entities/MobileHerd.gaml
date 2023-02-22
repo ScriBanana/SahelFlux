@@ -66,14 +66,11 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	landscape targetCell;
 	bool isInGoodSpot <- false;
 	
-	init {
-		speed <- herdSpeed;
-	}
-	
 	//// FSM behaviour
 	
 	state isGoingToSleepSpot {
-		do goto on:(landscape where each.crossableByHerds) target: currentSleepSpot;
+		do goto on: grazableLandscape speed: herdSpeed target: currentSleepSpot recompute_path: false;
+		
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}
 
@@ -99,7 +96,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 		}
 
 		do checkSpotQuality;
-		do goto on:(landscape where each.crossableByHerds) target: targetCell;
+		if !isInGoodSpot {
+			do goto on: grazableLandscape target: targetCell speed: herdSpeed recompute_path: false;
+		}
 		
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isGrazing when: isInGoodSpot;
@@ -107,14 +106,14 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 
 	state isGrazing {
 		enter {
-			landscape currentGrazingCell <- first(landscape overlapping self);
+			landscape currentGrazingCell <- currentCell;
 		}
 
 		list<landscape> cellsAround <- checkSpotQuality();
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent { // TODO Bon, à voir...
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
-			do goto on:(landscape where each.crossableByHerds) target: currentGrazingCell;
+			do goto target: currentGrazingCell speed: herdSpeed recompute_path: false; // No topology since resource consuming and unnecessary for a short herdVisionRadius
 		}
 
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced

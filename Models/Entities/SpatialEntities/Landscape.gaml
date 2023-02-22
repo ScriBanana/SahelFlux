@@ -8,6 +8,7 @@
 
 model Landscape
 
+import "../../Main.gaml"
 import "../../../Utilities/ImportZoning.gaml"
 import "Parcel.gaml"
 import "SOCstock.gaml"
@@ -28,6 +29,7 @@ global {
 	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
 	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	
+	list<landscape> grazableLandscape;
 	
 	//// Global landscape functions
 	
@@ -58,7 +60,8 @@ global {
 			}
 			
 			do updateColour;
-		}	
+		}
+		grazableLandscape <- landscape where each.crossableByHerds;
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
@@ -77,7 +80,7 @@ global {
 	
 }
 
-grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 schedules: [] use_regular_agents: false {
+grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 optimizer: "JPS" schedules: [] use_regular_agents: false {
 	
 	//// Parameters
 	

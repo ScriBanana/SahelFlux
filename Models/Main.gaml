@@ -15,7 +15,6 @@ import "Entities/GlobalProcesses.gaml"
 import "Entities/SpatialEntities/Landscape.gaml"
 import "Entities/AnimalGroup.gaml"
 import "Entities/Household.gaml"
-import "Experiments/BasicRuns.gaml"
 
 global {
 	
@@ -124,9 +123,6 @@ global {
 		ask landscape where each.biomassProducer {
 			do updateColour;
 		}
-		
-		// Refresh display
-		secondaryDisplayRefresh <- true;
 		
 	}
 

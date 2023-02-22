@@ -8,7 +8,6 @@
 
 model Household
 
-import "../Main.gaml"
 import "SpatialEntities/Parcel.gaml"
 import "MobileHerd.gaml"
 import "FattenedAnimal.gaml"
@@ -84,7 +83,7 @@ species household schedules: [] {
 	ORPHeap myORPHeap;
 	
 	action checkTranshuCondition {
-		if (myForagePileBiomassContent + sumBiomassContent) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu or !drySeason {
+		if (myForagePileBiomassContent + sumBiomassContent) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu {
 			write "" + myMobileHerd + " leaving for transhu";
 			ask transhumance {
 				capture myself.myMobileHerd as: transhumingHerd {

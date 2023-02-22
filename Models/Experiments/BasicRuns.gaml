@@ -9,13 +9,6 @@ model BasicRuns
 
 import "../Main.gaml"
 
-global {
-	
-	//// Global parameters
-	
-	bool secondaryDisplayRefresh <- false update: false;
-}
-
 experiment Run type: gui {
 	// Parameters - Tests in UnitTests.gaml
 	parameter "Start date" category: "Scenario - Time" var: starting_date;
@@ -51,17 +44,26 @@ experiment Run type: gui {
 }
 
 experiment FastAutoRun parent: Run autorun: true {
-	parameter "Short run end date" var: endDate <- date([2020, 12, 2, eveningTime + 1, 0, 0]);
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 100 min: 0;
+	parameter "Short run end date" var: endDate <- date([2020, 12, 30, eveningTime + 1, 0, 0]);
+}
+
+experiment FallowtoRun parent: Run autorun: true {
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0;
+	parameter "Short run start date" var: starting_date <- date([2020, 6, 22, eveningTime + 1, 0, 0]);
+	parameter "Short run end date" var: endDate <- date([2020, 12, 30, eveningTime + 1, 0, 0]);
+	parameter "Parcels borders as" category: "Display options" var: parcelsAspect <- "Cover" among: ["Owner", "Cover"];
+	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- true;
 }
 
 experiment SOCDispRun parent: Run {
 	output {
-		display carbonDisplay type: java2D refresh: secondaryDisplayRefresh {
+		display carbonDisplay type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
 			grid landscape;
 			species SOCstock;
 		}
 		
-		display SOCCompartiments refresh: secondaryDisplayRefresh {
+		display SOCCompartiments refresh:  current_date.day = 1 and updateTimeOfDay {
 			chart "Average SOC per compartment (kgC/ha)" type: series {
 				data "Labile C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
 				data "Stable C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
