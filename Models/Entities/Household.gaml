@@ -8,10 +8,12 @@
 
 model Household
 
+import "../Main.gaml"
 import "SpatialEntities/Parcel.gaml"
 import "MobileHerd.gaml"
 import "FattenedAnimal.gaml"
 import "ORPHeap.gaml"
+import "Transhumance.gaml"
 
 global {
 	
@@ -20,6 +22,8 @@ global {
 	int nbHousehold; // Parameter
 	int nbBushFieldsPerHh <- 10; // TODO Dummy
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
+	
+	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary
 	
 	//// Global households functions
 	
@@ -68,7 +72,7 @@ global {
 
 species household schedules: [] {
 	
-	//// Parameters
+	//// Variables
 	
 	rgb householdColour;
 	// Links to other agents
@@ -76,8 +80,19 @@ species household schedules: [] {
 	list<parcel> myHomeParcelsList;
 	mobileHerd myMobileHerd;
 	fattenedAnimal myFattenedAnimals;
-	float foragePile;
+	float myForagePileBiomassContent;
 	ORPHeap myORPHeap;
+	
+	action checkTranshuCondition {
+		if (myForagePileBiomassContent + sumBiomassContent) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu or !drySeason {
+			write "" + myMobileHerd + " leaving for transhu";
+			ask transhumance {
+				capture myself.myMobileHerd as: transhumingHerd {
+//					myHousehold.myTranshumingMobileHerd <- self;
+				}
+			}
+		}
+	}
 	
 }
 

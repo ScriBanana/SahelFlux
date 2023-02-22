@@ -30,7 +30,6 @@ global {
 	
 	date lastORPAddition <- starting_date;
 	action addWastesToHeaps {
-		write "Adding wastes to manure heaps.";
 		ask ORPHeap {
 			do addWastes;
 		}

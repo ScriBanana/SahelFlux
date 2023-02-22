@@ -61,7 +61,8 @@ global {
 		}	
 	}
 	
-	// Aggregation of biomass content for herds to identify cells to move to and graze
+	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
+	float sumBiomassContent;
 	float meanBiomassContent;
 	float biomassContentSD;
 	action updateGlobalBiomassMeanAndSD {
@@ -69,6 +70,7 @@ global {
 		ask landscape where each.biomassProducer {
 			allCellsBiomass <+ self.biomassContent;
 		}
+		sumBiomassContent <- sum(allCellsBiomass);
 		meanBiomassContent <- mean(allCellsBiomass);
 		biomassContentSD <- standard_deviation(allCellsBiomass);
 	}
@@ -99,7 +101,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 s
 	
 	//// Functions
 	
-	action growBiomass (int nbBiophUpdatesDuringRainySeason) {
+	action growBiomass {
 		// To be called regularly during the rainy season
 		
 		// Grow biomass

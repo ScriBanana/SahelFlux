@@ -43,12 +43,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	
 	//// Parameters
 	
+	// General
 	rgb herdColour;
-	int herdSize min: 1; // TLU
-	
-	// FSM parameters and variables
-	landscape targetCell;
-	bool isInGoodSpot <- false;
+	int herdSize min: 1; // TLU TODO à bouger dans AnimalGroup?
 	
 	// Paddocking parameters and variables
 	parcel myPaddock;
@@ -65,11 +62,15 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
 	landscape currentCell update: first(landscape overlapping self);
 	
+	// FSM parameters and variables
+	landscape targetCell;
+	bool isInGoodSpot <- false;
+	
 	init {
 		speed <- herdSpeed;
 	}
 	
-	//// FSM behaviour ////
+	//// FSM behaviour
 	
 	state isGoingToSleepSpot {
 		do goto on:(landscape where each.crossableByHerds) target: currentSleepSpot;
@@ -128,11 +129,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] {
 	}
 	
 	//// Functions
-	
-	// TODO Utiliser capture, release, migrate ?
-	// species transhumance {
-	// 	species transhumingHerd parent: mobileHerd {}
-	// }
 	
 	// Identify if current cell is suitable enough, in comparison to neighbouring cells.
 	list<landscape> checkSpotQuality { // and return visible cells.

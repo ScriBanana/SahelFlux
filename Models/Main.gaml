@@ -24,7 +24,8 @@ global {
 	////	--------------------------	////
 	
 	// Simulation calendar
-	date starting_date <- date([2020, 11, 1, wakeUpTime - 1, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
+	int startHour <- wakeUpTime - 1;
+	date starting_date <- date([2020, 11, 1, startHour, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
 	date endDate <- date([2022, 10, 31, eveningTime + 1, 0, 0]);
 	int drySeasonFirstMonth <- 11; // Tweaks have to be made to run with new year during the rainy season
 	int rainySeasonFirstMonth <- 7;
@@ -37,6 +38,7 @@ global {
 	bool drySeason;
 	int lengthRainySeason <- int(milliseconds_between(date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])) / 86400000.0); // days. Weird, but hard to find better
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
+	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
 	
 	////	--------------------------	////
 	////			Global init			////
@@ -52,6 +54,7 @@ global {
 		do placeParcels;
 		do segregateBushFields;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
+		create transhumance;
 		do initiateRotations;
 		do updateMeteo;
 		do resetFlowsMaps;
@@ -64,17 +67,24 @@ global {
 	////	Global scheduler		////
 	////	--------------------------	////
 	
-	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and current_date.hour = wakeUpTime and current_date.minute = 0){
+	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay){
+		
 		do updateGlobalBiomassMeanAndSD;
 		
-		if !drySeason { // TODO faire gaffe au scheduling, notamment en début de saison
+		if drySeason {
+			ask household where !dead(each.myMobileHerd) {
+				do checkTranshuCondition;
+			}
+		} else { // TODO faire gaffe au scheduling, notamment en début de saison
 			ask landscape where each.biomassProducer {
-					do growBiomass(nbBiophUpdatesDuringRainySeason);
+					do growBiomass;
 			}
 		}
+		
+		
 	}
 
-	reflex monthStep when: (current_date != (starting_date add_hours 1) and (current_date.day = 1 and current_date.hour = wakeUpTime and current_date.minute = 0)) {
+	reflex monthStep when: (current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay)) {
 		
 		switch current_date.month {
 			match 1 {
@@ -88,7 +98,9 @@ global {
 				write "	Dry season starts.";
 				do updateParcelsCovers;
 				drySeason <- true;
-				
+				ask transhumance {
+					do returnHerdsToLandscape;
+				}
 			}
 			
 			match rainySeasonFirstMonth {
