@@ -39,7 +39,7 @@ global {
 	
 }
 
-species mobileHerd parent: animalGroup control: fsm skills: [moving] {
+species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: true {
 	
 	//// Parameters
 	

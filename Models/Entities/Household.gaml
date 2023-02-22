@@ -19,6 +19,7 @@ global {
 	//// Global households parameters
 	
 	int nbHousehold; // Parameter
+	int nbTranshumantHh;
 	int nbBushFieldsPerHh <- 10; // TODO Dummy
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
 	
@@ -64,6 +65,9 @@ global {
 				
 			}
 		}
+		ask nbTranshumantHh among household {
+			isTranshumant <- true;
+		}
 		assert mobileHerd min_of each.herdSize > 0;
 		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds.";
 	}
@@ -74,6 +78,7 @@ species household schedules: [] {
 	//// Variables
 	
 	rgb householdColour;
+	bool isTranshumant <- false;
 	// Links to other agents
 	list<parcel> myBushParcelsList;
 	list<parcel> myHomeParcelsList;
@@ -82,13 +87,13 @@ species household schedules: [] {
 	float myForagePileBiomassContent;
 	ORPHeap myORPHeap;
 	
+	//// Functions
+	
 	action checkTranshuCondition {
 		if (myForagePileBiomassContent + sumBiomassContent) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu {
-			write "" + myMobileHerd + " leaving for transhu";
+			write "" + myMobileHerd + " is leaving for transhumance.";
 			ask transhumance {
-				capture myself.myMobileHerd as: transhumingHerd {
-//					myHousehold.myTranshumingMobileHerd <- self;
-				}
+				capture myself.myMobileHerd as: transhumingHerd;
 			}
 		}
 	}

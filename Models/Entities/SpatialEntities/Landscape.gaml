@@ -35,7 +35,6 @@ global {
 	
 	action initGrazableCells {
 		ask landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland") {
-			crossableByHerds <- true;
 			biomassProducer <- true;
 			
 			biomassContent <- cellLU = "Cropland" ? gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1) : gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1);
@@ -61,7 +60,7 @@ global {
 			
 			do updateColour;
 		}
-		grazableLandscape <- landscape where each.crossableByHerds;
+		grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
@@ -87,7 +86,6 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	// Land unit
 	string cellLU;
 	bool biomassProducer <- false;
-	bool crossableByHerds <- false;
 	int nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY
 	// Part of a parcel
 	parcel myParcel;

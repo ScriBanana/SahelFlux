@@ -18,6 +18,9 @@ global {
 		assert starting_date < endDate;
 		assert lengthRainySeason > 0;
 		
+		// Households
+		assert nbHousehold >= nbTranshumantHh;
+		
 		// Parcel
 		assert parcelRadiusDistri.value > 0.0 and parcelRadiusDistri.key >= 0.0;
 		

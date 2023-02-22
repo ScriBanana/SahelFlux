@@ -71,7 +71,7 @@ global {
 		do updateGlobalBiomassMeanAndSD;
 		
 		if drySeason {
-			ask household where !dead(each.myMobileHerd) {
+			ask household where (each.isTranshumant and !dead(each.myMobileHerd)) {
 				do checkTranshuCondition;
 			}
 		} else { // TODO faire gaffe au scheduling, notamment en début de saison
@@ -79,7 +79,6 @@ global {
 					do growBiomass;
 			}
 		}
-		
 		
 	}
 
@@ -100,12 +99,25 @@ global {
 				ask transhumance {
 					do returnHerdsToLandscape;
 				}
+				if fallowEnabled {
+					grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
+				}
 			}
 			
 			match rainySeasonFirstMonth {
 			// Rainy season processes
 				write "	Rainy season starts.";
 				drySeason <- false;
+				
+				write "Sending remaining transhuming herds to transhumance";
+				ask transhumance {
+					capture mobileHerd where (each.myHousehold.isTranshumant) as: transhumingHerd;
+				}
+				
+				if fallowEnabled {
+					write "Restrincting mobility to fallows and rangelands.";
+					grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
+				}
 				
 				write "Computing plant biomass production for the upcoming rainy season.";
 				ask landscape where each.biomassProducer {
