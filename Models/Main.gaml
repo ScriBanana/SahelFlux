@@ -115,8 +115,7 @@ global {
 				}
 				
 				if fallowEnabled {
-					write "Restrincting mobility to fallows and rangelands.";
-					grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
+					do transitionToFallows;
 				}
 				
 				write "Computing plant biomass production for the upcoming rainy season.";

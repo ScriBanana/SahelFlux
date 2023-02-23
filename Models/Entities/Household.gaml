@@ -55,6 +55,7 @@ global {
 			] {	
 				myHousehold.myMobileHerd <- self;
 				// Paddocking initialisation
+				myPaddockList <- copy(myHousehold.myHomeParcelsList);
 				do resetSleepSpot;
 				location <- currentSleepSpot.location;
 			}

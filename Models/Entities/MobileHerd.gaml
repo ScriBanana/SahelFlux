@@ -33,13 +33,27 @@ global {
 	// Zootechnical data
 	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
 	float IIRRangelandTLU <- 14.2; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
-	float IIRCroplandTLU <- 10.9;// instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
+	float IIRCroplandTLU <- 10.9; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	
 	float ratioExcretionIngestion <- 0.55; // TODO DUMMY Dung excreted over ingested biomass (dry matter). Source : Wade (2016)
 	
+	//// Global mobile herds functions
+	action transitionToFallows {
+		write "Restrincting mobility to fallows and rangelands.";
+		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
+		
+		migrate mobileHerd target: mobileHerdInFallows {
+			list<parcel> lastRemainingPaddockList <- remainingPaddocks;
+			// Manque les cells et le nb de nuits
+			myPaddockList <- copy(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow"));
+			do resetSleepSpot;
+			self.location <- currentSleepSpot.location;
+		}
+	}
+	
 }
 
-species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: true {
+species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: true { // Parallel dangerous? Anyway, saves a lot of computation time
 	
 	//// Parameters
 	
@@ -52,6 +66,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	landscape currentSleepSpot;
 	int nbNightInCurrentSleepSpot;
 	list<landscape> remainingSleepSpots;
+	list<parcel> myPaddockList;
 	list<parcel> remainingPaddocks;
 	
 	// Grazing parameters and variables
@@ -140,7 +155,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	action resetSleepSpot {
 		if length(remainingSleepSpots) <= 1 {
 			if length(remainingPaddocks) <= 1 {
-				remainingPaddocks <- copy(myHousehold.myHomeParcelsList);
+				remainingPaddocks <- myPaddockList;
 				myPaddock <- first(remainingPaddocks);
 				remainingSleepSpots <- copy(myPaddock.myCells) sort_by each;
 				currentSleepSpot <- first(remainingSleepSpots);
@@ -199,3 +214,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	}
 }
 
+species mobileHerdInFallows parent: mobileHerd {
+	
+}
