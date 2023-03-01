@@ -40,7 +40,6 @@ experiment Run type: gui {
 			grid landscape;
 			species parcel;
 			species mobileHerd;
-			species mobileHerdInFallows;
 		}
 	}
 }

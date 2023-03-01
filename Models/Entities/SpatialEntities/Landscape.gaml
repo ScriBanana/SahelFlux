@@ -119,7 +119,6 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	action computeYearlyBiomassProduction {
 		// Computes plant biomass production at the start of the rainy season
 		
-		
 		ask mySoilNProcesses {
 			myself.thisYearNAvailable <- computeNAvailable();
 		}

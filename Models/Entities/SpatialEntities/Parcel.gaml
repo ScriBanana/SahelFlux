@@ -140,7 +140,6 @@ species parcel parallel: true schedules: [] {
 	list<landscape> myCells;
 	household myOwner;
 	bool homeField <- false;
-	bool partOfFallow <- false;
 	
 	list<string> myRotation;
 	int rotationLength;

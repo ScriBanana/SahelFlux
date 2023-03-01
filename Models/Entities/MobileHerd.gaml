@@ -38,16 +38,32 @@ global {
 	float ratioExcretionIngestion <- 0.55; // TODO DUMMY Dung excreted over ingested biomass (dry matter). Source : Wade (2016)
 	
 	//// Global mobile herds functions
+	
 	action transitionToFallows {
-		write "Restrincting mobility to fallows and rangelands.";
+		write "Restrincting remaining herds to fallows and contiguous rangelands.";
 		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
-		
-		migrate mobileHerd target: mobileHerdInFallows {
-			list<parcel> lastRemainingPaddockList <- remainingPaddocks;
-			// Manque les cells et le nb de nuits
-			myPaddockList <- copy(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow"));
+		list<parcel> fallowParcelWithNoFallowOwnerList <- listAllBushParcels where (each.myOwner = nil or each.myOwner.isTranshumant);
+		ask mobileHerd where !(each.myHousehold.isTranshumant) {
+			
+			// Store paddocking data for next dry season
+			lastDSPaddock <- currentPaddock;
+			lastDSSleepSpot <- currentSleepSpot;
+			lastDSNbNightInCurrentSleepSpot <- nbNightInCurrentSleepSpot;
+			lastDSRemainingSleepSpots <- remainingSleepSpots;
+			lastDSPaddockList <- myPaddockList;
+			lastDSRemainingPaddocks <- remainingPaddocks;
+			
+			// Transition to fallow
+			if !empty(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow")) {
+				myPaddockList <- copy(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow"));
+			} else {
+				myPaddockList <- 3 among (fallowParcelWithNoFallowOwnerList); // TODO dummy and can still cause trouble if several herds get tied to the same parcel
+			}
+			remainingSleepSpots <- [];
+			remainingPaddocks <- [];
 			do resetSleepSpot;
 			self.location <- currentSleepSpot.location;
+			self.currentCell <- currentSleepSpot;
 		}
 	}
 	
@@ -62,12 +78,20 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	int herdSize min: 1; // TLU TODO à bouger dans AnimalGroup?
 	
 	// Paddocking parameters and variables
-	parcel myPaddock;
+	parcel currentPaddock;
 	landscape currentSleepSpot;
 	int nbNightInCurrentSleepSpot;
 	list<landscape> remainingSleepSpots;
 	list<parcel> myPaddockList;
 	list<parcel> remainingPaddocks;
+	
+	// Variables to store the latter, meant for scenarios where fallow is enabled
+	parcel lastDSPaddock;
+	landscape lastDSSleepSpot;
+	int lastDSNbNightInCurrentSleepSpot;
+	list<landscape> lastDSRemainingSleepSpots;
+	list<parcel> lastDSPaddockList;
+	list<parcel> lastDSRemainingPaddocks;
 	
 	// Grazing parameters and variables
 	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize; // kgDM/herd/day
@@ -128,7 +152,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent { // TODO Bon, à voir...
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
-			do goto target: currentGrazingCell speed: herdSpeed recompute_path: false; // No topology since resource consuming and unnecessary for a short herdVisionRadius
+			do goto on: grazableLandscape target: currentGrazingCell speed: herdSpeed recompute_path: false;
 		}
 
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
@@ -156,13 +180,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		if length(remainingSleepSpots) <= 1 {
 			if length(remainingPaddocks) <= 1 {
 				remainingPaddocks <- myPaddockList;
-				myPaddock <- first(remainingPaddocks);
-				remainingSleepSpots <- copy(myPaddock.myCells) sort_by each;
+				currentPaddock <- first(remainingPaddocks);
+				remainingSleepSpots <- copy(currentPaddock.myCells) sort_by each;
 				currentSleepSpot <- first(remainingSleepSpots);
 			} else {
-				remainingPaddocks >- myPaddock;
-				myPaddock <- first(remainingPaddocks);
-				remainingSleepSpots <- copy(myPaddock.myCells) sort_by each;
+				remainingPaddocks >- currentPaddock;
+				currentPaddock <- first(remainingPaddocks);
+				remainingSleepSpots <- copy(currentPaddock.myCells) sort_by each;
 				currentSleepSpot <- first(remainingSleepSpots);
 			}
 		} else {
@@ -209,11 +233,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		
 	}
 	
+	//// Aspect
+	
 	aspect default {
 		draw square(sqrt(cellWidth ^ 2 / 2) * 0.8) rotated_by 45.0 color: herdColour border: #black;
 	}
-}
-
-species mobileHerdInFallows parent: mobileHerd {
-	
 }

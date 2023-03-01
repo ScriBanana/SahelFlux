@@ -69,8 +69,9 @@ global {
 		ask nbTranshumantHh among household {
 			isTranshumant <- true;
 		}
+		
 		assert mobileHerd min_of each.herdSize > 0;
-		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds.";
+		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants.";
 	}
 }
 
