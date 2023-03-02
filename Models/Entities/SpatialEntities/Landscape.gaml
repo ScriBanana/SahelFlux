@@ -149,8 +149,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				} match "Fallow" {
 					thisYearReceivingPool <- "TF-ToFallowVeget";
 					// Same as rangeland veg
-				waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
-				nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
+					waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
+					nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 				
 				}
 			}

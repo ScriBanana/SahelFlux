@@ -21,6 +21,10 @@ global {
 	float kineticStable <- 0.01; // Dimensionless; own regression
 	float humificationCoef <- 0.05; // Dimensionless; own regression
 	
+	float criticalNbStepForDiscretisation <- 2 / (kineticLabile * edaphicClimateFactor); // Computed for Euler method.
+	// The critical time for the stable pool is way higher than this, so we only take this one.
+	float boundaryNbStepForDiscretisation <- 0.8 * criticalNbStepForDiscretisation; // 0.8 factor for safety
+	
 	float croplandSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020 TODO sourcer + à assigner aux LU
 	float rangelandSOChaInit <- 11100.0; // kgC/ha; Loum selon Ndour 2020 TODO sourcer + à assigner aux LU
 	float croplandSOCInit <- croplandSOChaInit * hectareToCell; // kgC/cell
@@ -34,13 +38,14 @@ global {
 	
 	//// Global SOC functions
 	
-	date lastSOCComputation <- starting_date;
+	int lastSOCComputation <- 0;
 	action updateSOCStocks {
 		write "Updating soils C pools.";
+		int SOCProcessesPeriodLength <- cycle - lastSOCComputation;
+		lastSOCComputation <- cycle;
 		ask SOCstock {
-			do updateCarbonPools;
+			do updateCarbonPools (SOCProcessesPeriodLength);
 		}
-		lastSOCComputation <- current_date;
 	}
 }
 
@@ -54,7 +59,6 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 	float stableCPool; // kgC/cell
 	float totalSOC; // kgC/cell
 	float CToBeEmittedInRainySeason;
-	float SOCProcessesPeriodLength;
 	
 //	// ICBM model (Andrén & Kätterer, 1997)
 //	equation ICBM {
@@ -64,30 +68,38 @@ species SOCstock parallel: true schedules: [] { // TODO parent/ mirror/ intégre
 	
 	//// Functions
 	
-	action updateCarbonPools {		
-		SOCProcessesPeriodLength <- (current_date - lastSOCComputation);
+	action updateCarbonPools (int periodLength) {
 		
 		// Compute input // TODO very DUMMY
 		CToBeEmittedInRainySeason <- periodCInputMap["HerdsDung"] * dummyCEmittedAtDungDepositFactor;
 		periodCInputMap["HerdsDung"] <- periodCInputMap["HerdsDung"] - CToBeEmittedInRainySeason;
-		float periodCinput <- sum(periodCInputMap);
+		float periodCInput <- sum(periodCInputMap);
 		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
-		
+		periodCInput <- periodCInput + 1000;
 		// Flows to and from the two pools
-		float humifiedC <- (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
-		float emissionsFromLabile <- ((1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
-		float emissionsFromStable <- (kineticStable * edaphicClimateFactor * stableCPool) / SOCProcessesPeriodLength;
-
-		// Update pools SOC content
-		labileCPool <- labileCPool + periodCinput - (humifiedC + emissionsFromLabile) * SOCProcessesPeriodLength;
-		stableCPool <- stableCPool + (humifiedC - emissionsFromStable) * SOCProcessesPeriodLength;
+//		float humifiedC <- (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
+//		float emissionsFromLabile <- ((1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool) / SOCProcessesPeriodLength;
+//		float emissionsFromStable <- (kineticStable * edaphicClimateFactor * stableCPool) / SOCProcessesPeriodLength;
+//		
+		// Update pools SOC content using Euler method (semi-implicit for stableCPool)
+		int solverIterations <- int(ceil(1 / boundaryNbStepForDiscretisation)); // = 2
+		float solverDeltaT <- boundaryNbStepForDiscretisation / solverIterations; // = 0.5
+		loop i from: 0 to: solverIterations {
+			labileCPool <- labileCPool + (periodCInput - kineticLabile * edaphicClimateFactor * labileCPool) * solverDeltaT;
+			stableCPool <- stableCPool + (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool - kineticStable * edaphicClimateFactor * stableCPool) * solverDeltaT;
+		}
 		totalSOC <- labileCPool + stableCPool;
+
+
+//		labileCPool <- labileCPool + periodCinput - (humifiedC + emissionsFromLabile) * SOCProcessesPeriodLength;
+//		stableCPool <- stableCPool + (humifiedC - emissionsFromStable) * SOCProcessesPeriodLength;
+//		totalSOC <- labileCPool + stableCPool;
 //		float periodSOCVar <- periodCinput - emissionsFromLabile - emissionsFromStable; // TODO a modifier selon le modèle de SCS?
 		
 		// Return flows for output indicators computation and save in flows map
 		// TODO scinder pertes et GHG
-		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
-		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
+//		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+//		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
 	}
 	
 	aspect default {
