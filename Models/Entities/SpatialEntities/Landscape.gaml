@@ -30,6 +30,7 @@ global {
 	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	
 	list<landscape> grazableLandscape;
+	list<landscape> targetableCellsForChangingSite;
 	
 	//// Global landscape functions
 	
@@ -61,6 +62,7 @@ global {
 			do updateColour;
 		}
 		grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
+		targetableCellsForChangingSite <- landscape where (each.cellLU = "Rangeland");
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance

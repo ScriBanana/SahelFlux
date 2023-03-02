@@ -100,7 +100,7 @@ global {
 					do returnHerdsToLandscape;
 				}
 				if fallowEnabled {
-					grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
+					do transitionFromFallows;
 				}
 			}
 			

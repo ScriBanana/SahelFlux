@@ -41,8 +41,12 @@ global {
 	
 	action transitionToFallows {
 		write "Restrincting remaining herds to fallows and contiguous rangelands.";
+		// Restrict grazable area
 		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
+		targetableCellsForChangingSite <- landscape where (each.myParcel != nil and each.myParcel.currentYearCover = "Fallow");
+		
 		list<parcel> fallowParcelWithNoFallowOwnerList <- listAllBushParcels where (each.myOwner = nil or each.myOwner.isTranshumant);
+		
 		ask mobileHerd where !(each.myHousehold.isTranshumant) {
 			
 			// Store paddocking data for next dry season
@@ -64,6 +68,22 @@ global {
 			do resetSleepSpot;
 			self.location <- currentSleepSpot.location;
 			self.currentCell <- currentSleepSpot;
+		}
+	}
+	
+	action transitionFromFallows {
+		// Unrestrict grazable area
+		grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
+		targetableCellsForChangingSite <- landscape where (each.cellLU = "Rangeland");
+		
+		ask mobileHerd where !(each.myHousehold.isTranshumant) {
+			// Set padocking variable to those of the last dry season
+			currentPaddock <- lastDSPaddock;
+			currentSleepSpot <- lastDSSleepSpot;
+			nbNightInCurrentSleepSpot <- lastDSNbNightInCurrentSleepSpot;
+			remainingSleepSpots <- lastDSRemainingSleepSpots;
+			myPaddockList <- lastDSPaddockList;
+			remainingPaddocks <- lastDSRemainingPaddocks;
 		}
 	}
 	
@@ -131,7 +151,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 
 	state isChangingSite {
 		enter {
-			targetCell <- shuffle(landscape) first_with (each.cellLU = "Rangeland");
+			targetCell <- one_of(targetableCellsForChangingSite);
 		}
 
 		do checkSpotQuality;
@@ -146,13 +166,14 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	state isGrazing {
 		enter {
 			landscape currentGrazingCell <- currentCell;
+			list<landscape> cellsAround <- checkSpotQuality();
 		}
 
-		list<landscape> cellsAround <- checkSpotQuality();
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent { // TODO Bon, à voir...
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
 			do goto on: grazableLandscape target: currentGrazingCell speed: herdSpeed recompute_path: false;
+			cellsAround <- checkSpotQuality();
 		}
 
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
