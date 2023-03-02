@@ -69,6 +69,9 @@ global {
 	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay){
 		
 		do updateGlobalBiomassMeanAndSD;
+		ask landscape where each.biomassProducer {
+			do updateColour;
+		}
 		
 		if drySeason {
 			ask household where (each.isTranshumant and !dead(each.myMobileHerd)) {
@@ -115,6 +118,7 @@ global {
 				}
 				
 				if fallowEnabled {
+					write "Restricting herd movement to fallows";
 					do transitionToFallows;
 				}
 				
@@ -131,9 +135,6 @@ global {
 		
 		do addWastesToHeaps;
 		do updateSOCStocks;
-		ask landscape where each.biomassProducer {
-			do updateColour;
-		}
 		
 	}
 

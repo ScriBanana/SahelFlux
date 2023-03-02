@@ -29,6 +29,7 @@ global {
 	int dailyRestEndTime <- 15; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	bool restTime <- false update: abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2;
 	int maxNbNightsPerCellInPaddock <- 4; // Field data TODO Doit être un UBT/cell demandé à Jonathan
+	int maxNbFallowPaddock <- 2; // TODO Confirm
 	
 	// Zootechnical data
 	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
@@ -36,56 +37,6 @@ global {
 	float IIRCroplandTLU <- 10.9; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	
 	float ratioExcretionIngestion <- 0.55; // TODO DUMMY Dung excreted over ingested biomass (dry matter). Source : Wade (2016)
-	
-	//// Global mobile herds functions
-	
-	action transitionToFallows {
-		write "Restrincting remaining herds to fallows and contiguous rangelands.";
-		// Restrict grazable area
-		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
-		targetableCellsForChangingSite <- landscape where (each.myParcel != nil and each.myParcel.currentYearCover = "Fallow");
-		
-		list<parcel> fallowParcelWithNoFallowOwnerList <- listAllBushParcels where (each.myOwner = nil or each.myOwner.isTranshumant);
-		
-		ask mobileHerd where !(each.myHousehold.isTranshumant) {
-			
-			// Store paddocking data for next dry season
-			lastDSPaddock <- currentPaddock;
-			lastDSSleepSpot <- currentSleepSpot;
-			lastDSNbNightInCurrentSleepSpot <- nbNightInCurrentSleepSpot;
-			lastDSRemainingSleepSpots <- remainingSleepSpots;
-			lastDSPaddockList <- myPaddockList;
-			lastDSRemainingPaddocks <- remainingPaddocks;
-			
-			// Transition to fallow
-			if !empty(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow")) {
-				myPaddockList <- copy(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow"));
-			} else {
-				myPaddockList <- 3 among (fallowParcelWithNoFallowOwnerList); // TODO dummy and can still cause trouble if several herds get tied to the same parcel
-			}
-			remainingSleepSpots <- [];
-			remainingPaddocks <- [];
-			do resetSleepSpot;
-			self.location <- currentSleepSpot.location;
-			self.currentCell <- currentSleepSpot;
-		}
-	}
-	
-	action transitionFromFallows {
-		// Unrestrict grazable area
-		grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
-		targetableCellsForChangingSite <- landscape where (each.cellLU = "Rangeland");
-		
-		ask mobileHerd where !(each.myHousehold.isTranshumant) {
-			// Set padocking variable to those of the last dry season
-			currentPaddock <- lastDSPaddock;
-			currentSleepSpot <- lastDSSleepSpot;
-			nbNightInCurrentSleepSpot <- lastDSNbNightInCurrentSleepSpot;
-			remainingSleepSpots <- lastDSRemainingSleepSpots;
-			myPaddockList <- lastDSPaddockList;
-			remainingPaddocks <- lastDSRemainingPaddocks;
-		}
-	}
 	
 }
 
@@ -200,7 +151,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	action resetSleepSpot {
 		if length(remainingSleepSpots) <= 1 {
 			if length(remainingPaddocks) <= 1 {
-				remainingPaddocks <- myPaddockList;
+				remainingPaddocks <- copy(myPaddockList);
 				currentPaddock <- first(remainingPaddocks);
 				remainingSleepSpots <- copy(currentPaddock.myCells) sort_by each;
 				currentSleepSpot <- first(remainingSleepSpots);

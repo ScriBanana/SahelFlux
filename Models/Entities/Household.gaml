@@ -12,7 +12,7 @@ import "SpatialEntities/Parcel.gaml"
 import "MobileHerd.gaml"
 import "FattenedAnimal.gaml"
 import "ORPHeap.gaml"
-import "Transhumance.gaml"
+import "TranshumanceAndFallows.gaml"
 
 global {
 	
