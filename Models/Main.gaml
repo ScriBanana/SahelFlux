@@ -135,7 +135,9 @@ global {
 		write string(date(time), "M'/'y");
 		
 		do addWastesToHeaps;
-		do updateSOCStocks;
+		ask SOCstock {
+			do updateCarbonPools;
+		}
 		
 	}
 
