@@ -14,14 +14,16 @@ global {
 	//// Fallow transition functions
 	
 	action transitionToFallows {
+		
 		write "Restrincting remaining herds to fallows and contiguous rangelands.";
+		
 		// Restrict grazable area
 		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
 		targetableCellsForChangingSite <- landscape where (each.myParcel != nil and each.myParcel.currentYearCover = "Fallow");
 		
-		list<parcel> fallowParcelNotPaddocks <- listAllBushParcels where (each.currentYearCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
-		
-		ask mobileHerd where !(each.myHousehold.isTranshumant) {
+		// Moving herds
+		list<parcel> fallowParcelsNotPaddockedList <- listAllBushParcels where (each.currentYearCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
+		ask mobileHerd where !(each.myHousehold.isTranshumant) { // Revamp condition (useless as of now) if additionnal cases emerge
 			
 			// Store paddocking data for next dry season
 			lastDSPaddock <- currentPaddock;
@@ -31,23 +33,29 @@ global {
 			lastDSPaddockList <- copy(myPaddockList);
 			lastDSRemainingPaddocks <- copy(remainingPaddocks);
 			
-			// Transition to fallow
-			if !empty(myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow")) {
-				myPaddockList <- maxNbFallowPaddock among (myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow"));
-				fallowParcelNotPaddocks >>- myPaddockList;
+			// New paddocks attribution. Owner parcels first, then the rest
+			list<parcel> myOwnerFallowParcels <- myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow");
+			if !empty(myOwnerFallowParcels) {
+				myPaddockList <- maxNbFallowPaddock among myOwnerFallowParcels;
+				fallowParcelsNotPaddockedList >>- myPaddockList;
 			}
 			if length(myPaddockList) < maxNbFallowPaddock { // Apparently loop times: 0 is a thing, but I'm too scared.
+				if empty(fallowParcelsNotPaddockedList) {
+					// Reset availiable parcels if need be. Several herds can end up in the same paddock.
+					fallowParcelsNotPaddockedList <- listAllBushParcels where (each.currentYearCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
+				}
 				loop times: maxNbFallowPaddock - length(myPaddockList) {
-					myPaddockList <+ one_of(fallowParcelNotPaddocks); // TODO dummy and can still cause trouble if several herds get tied to the same parcel
-					fallowParcelNotPaddocks >>- myPaddockList;
+					myPaddockList <+ one_of(fallowParcelsNotPaddockedList);
+					fallowParcelsNotPaddockedList >>- myPaddockList;
 				}
 			}
-			
 			remainingSleepSpots <- [];
 			remainingPaddocks <- [];
 			do resetSleepSpot;
+			
+			// Actual transition
 			self.location <- currentSleepSpot.location;
-			self.currentCell <- currentSleepSpot;
+			self.currentCell <- currentSleepSpot; // Probably not necessary.
 		}
 	}
 	
@@ -75,11 +83,11 @@ global {
  	species transhumingHerd parent: mobileHerd schedules: [];
  	
  	action returnHerdsToLandscape {
- 		write "Herds return from transhumance";
+ 		write "	Herds return from transhumance";
  		release list(transhumingHerd) as: mobileHerd {
  			myHousehold.myMobileHerd <- self;
  			location <- currentSleepSpot.location;
-// 			chymeChunksList <- []; TODO temporary?
+// 			chymeChunksList <- []; TODO temporary? As of now, they poop what they eat 4 months ago.
 		}
  	}
  }

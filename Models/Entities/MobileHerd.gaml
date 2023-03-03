@@ -56,7 +56,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	list<parcel> myPaddockList;
 	list<parcel> remainingPaddocks;
 	
-	// Variables to store the latter, meant for scenarios where fallow is enabled
+	// Variables to store the latter during the rainy season, meant for scenarios where fallow is enabled
 	parcel lastDSPaddock;
 	landscape lastDSSleepSpot;
 	int lastDSNbNightInCurrentSleepSpot;
@@ -72,12 +72,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
 	landscape currentCell update: first(landscape overlapping self);
 	
-	// FSM parameters and variables
+	//// FSM behaviour
+	
+	// FSM variables
 	landscape targetCell;
 	bool isInGoodSpot <- false;
 	
-	//// FSM behaviour
-	
+	// States
 	state isGoingToSleepSpot {
 		do goto on: grazableLandscape speed: herdSpeed target: currentSleepSpot recompute_path: false;
 		
@@ -97,7 +98,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 				nbNightInCurrentSleepSpot <- 0;
 			}
 		}
-
 	}
 
 	state isChangingSite {
@@ -128,6 +128,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		}
 
 		do graze(currentGrazingCell); // Add conditional if speed*step gets significantly reduced
+		
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isResting when: restTime or !hungry;
 		transition to: isChangingSite when: !isInGoodSpot;
@@ -148,6 +149,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		return cellsAround;
 	}
 	
+	// Cjhanges sleepspot (and paddock) whenever the number of nights is depleted
 	action resetSleepSpot {
 		if length(remainingSleepSpots) <= 1 {
 			if length(remainingPaddocks) <= 1 {
@@ -171,8 +173,10 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	action graze (landscape cellToGraze) {
 		string eatenBiomassType <- currentCell.cellLU;
 		float eatenQuantity <- eatenBiomassType = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd;
+		assert cellToGraze.biomassContent >= 0.0; // Trying to graze on a depleted cell
+		
+		eatenQuantity <-  cellToGraze.biomassContent > eatenQuantity ? eatenQuantity : cellToGraze.biomassContent;
 		ask cellToGraze {
-			// TODO manque un failsafe quand la BM est à zero
 			self.biomassContent <- self.biomassContent - eatenQuantity;
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;

@@ -58,15 +58,15 @@ global {
 		do updateMeteo;
 		do resetFlowsMaps;
 		
+		write "	Start date : " + starting_date;
 		write "=== MODEL INITIALISED ===";
-		write "Start date : " + starting_date;
 	}
 
-	////	--------------------------	////
+	////	--------------------------		////
 	////	Global scheduler		////
-	////	--------------------------	////
+	////	--------------------------		////
 	
-	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay){
+	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay) { // Every 15 days default
 		
 		do updateGlobalBiomassMeanAndSD;
 		ask landscape where each.biomassProducer {
@@ -74,12 +74,13 @@ global {
 		}
 		
 		if drySeason {
+			// Regular check to see if transhumance conditions are reached yet.
 			ask household where (each.isTranshumant and !dead(each.myMobileHerd)) {
 				do checkTranshuCondition;
 			}
 		} else { // TODO faire gaffe au scheduling, notamment en début de saison
 			ask landscape where each.biomassProducer {
-					do growBiomass;
+				do growBiomass;
 			}
 		}
 		
@@ -88,15 +89,31 @@ global {
 	reflex monthStep when: (current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay)) {
 		
 		switch current_date.month {
-			match 1 {
-			// New year processes
-				write string(current_date, "'	Y'y");
-				do updateMeteo;
+			
+			match rainySeasonFirstMonth {
+			// Rainy season processes
+				write "RAINY SEASON STARTS.";
+				drySeason <- false;
+				
+				write "	Sending remaining transhuming herds to transhumance";
+				ask transhumance {
+					capture mobileHerd where (each.myHousehold.isTranshumant) as: transhumingHerd;
+				}
+				
+				if fallowEnabled {
+					write "	Restricting herd movement to fallows";
+					do transitionToFallows;
+				}
+				
+				write "	Computing plant biomass production for the upcoming rainy season.";
+				ask landscape where each.biomassProducer {
+					do computeYearlyBiomassProduction;
+				}
 			}
-
+			
 			match drySeasonFirstMonth {
 			// Dry season processes
-				write "	Dry season starts.";
+				write "DRY SEASON STARTS.";
 				do updateParcelsCovers;
 				drySeason <- true;
 				ask transhumance {
@@ -107,40 +124,24 @@ global {
 				}
 			}
 			
-			match rainySeasonFirstMonth {
-			// Rainy season processes
-				write "	Rainy season starts.";
-				drySeason <- false;
-				
-				write "Sending remaining transhuming herds to transhumance";
-				ask transhumance {
-					capture mobileHerd where (each.myHousehold.isTranshumant) as: transhumingHerd;
-				}
-				
-				if fallowEnabled {
-					write "Restricting herd movement to fallows";
-					do transitionToFallows;
-				}
-				
-				write "Computing plant biomass production for the upcoming rainy season.";
-				ask landscape where each.biomassProducer {
-					do computeYearlyBiomassProduction;
-				}
-				
+			match 1 {
+			// New year processes
+//				write string(current_date, "'	Y'y");
+				do updateMeteo;
 			}
 		}
 		
 		// Monthly processes
-		write string(date(time), "'		'M'/'y");
+		write string(date(time), "M'/'y");
 		
 		do addWastesToHeaps;
 		do updateSOCStocks;
 		
 	}
 
-	////	--------------------------	////
+	////	--------------------------		////
 	////		End statements		////
-	////	--------------------------	////
+	////	--------------------------		////
 	
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";

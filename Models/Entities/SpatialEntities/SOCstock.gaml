@@ -40,7 +40,6 @@ global {
 	
 	int lastSOCComputation <- 0;
 	action updateSOCStocks {
-		write "Updating soils C pools.";
 		int SOCProcessesPeriodLength <- cycle - lastSOCComputation;
 		lastSOCComputation <- cycle;
 		ask SOCstock {

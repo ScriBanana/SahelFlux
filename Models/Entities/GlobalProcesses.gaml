@@ -31,13 +31,14 @@ global {
 			}
 			match "Random" {
 				yearRainfall <- int(gauss(meanRainfall, SDRainfall));
-				yearMeteoQuality <- gauss(1.0, 0.5);
+				yearMeteoQuality <- gauss(0.5, 0.5);
 				
 			}
 			match "Input data" {
 				assert false; // TODO Not implemented yet
 			}
 		}
+		write "	Done. " + yearRainfall + " mm, " + floor(yearMeteoQuality * 10) / 10 + " /1 meteorological quality.";
 		
 	}
 	
