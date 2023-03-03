@@ -34,6 +34,7 @@ global {
 			lastDSRemainingPaddocks <- copy(remainingPaddocks);
 			
 			// New paddocks attribution. Owner parcels first, then the rest
+			myPaddockList <- [];
 			list<parcel> myOwnerFallowParcels <- myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow");
 			if !empty(myOwnerFallowParcels) {
 				myPaddockList <- maxNbFallowPaddock among myOwnerFallowParcels;
