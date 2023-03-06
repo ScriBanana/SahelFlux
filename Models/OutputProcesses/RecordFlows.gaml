@@ -31,6 +31,7 @@ global {
 		"TF-ToFallowVeget"::0.0,
 		"TF-ToSpontVeget"::0.0,
 		"TF-ToWeeds"::0.0,
+		"TF-ToTrees"::0.0,
 		// Outflows
 		"OF-SoldOnMarket"::0.0,
 		"OF-GHG"::0.0,
@@ -60,7 +61,8 @@ global {
 				"Groundnut"::copy(flowsMapTemplate),
 				"FallowVeg"::copy(flowsMapTemplate),
 				"SpontVeg"::copy(flowsMapTemplate),
-				"Weeds"::copy(flowsMapTemplate)
+				"Weeds"::copy(flowsMapTemplate),
+				"Trees"::copy(flowsMapTemplate)
 			];
 		CFlowsMap <- [ // Copy(a template) doesn't work, apparently
 				"Households"::copy(flowsMapTemplate),
@@ -75,7 +77,8 @@ global {
 				"Groundnut"::copy(flowsMapTemplate),
 				"FallowVeg"::copy(flowsMapTemplate),
 				"SpontVeg"::copy(flowsMapTemplate),
-				"Weeds"::copy(flowsMapTemplate)
+				"Weeds"::copy(flowsMapTemplate),
+				"Trees"::copy(flowsMapTemplate)
 			];
 	}
 	
@@ -142,7 +145,7 @@ global {
 	action saveFlowInMap (string flowType, string emittingPool, string flowDestination, float flowValue) {
 		// Tests for typo
 		assert flowType in ["C", "N"];
-		assert emittingPool in NFlowsMap.keys;
+		assert (emittingPool in NFlowsMap.keys) or (emittingPool in map(flowsMapTemplate.pairs where (each.key contains "IF-")).keys);
 		assert flowDestination in flowsMapTemplate.keys;
 		
 		// Assign to flows map

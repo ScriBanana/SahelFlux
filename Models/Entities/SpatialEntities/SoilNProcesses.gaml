@@ -59,16 +59,29 @@ species soilNProcesses parallel: true schedules: [] {
 	}
 	
 	float computeNFromSoil {
-		float NFromSoil <- (myCell.myParcel != nil and myCell.myParcel.homeField) ? baseNFromSoilHomefields : baseNFromSoilBushfields; // Will return the value for bushfields in cropland not part of a parcel and rangeland.
+		float NFromSoil <- (myCell.myParcel != nil and myCell.myParcel.homeField) ? baseNFromSoilHomefields : baseNFromSoilBushfields;
+		// Will return the value for bushfields in cropland not part of a parcel and rangeland.
 		// TODO Value for rangeland?
 		return NFromSoil;
 	}
 	
 	list<float> computeNAtmo {
+		
+		// TODO étaler dans l'année
+		// TODO Valider le groundnut
+		
 		float NAtmoMicroOrga <- baseNAtmoMicroOrga;
-		float NAtmoGroundnut <- baseNAtmoGroundnut;
+		float NAtmoGroundnut <- myCell.myParcel != nil and myCell.myParcel.currentYearCover = "Groundnut" ? baseNAtmoGroundnut : 0.0;
 		float NAtmoFromTrees <- baseNAtmoPerTree * myCell.nbTrees;
-		return;
+		
+		string inflowRecievingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+		string treeFixationRecievingPool <- myCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");
+		ask world {	do saveFlowInMap("N", inflowRecievingPool, "IF-FromAtmo", NAtmoMicroOrga);}
+		ask world {	do saveFlowInMap("N", inflowRecievingPool, "IF-FromAtmo", NAtmoGroundnut);}
+		ask world {	do saveFlowInMap("N", "Trees", "IF-FromAtmo", NAtmoFromTrees);}
+		ask world {	do saveFlowInMap("N", "Trees", treeFixationRecievingPool, NAtmoFromTrees);}
+		
+		return [NAtmoMicroOrga, NAtmoGroundnut, NAtmoFromTrees];
 	}
 	
 	map<string, float> computeNDepositsAndAfterEffect {

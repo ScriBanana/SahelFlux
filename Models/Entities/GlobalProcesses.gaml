@@ -31,7 +31,7 @@ global {
 			}
 			match "Random" {
 				yearRainfall <- int(gauss(meanRainfall, SDRainfall));
-				yearMeteoQuality <- gauss(0.5, 0.5);
+				yearMeteoQuality <- gauss(0.5, 0.3);
 				
 			}
 			match "Input data" {

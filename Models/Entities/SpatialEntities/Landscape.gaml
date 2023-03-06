@@ -64,12 +64,10 @@ global {
 				
 				labileCPool <- myself.cellLU = "Cropland" ?
 					gauss(croplandSOCInit * labileCPoolProportionInit, croplandSOCInit * labileCPoolProportionInit * 0.1) : 
-					gauss(rangelandSOCInit * labileCPoolProportionInit, rangelandSOCInit * labileCPoolProportionInit * 0.1)
-				; // TODO DUMMY
+					gauss(rangelandSOCInit * labileCPoolProportionInit, rangelandSOCInit * labileCPoolProportionInit * 0.1); // TODO DUMMY
 				stableCPool <- myself.cellLU = "Cropland" ?
 					gauss(croplandSOCInit * stableCPoolProportionInit, croplandSOCInit * stableCPoolProportionInit * 0.1) : 
-					gauss(rangelandSOCInit * stableCPoolProportionInit, rangelandSOCInit * stableCPoolProportionInit * 0.1)
-				; // TODO DUMMY
+					gauss(rangelandSOCInit * stableCPoolProportionInit, rangelandSOCInit * stableCPoolProportionInit * 0.1); // TODO DUMMY
 				totalSOC <- labileCPool + stableCPool;
 			}
 			create soilNProcesses with: [myCell::self] {

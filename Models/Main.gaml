@@ -119,6 +119,9 @@ global {
 				ask landscape where (each.myParcel != nil) {
 					do getHarvested;
 				}
+				ask landscape where each.biomassProducer {
+					do updateColour;
+				}
 				do updateParcelsCovers; // Crop rotation
 				
 				// Retrieving herds
