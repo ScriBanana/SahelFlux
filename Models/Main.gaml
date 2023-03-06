@@ -157,7 +157,7 @@ global {
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";
 		do gatherFlows;
-		do exportOutputData;
+		do exportStockFlowsOutputData;
 		do pause;
 	}
 	
