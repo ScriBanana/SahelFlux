@@ -36,15 +36,18 @@ global {
 	float groundnutExportedBiomassRatio <- 1.0;
 	float fallowExportedBiomass <- 0.55; // Surveys
 	
-	// C and N contents of crops TODO unify
+	// C and N contents of crops TODO unify utilisé dans le grow pour la photosynth et dans la récolte (cohérence?)
+	float rangelandVegCContent <- 0.5; // TODO DUMMY
 	float milletEarNContent <- 0.5; // TODO DUMMY
 	float milletEarCContent <- 0.5; // TODO DUMMY
 	float milletStrawNContent <- 0.5; // TODO DUMMY
 	float milletStrawCContent <- 0.5; // TODO DUMMY
+	float wholeMilletCContent <- 0.5; // TODO DUMMY
 	float groundnutPlantNContent <- 0.5; // TODO DUMMY
 	float groundnutPlantCContent <- 0.5; // TODO DUMMY
 	float fallowVegNContent <- 0.5; // TODO DUMMY
 	float fallowVegCContent <- 0.5; // TODO DUMMY
+	float weedsCContent <- 0.5; // TODO DUMMY
 	
 	// Variables
 	list<landscape> grazableLandscape;
@@ -114,9 +117,11 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	// Grazable biomass
 	float biomassContent min: 0.0; // kgDM
 	float thisYearNAvailable;
+	float thisYearBiomassCContent;
 	string thisYearReceivingPool;
 	float yearlyBiomassToBeProduced;
 	float yearlyWeedsBiomassToBeProduced;
+	float weedProportionInBiomass;
 	
 	//// Functions
 	
@@ -125,12 +130,18 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		// Grow biomass
 		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
 		
-		// Registering N flows
-		float NFlowsToSaveEachCall <- thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+		// Registering N and C flows
+		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+		float weedsNFlowToSaveEachCall <- weedProportionInBiomass * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
+		float weedsCFlowToSaveEachCall <- yearlyWeedsBiomassToBeProduced * weedsCContent / nbBiophUpdatesDuringRainySeason;
 		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
-		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearReceivingPool , NFlowsToSaveEachCall);} // Assumes all N available is consumed.
+		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
+		ask world {	do saveFlowInMap("C", emittingPool, myself.thisYearReceivingPool, cropCFlowsToSaveEachCall);}
+		ask world {	do saveFlowInMap("C", emittingPool,  "TF-ToWeeds", weedsCFlowToSaveEachCall);}
 		
-		// TODO Add photoshynthesis
+		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
 	}
 	
 	action computeYearlyBiomassProduction {
@@ -145,6 +156,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		
 		if cellLU = "Rangeland" {
 			thisYearReceivingPool <- "TF-ToSpontVeget";
+			thisYearBiomassCContent <- rangelandVegCContent;
 			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 			
@@ -153,30 +165,37 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				
 				match "Millet" {
 					thisYearReceivingPool <- "TF-ToMillet";
+					thisYearBiomassCContent <- wholeMilletCContent;
 					waterLimitedYieldHa <- max(0.0, min(3775.0, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
 				
 				} match "Groundnut" {
 					thisYearReceivingPool <- "TF-ToGroundnut";
+					thisYearBiomassCContent <- groundnutPlantCContent;
 					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
 					
 				} match "Fallow" {
 					thisYearReceivingPool <- "TF-ToFallowVeget";
 					// Same as rangeland veg
+					thisYearBiomassCContent <- fallowVegCContent;
 					waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 				
 				}
 			}
 		} else {
-			thisYearReceivingPool <- "TF-ToWeeds"; // TODO Gros bullshit
+			// TODO Gros bullshit
+			// Tout à 0 car hors rotation
+			thisYearReceivingPool <- "TF-ToWeeds";
+			thisYearBiomassCContent <- fallowVegCContent;
 		}
 		
 		// Producing biomass
 		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
 		assert yearlyBiomassToBeProduced >= 0;
 		yearlyWeedsBiomassToBeProduced <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
+		weedProportionInBiomass <- yearlyWeedsBiomassToBeProduced / (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced);
 		
 	}
 	
@@ -192,7 +211,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		switch myParcel.currentYearCover {
 			match "Millet" {
 				emittingPool <- "Millet";
-				exportedCropsBiomass <- milletExportedAgriProductRatio * self.biomassContent;
+				exportedCropsBiomass <- milletExportedAgriProductRatio * (1 - weedProportionInBiomass) * self.biomassContent;
 				exportedStrawBiomass <- milletExportedStrawRatio * exportedCropsBiomass;
 				
 				exportedCropsNFlow <- exportedCropsBiomass * milletEarNContent; // kgN
@@ -202,14 +221,14 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 			}
 			match "Groundnut" {
 				emittingPool <- "Groundnut";
-				exportedCropsBiomass <- groundnutExportedBiomassRatio * self.biomassContent;
+				exportedCropsBiomass <- groundnutExportedBiomassRatio * (1 - weedProportionInBiomass) * self.biomassContent;
 				
 				exportedCropsNFlow <- exportedCropsBiomass * groundnutPlantNContent; // kgN
 				exportedCropsCFlow <- exportedCropsBiomass * groundnutPlantCContent; // kgC
 			}
 			match "Fallow" {
 				emittingPool <- "FallowVeg";
-				exportedStrawBiomass <- fallowExportedBiomass * self.biomassContent;
+				exportedStrawBiomass <- fallowExportedBiomass * (1 - weedProportionInBiomass) * self.biomassContent;
 				
 				exportedStrawNFlow <- exportedStrawBiomass * fallowVegNContent; // kgN
 				exportedStrawCFlow <- exportedStrawBiomass * fallowVegCContent; // kgC

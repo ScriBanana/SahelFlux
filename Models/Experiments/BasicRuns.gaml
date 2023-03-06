@@ -45,7 +45,7 @@ experiment Run type: gui {
 }
 
 experiment FastAutoRun autorun: true {
-	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 100 min: 0;
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 60 min: 0;
 	parameter "Short run end date" var: endDate <- date([2021, 11, 1, eveningTime + 1, 0, 0]);
 }
 
