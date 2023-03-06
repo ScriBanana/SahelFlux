@@ -11,6 +11,7 @@ model SahelFlux
 
 import "../Utilities/UnitTests.gaml"
 import "../Utilities/GenerateExportFiles.gaml"
+import "OutputProcesses/ComputeOutputs.gaml"
 import "Entities/GlobalProcesses.gaml"
 import "Entities/SpatialEntities/Landscape.gaml"
 import "Entities/AnimalGroup.gaml"
@@ -154,10 +155,13 @@ global {
 	////		End statements		////
 	////	--------------------------		////
 	
+	bool endSimu <- false;
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";
 		do gatherFlows;
+		do computeENAIndicators;
 		do exportStockFlowsOutputData;
+		endSimu <- true; // Stops batch experiments
 		do pause;
 	}
 	

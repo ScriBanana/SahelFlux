@@ -8,11 +8,10 @@
 
 model GenerateExportFiles
 
-import "../Models/OutputProcesses/ComputeOutputs.gaml"
 import "ImportZoning.gaml"
 
 global {
-	string outputDirectory <- "../OutputFiles/";
+	string outputDirectory <- "../../OutputFiles/";
 	string filePrefix <- "SahelFlux-Out-";
 	
 	action exportStockFlowsOutputData {

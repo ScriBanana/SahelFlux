@@ -137,7 +137,7 @@ global {
 		write "C flows :";
 		write CFlowsMatrix;
 		
-		do resetFlowsMaps;
+//		do resetFlowsMaps; TODO Tester si avoir un gather régulier améliore la perf
 	}
 	
 	
