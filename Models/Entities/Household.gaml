@@ -46,7 +46,7 @@ global {
 				myOwner.myBushParcelsList <+ self;
 				self.parcelColour <- myself.householdColour;
 			}
-						
+			
 			// Giving a mobile herd
 			create mobileHerd with: [
 				myHousehold::self,

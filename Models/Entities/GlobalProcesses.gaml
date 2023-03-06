@@ -38,7 +38,7 @@ global {
 				assert false; // TODO Not implemented yet
 			}
 		}
-		write "	Done. " + yearRainfall + " mm, " + floor(yearMeteoQuality * 10) / 10 + " /1 meteorological quality.";
+		write "	Done. " + yearRainfall + " mm, " + int(floor(yearMeteoQuality * 10)) + " /10 meteorological quality.";
 		
 	}
 	

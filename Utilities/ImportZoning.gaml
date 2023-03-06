@@ -23,6 +23,7 @@ global {
 	float cellHeight <- shape.height / gridHeight;
 	float cellWidth <- shape.width / gridWidth;
 	float hectareToCell <- cellWidth * cellHeight / 10000 #m2;
+	float totalAreaHa <- shape.area / 10000 #m2;
 	
 	//TODO  RASTER - Landscape units definition (from source)
 	list<string> LUList <- ["Dwellings", "Lowlands", "Ponds", "Wooded savannah", "Fallows", "Rainfed crops", "Gardens"];

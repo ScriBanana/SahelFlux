@@ -9,6 +9,7 @@
 model GenerateExportFiles
 
 import "../Models/OutputProcesses/ComputeOutputs.gaml"
+import "ImportZoning.gaml"
 
 global {
 	string outputDirectory <- "../OutputFiles/";
@@ -21,6 +22,7 @@ global {
 		list<string> outputCSVheader <- [""];
 		outputCSVheader <<+ flowsMapTemplate.keys where (each contains "IF-");
 		outputCSVheader <<+ NFlowsMap.keys;
+		
 		save outputCSVheader to: outputDirectory + "SahelFlux-Out_NFlowsMatrix.csv" type: csv rewrite: true header: false;
 		save outputCSVheader to: outputDirectory + "SahelFlux-Out_CFlowsMatrix.csv" type: csv rewrite: true header: false;
 		
@@ -40,6 +42,53 @@ global {
 			save lineToSave to: outputDirectory + "SahelFlux-Out_CFlowsMatrix.csv" type: csv rewrite: false;
 			outputId <- outputId +1;
 		}
+		
+		// Global matrix per ha
+		save outputCSVheader to: outputDirectory + "SahelFlux-Out_haNFlowsMatrix.csv" type: csv rewrite: true header: false;
+		save outputCSVheader to: outputDirectory + "SahelFlux-Out_haCFlowsMatrix.csv" type: csv rewrite: true header: false;
+		
+		outputId <- 0;
+		loop matLine over: rows_list (NFlowsMatrix) {
+			list<string> lineToSave <- [flowsMapTemplate.keys[outputId + nbInflows]];
+			loop valueToSave over: matLine {
+				lineToSave <+ string(valueToSave / totalAreaHa);
+			}
+			save lineToSave to: outputDirectory + "SahelFlux-Out_haNFlowsMatrix.csv" type: csv rewrite: false;
+			outputId <- outputId +1;
+		}
+		outputId <- 0;
+		loop matLine over: rows_list (CFlowsMatrix) {
+			list<string> lineToSave <- [flowsMapTemplate.keys[outputId + nbInflows]];
+			loop valueToSave over: matLine {
+				lineToSave <+ string(valueToSave / totalAreaHa);
+			}
+			save lineToSave to: outputDirectory + "SahelFlux-Out_haCFlowsMatrix.csv" type: csv rewrite: false;
+			outputId <- outputId +1;
+		}
+		
+		// Global matrix per TLU
+		save outputCSVheader to: outputDirectory + "SahelFlux-Out_TLUNFlowsMatrix.csv" type: csv rewrite: true header: false;
+		save outputCSVheader to: outputDirectory + "SahelFlux-Out_TLUCFlowsMatrix.csv" type: csv rewrite: true header: false;
+		
+		outputId <- 0;
+		loop matLine over: rows_list (NFlowsMatrix) {
+			list<string> lineToSave <- [flowsMapTemplate.keys[outputId + nbInflows]];
+			loop valueToSave over: matLine {
+				lineToSave <+ string(valueToSave / length(mobileHerd)); // TODO ne marche pas pour les fattened
+			}
+			save lineToSave to: outputDirectory + "SahelFlux-Out_TLUNFlowsMatrix.csv" type: csv rewrite: false;
+			outputId <- outputId +1;
+		}
+		outputId <- 0;
+		loop matLine over: rows_list (CFlowsMatrix) {
+			list<string> lineToSave <- [flowsMapTemplate.keys[outputId + nbInflows]];
+			loop valueToSave over: matLine {
+				lineToSave <+ string(valueToSave / length(mobileHerd));
+			}
+			save lineToSave to: outputDirectory + "SahelFlux-Out_TLUCFlowsMatrix.csv" type: csv rewrite: false;
+			outputId <- outputId +1;
+		}
+		
 		write "... Done";
 	}
 }
