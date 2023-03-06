@@ -91,7 +91,7 @@ global {
 		switch current_date.month {
 			
 			match rainySeasonFirstMonth {
-			// Rainy season processes
+				// Rainy season processes
 				write "RAINY SEASON STARTS.";
 				drySeason <- false;
 				
@@ -112,10 +112,16 @@ global {
 			}
 			
 			match drySeasonFirstMonth {
-			// Dry season processes
+				// Dry season processes
 				write "DRY SEASON STARTS.";
-				do updateParcelsCovers;
 				drySeason <- true;
+				
+				ask landscape where (each.myParcel != nil) {
+					do getHarvested;
+				}
+				do updateParcelsCovers; // Crop rotation
+				
+				// Retrieving herds
 				ask transhumance {
 					do returnHerdsToLandscape;
 				}

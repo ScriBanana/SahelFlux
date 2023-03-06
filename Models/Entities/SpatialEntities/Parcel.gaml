@@ -11,7 +11,7 @@ import "../Household.gaml"
 
 global {
 	
-	//// Global parcels parameters
+	//// Global parcels parameters and variables
 	
 	int maxNbCroplandParcels <- 1000;
 	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
@@ -131,6 +131,7 @@ global {
 			currentYearCover <- coverIdInRot >= rotationLength - 1 ? myRotation[0] : myRotation[coverIdInRot + 1];
 		}
 	}
+	
 }
 
 species parcel parallel: true schedules: [] {

@@ -24,11 +24,29 @@ global {
 	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
 	
+	// Weeds biomass production parameters
 	float weedProdRangelandHa <- 475.0; // kgDM/ha Grillot 2018
 	float weedProdCroplandHa <- 100.0; // kgDM/ha Grillot 2018
 	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
 	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	
+	// Harvest parameters
+	float milletExportedAgriProductRatio <- 0.3; // Grillot et al, 2018
+	float milletExportedStrawRatio <- 0.38; // Ratio of produced straw that gets exported. Grillot et al, 2018
+	float groundnutExportedBiomassRatio <- 1.0;
+	float fallowExportedBiomass <- 0.55; // Surveys
+	
+	// C and N contents of crops TODO unify
+	float milletEarNContent <- 0.5; // TODO DUMMY
+	float milletEarCContent <- 0.5; // TODO DUMMY
+	float milletStrawNContent <- 0.5; // TODO DUMMY
+	float milletStrawCContent <- 0.5; // TODO DUMMY
+	float groundnutPlantNContent <- 0.5; // TODO DUMMY
+	float groundnutPlantCContent <- 0.5; // TODO DUMMY
+	float fallowVegNContent <- 0.5; // TODO DUMMY
+	float fallowVegCContent <- 0.5; // TODO DUMMY
+	
+	// Variables
 	list<landscape> grazableLandscape;
 	list<landscape> targetableCellsForChangingSite;
 	
@@ -96,7 +114,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	soilNProcesses mySoilNProcesses;
 	
 	// Grazable biomass
-	float biomassContent min: 0.0;
+	float biomassContent min: 0.0; // kgDM
 	float thisYearNAvailable;
 	string thisYearReceivingPool;
 	float yearlyBiomassToBeProduced;
@@ -104,9 +122,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	
 	//// Functions
 	
-	action growBiomass {
-		// To be called regularly during the rainy season
-		
+	action growBiomass { // To be called regularly during the rainy season
+	
 		// Grow biomass
 		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
 		
@@ -165,13 +182,64 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		
 	}
 	
+	action getHarvested {
+		float exportedCropsBiomass; // kgDM
+		float exportedStrawBiomass; // kgDM
+		float exportedCropsNFlow; // kgN
+		float exportedCropsCFlow; // kgC
+		float exportedStrawNFlow; // kgN
+		float exportedStrawCFlow; // kgC
+		string emittingPool;
+		
+		switch myParcel.currentYearCover {
+			match "Millet" {
+				emittingPool <- "Millet";
+				exportedCropsBiomass <- milletExportedAgriProductRatio * self.biomassContent;
+				exportedStrawBiomass <- milletExportedStrawRatio * exportedCropsBiomass;
+				
+				exportedCropsNFlow <- exportedCropsBiomass * milletEarNContent; // kgN
+				exportedCropsCFlow <- exportedCropsBiomass * milletEarCContent; // kgC
+				exportedStrawNFlow <- exportedStrawBiomass * milletStrawNContent; // kgN
+				exportedStrawCFlow <- exportedStrawBiomass * milletStrawCContent; // kgC
+			}
+			match "Groundnut" {
+				emittingPool <- "Groundnut";
+				exportedCropsBiomass <- groundnutExportedBiomassRatio * self.biomassContent;
+				
+				exportedCropsNFlow <- exportedCropsBiomass * groundnutPlantNContent; // kgN
+				exportedCropsCFlow <- exportedCropsBiomass * groundnutPlantCContent; // kgC
+			}
+			match "Fallow" {
+				emittingPool <- "FallowVeg";
+				exportedStrawBiomass <- fallowExportedBiomass * self.biomassContent;
+				
+				exportedStrawNFlow <- exportedStrawBiomass * fallowVegNContent; // kgN
+				exportedStrawCFlow <- exportedStrawBiomass * fallowVegCContent; // kgC
+			}
+		}
+		
+		self.biomassContent <- self.biomassContent - exportedCropsBiomass - exportedStrawBiomass;
+		
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHomeFields", exportedCropsNFlow);}
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHomeFields", exportedCropsCFlow);}
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToStrawPiles", exportedStrawNFlow);}
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToStrawPiles", exportedStrawCFlow);}
+	}
+	
 	// Colouring
 	action updateColour {
 		if cellLU = "Cropland" { // Ternary possible, but if statement more secure and readable
-			color <- rgb(255 + (216 - 255) / maxCropBiomassContent * biomassContent, 255 + (232 - 255) / maxCropBiomassContent * biomassContent, 180);
+			color <- rgb(
+				255 + (216 - 255) / maxCropBiomassContent * biomassContent,
+				255 + (232 - 255) / maxCropBiomassContent * biomassContent,
+				180
+			);
 		} else if cellLU = "Rangeland" {
-			color <-
-			rgb(200 + (101 - 200) / maxRangelandBiomassContent * biomassContent, 230 + (198 - 230) / maxRangelandBiomassContent * biomassContent, 180 + (110 - 180) / maxRangelandBiomassContent * biomassContent);
+			color <- rgb(
+				200 + (101 - 200) / maxRangelandBiomassContent * biomassContent,
+				230 + (198 - 230) / maxRangelandBiomassContent * biomassContent,
+				180 + (110 - 180) / maxRangelandBiomassContent * biomassContent
+			);
 		}
 	}
 
