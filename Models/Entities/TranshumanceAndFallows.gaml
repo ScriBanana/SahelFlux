@@ -11,6 +11,20 @@ import "MobileHerd.gaml"
 
 global {
 	
+	//// Transhumance transition functions
+	action captureRemainingTranshumants {
+		write "	Sending remaining transhuming herds to transhumance";
+		
+ 		float leavingHerdNFlow <- mobileHerd where (each.myHousehold.isTranshumant) sum_of (each.herdSize * TLUNcontent);
+ 		float leavingHerdCFlow <- mobileHerd where (each.myHousehold.isTranshumant) sum_of (each.herdSize  * TLUCcontent);
+ 		ask world {	do saveFlowInMap("N", "MobileHerds", "OF-ToTranshu", leavingHerdNFlow);}
+ 		ask world {	do saveFlowInMap("C", "MobileHerds", "OF-ToTranshu", leavingHerdCFlow);}
+ 		
+		ask transhumance {
+			capture mobileHerd where (each.myHousehold.isTranshumant) as: transhumingHerd;
+		}
+	}
+	
 	//// Fallow transition functions
 	
 	action transitionToFallows {
@@ -85,6 +99,12 @@ global {
  	
  	action returnHerdsToLandscape {
  		write "	Herds return from transhumance";
+ 		
+ 		float returningTranshumersNFlow <- transhumingHerd sum_of (each.herdSize * TLUNcontent);
+ 		float returningTranshumersCFlow <- transhumingHerd sum_of (each.herdSize * TLUCcontent);
+ 		ask world {	do saveFlowInMap("N", "MobileHerds", "IF-FromTranshu", returningTranshumersNFlow);}
+ 		ask world {	do saveFlowInMap("C", "MobileHerds", "IF-FromTranshu", returningTranshumersCFlow);}
+ 		
  		release list(transhumingHerd) as: mobileHerd {
  			myHousehold.myMobileHerd <- self;
  			location <- currentSleepSpot.location;

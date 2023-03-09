@@ -14,6 +14,10 @@ global {
 	
 	//// Global Animals parameters
 	
+	// Animal constitution
+	float TLUNcontent <- 5.0; // kgN TODO DUMMY
+	float TLUCcontent <- 250.0; // kgN TODO DUMMY
+	
 	// Digestion parameters
 	int digestionLengthParamAsInt; // More readable
 	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals

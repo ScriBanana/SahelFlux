@@ -96,10 +96,7 @@ global {
 				write "RAINY SEASON STARTS.";
 				drySeason <- false;
 				
-				write "	Sending remaining transhuming herds to transhumance";
-				ask transhumance {
-					capture mobileHerd where (each.myHousehold.isTranshumant) as: transhumingHerd;
-				}
+				do captureRemainingTranshumants;
 				
 				if fallowEnabled {
 					write "	Restricting herd movement to fallows";

@@ -94,6 +94,12 @@ species household schedules: [] {
 	action checkTranshuCondition {
 		if (myForagePileBiomassContent + (sumBiomassContent / nbHousehold)) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu {
 			write "	" + myMobileHerd + " is leaving for transhumance early."; // TODO remove after calibration
+			
+	 		float leavingHerdNFlow <- myMobileHerd.herdSize * TLUNcontent;
+	 		float leavingHerdCFlow <- myMobileHerd.herdSize * TLUCcontent;
+	 		ask world {	do saveFlowInMap("N", "MobileHerds", "OF-ToTranshu", leavingHerdNFlow);}
+	 		ask world {	do saveFlowInMap("C", "MobileHerds", "OF-ToTranshu", leavingHerdCFlow);}
+	 		
 			ask transhumance {
 				capture myself.myMobileHerd as: transhumingHerd;
 			}

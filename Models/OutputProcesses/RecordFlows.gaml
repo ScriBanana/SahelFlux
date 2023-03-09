@@ -16,6 +16,7 @@ global {
 	map<string, float> flowsMapTemplate <- [
 		// Inflows
 		"IF-FromMarket"::0.0,
+		"IF-FromTranshu"::0.0,
 		"IF-FromAtmo"::0.0,
 		// Throughflows
 		"TF-ToHouseholds"::0.0,
@@ -34,6 +35,7 @@ global {
 		"TF-ToTrees"::0.0,
 		// Outflows
 		"OF-SoldOnMarket"::0.0,
+		"OF-ToTranshu"::0.0,
 		"OF-GHG"::0.0,
 		"OF-AtmoLosses"::0.0
 	];
