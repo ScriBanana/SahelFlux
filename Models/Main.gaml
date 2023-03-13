@@ -16,6 +16,7 @@ import "Entities/GlobalProcesses.gaml"
 import "Entities/SpatialEntities/Landscape.gaml"
 import "Entities/AnimalGroup.gaml"
 import "Entities/Household.gaml"
+import "Entities/FattenedAnimal.gaml"
 
 global {
 	
@@ -33,6 +34,10 @@ global {
 	// Time step parameters
 	float step <- 30.0 #minutes;
 	int biophysicalProcessesUpdateFreq <- 15; // In days
+	int lengthFatteningSeason <- 3; // Months. field survey.
+	int monthFirstRenewal <- drySeasonFirstMonth + lengthFatteningSeason > 12 ? drySeasonFirstMonth + lengthFatteningSeason - 12 : drySeasonFirstMonth + lengthFatteningSeason; // Maybe weird and useless
+	int monthSecondRenewal <- drySeasonFirstMonth + 2 * lengthFatteningSeason > 12 ? drySeasonFirstMonth + 2 * lengthFatteningSeason - 12 : drySeasonFirstMonth + 2 * lengthFatteningSeason;
+	int monthEndFattening <- drySeasonFirstMonth + 3 * lengthFatteningSeason > 12 ? drySeasonFirstMonth + 3 * lengthFatteningSeason - 12 : drySeasonFirstMonth + 3 * lengthFatteningSeason;
 	
 	// Time related variables
 	bool drySeason;
@@ -49,6 +54,7 @@ global {
 		write "=== MODEL INITIALISATION ===";
 		drySeason <- !(starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth);
 		// All init actions defined in related species files.
+		do resetFlowsMaps;
 		do assignLUFromRaster;
 		do initGrazableCells;
 		do placeParcels;
@@ -57,7 +63,6 @@ global {
 		create transhumance;
 		do initiateRotations;
 		do updateMeteo;
-		do resetFlowsMaps;
 		
 		write "	Start date : " + starting_date;
 		write "=== MODEL INITIALISED ===";
@@ -90,6 +95,12 @@ global {
 	reflex monthStep when: (current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay)) {
 		
 		switch current_date.month {
+			
+			match 1 {
+			// New year processes
+//				write string(current_date, "'	Y'y");
+				do updateMeteo;
+			}
 			
 			match rainySeasonFirstMonth {
 				// Rainy season processes
@@ -131,11 +142,21 @@ global {
 				}
 			}
 			
-			match 1 {
-			// New year processes
-//				write string(current_date, "'	Y'y");
-				do updateMeteo;
+			match_one [monthFirstRenewal, monthSecondRenewal, monthEndFattening] {
+				write "	Selling fattenend animals.";
+				ask household where each.doesFattening {
+					do sellFattenedAnimals;
+				}
 			}
+			
+			match_one [drySeasonFirstMonth, monthFirstRenewal, monthSecondRenewal] {
+				write "	Renewing fattenend animals.";
+				ask household where each.doesFattening {
+					do renewFattenedAnimals;
+				}
+			}
+			
+			
 		}
 		
 		// Monthly processes

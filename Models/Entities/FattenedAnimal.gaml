@@ -10,14 +10,24 @@ model FattenedAnimal
 
 import "AnimalGroup.gaml"
 
+global {
+	
+	//// Global fattening parameters
+	
+	float meanFattenedGroupSize <- 1.0; // TODO DUMMY
+	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increasin in chance to aquire a new one. Arbitrary value
+	
+}
+
 species fattenedAnimal parent: animalGroup schedules: [] {
 	
 	//// Parameters
 	
+	float groupSize; // TLU
 	
 	//// Functions
 	
-	action eat { // reflex ou scheduler?
+	action eat {
 		float eatenQuantity <- 6.0; //TODO DUMMY
 		// ask stock du household >- eatenQuantity
 		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];

@@ -18,6 +18,9 @@ global {
 	float TLUNcontent <- 5.0; // kgN TODO DUMMY
 	float TLUCcontent <- 250.0; // kgN TODO DUMMY
 	
+	// Shared parameters for mobile and fattened
+	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
+	
 	// Digestion parameters
 	int digestionLengthParamAsInt; // More readable
 	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals

@@ -20,6 +20,7 @@ global {
 	
 	int nbHousehold; // Parameter
 	int nbTranshumantHh;
+	int nbFatteningHh;
 	int nbBushFieldsPerHh <- 10; // TODO Dummy
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
 	
@@ -63,31 +64,43 @@ global {
 			// Assiciating an ORP heap
 			create ORPHeap with: [myHousehold::self] {	
 				myHousehold.myORPHeap <- self;
-				
 			}
 		}
 		ask nbTranshumantHh among household {
 			isTranshumant <- true;
 		}
+		ask nbFatteningHh among household {
+			doesFattening <- true;
+			myMeanNbFattenedAnx <- abs(gauss(meanFattenedGroupSize, meanFattenedGroupSize * 0.2)) + 0.1; // TODO DUMMY 0.1 to avoid 0
+		}
+		ask household where each.doesFattening {
+			do renewFattenedAnimals;
+		}
 		
 		assert mobileHerd min_of each.herdSize > 0;
-		write "		Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants.";
+		write "		Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants, " + length(household where each.isTranshumant) + " fatteners.";
 	}
 }
 
 species household schedules: [] {
 	
-	//// Variables
+	//// Parameters and variables
 	
 	rgb householdColour;
 	bool isTranshumant <- false;
+	bool doesFattening <- false;
+	
 	// Links to other agents
 	list<parcel> myBushParcelsList;
 	list<parcel> myHomeParcelsList;
+	ORPHeap myORPHeap;
 	mobileHerd myMobileHerd;
 	fattenedAnimal myFattenedAnimals;
+	float myMeanNbFattenedAnx;
+	
+	// Variables
+	float nbAnxSoldLastSeason;
 	float myForagePileBiomassContent;
-	ORPHeap myORPHeap;
 	
 	//// Functions
 	
@@ -104,6 +117,41 @@ species household schedules: [] {
 				capture myself.myMobileHerd as: transhumingHerd;
 			}
 		}
+	}
+	
+	action sellFattenedAnimals {
+		if !empty(myFattenedAnimals) {
+ 			float soldFattenedNFlow <- myFattenedAnimals.groupSize * TLUNcontent;
+	 		float soldFattenedCFlow <- myFattenedAnimals.groupSize * TLUCcontent;
+	 		ask world {	do saveFlowInMap("N", "FattenedAn", "OF-SoldOnMarket", soldFattenedNFlow);}
+	 		ask world {	do saveFlowInMap("C", "FattenedAn", "OF-SoldOnMarket", soldFattenedCFlow);}
+	 		
+	 		nbAnxSoldLastSeason <- myFattenedAnimals.groupSize;
+	 		
+	 		ask myFattenedAnimals {
+	 			do die;
+	 		}
+		}
+	}
+	
+	action renewFattenedAnimals {
+ 		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2); // TODO DUMMY 0.2
+ 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
+ 		if myForagePileBiomassContent != 0.0 and nbFatteningRenewal != 0.0 {
+ 			nbFatteningRenewal <- nbFatteningRenewal * min(0, max(1, 1 + 1 / myForagePileBiomassContent - 1 / (dailyIntakeRatePerTLU * nbFatteningRenewal * lengthFatteningSeason * 30))); // Doesn't take into account mobileherds
+ 		}
+ 		
+		float boughtFattenedNFlow <- nbFatteningRenewal * TLUNcontent;
+ 		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCcontent;
+ 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", boughtFattenedNFlow);}
+ 		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", boughtFattenedCFlow);}
+ 		
+ 		create fattenedAnimal with: [
+			myHousehold::self,
+			groupSize::nbFatteningRenewal
+ 		] {
+			myHousehold.myFattenedAnimals <- self;
+ 		}
 	}
 	
 }
