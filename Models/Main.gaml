@@ -34,16 +34,14 @@ global {
 	// Time step parameters
 	float step <- 30.0 #minutes;
 	int biophysicalProcessesUpdateFreq <- 15; // In days
-	int lengthFatteningSeason <- 3; // Months. field survey.
-	int monthFirstRenewal <- drySeasonFirstMonth + lengthFatteningSeason > 12 ? drySeasonFirstMonth + lengthFatteningSeason - 12 : drySeasonFirstMonth + lengthFatteningSeason; // Maybe weird and useless
-	int monthSecondRenewal <- drySeasonFirstMonth + 2 * lengthFatteningSeason > 12 ? drySeasonFirstMonth + 2 * lengthFatteningSeason - 12 : drySeasonFirstMonth + 2 * lengthFatteningSeason;
-	int monthEndFattening <- drySeasonFirstMonth + 3 * lengthFatteningSeason > 12 ? drySeasonFirstMonth + 3 * lengthFatteningSeason - 12 : drySeasonFirstMonth + 3 * lengthFatteningSeason;
-	
-	// Time related variables
-	bool drySeason;
 	int lengthRainySeason <- int(milliseconds_between(date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])) / 86400000.0); // days. Weird, but hard to find better
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
 	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
+	int lengthFatteningSeason <- 80; // Days. field survey.
+	
+	// Time related variables
+	bool drySeason;
+	int dayInDS <- 0;
 	
 	////	--------------------------	////
 	////			Global init			////
@@ -72,7 +70,7 @@ global {
 	////	Global scheduler		////
 	////	--------------------------		////
 	
-	reflex biophysicalProcessesStep when: (mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay) { // Every 15 days default
+	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay { // Every 15 days default
 		
 		do updateGlobalBiomassMeanAndSD;
 		ask landscape where each.biomassProducer {
@@ -92,7 +90,7 @@ global {
 		
 	}
 
-	reflex monthStep when: (current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay)) {
+	reflex monthStep when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay) {
 		
 		switch current_date.month {
 			
@@ -124,6 +122,7 @@ global {
 				// Dry season processes
 				write "DRY SEASON STARTS.";
 				drySeason <- true;
+				dayInDS <- 0;
 				
 				ask landscape where (each.myParcel != nil) {
 					do getHarvested;
@@ -142,21 +141,6 @@ global {
 				}
 			}
 			
-			match_one [monthFirstRenewal, monthSecondRenewal, monthEndFattening] {
-				write "	Selling fattenend animals.";
-				ask household where each.doesFattening {
-					do sellFattenedAnimals;
-				}
-			}
-			
-			match_one [drySeasonFirstMonth, monthFirstRenewal, monthSecondRenewal] {
-				write "	Renewing fattenend animals.";
-				ask household where each.doesFattening {
-					do renewFattenedAnimals;
-				}
-			}
-			
-			
 		}
 		
 		// Monthly processes
@@ -167,6 +151,27 @@ global {
 			do updateCarbonPools;
 		}
 		
+	}
+	
+	reflex dailyStep when: updateTimeOfDay { // Has to come after monthStep for indentation reasons
+		if mod(dayInDS, lengthFatteningSeason) = 0 and drySeason {
+			if dayInDS > (365 - lengthRainySeason) * 1 / 4 { // IDK what I'm doing anymore
+				write "	Selling fattenend animals.";
+				ask household where each.doesFattening {
+					do sellFattenedAnimals;
+				}
+				
+			}
+			
+			if dayInDS < (365 - lengthRainySeason) * 3 / 4 {
+				write "	Renewing fattenend animals.";
+				ask household where each.doesFattening {
+					do renewFattenedAnimals;
+				}
+				
+			}
+		}
+		dayInDS <- dayInDS + 1;
 	}
 
 	////	--------------------------		////
