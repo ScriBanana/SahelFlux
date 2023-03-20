@@ -187,6 +187,8 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		string emittingPool <- eatenBiomassType = "Rangeland" ? "Rangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyCContent);}
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyNContent);}
+		
+		do emitMetaboIntake(eatenBiomassType, eatenQuantity);
 	}
 	
 	// Excretion after digestionLength (Temporality differs with fattened)

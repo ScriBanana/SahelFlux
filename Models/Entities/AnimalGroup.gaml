@@ -29,6 +29,13 @@ global {
 	float ratioNUrineOnFaeces <- 0.25; // Wade 2016
 	float forageEnergyContent <- 18.45; // MJ/kgDM IPCC 2019
 	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
+	
+	// TODO à grouper dans un fichier param
+	// C
+	float coefCO2ToC <- 0.2729; // Proportion of C in the mass of CO2
+	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CO2
+	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
+	float methaneEnergyContent <- 55.65; // MJ/kgCH4
 }
 
 species animalGroup virtual: true schedules: [] { // Not sure if schedules is not already empty if virtual is true.
@@ -43,9 +50,24 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 	
 	//// Functions
 	
-	action emitMetabo {
-		// TODO emit CH4 and CO2
+	action emitMetaboIntake (string eatenBiomassType, float eatenQuantity) {
+		float eatenEnergy;
+		switch eatenBiomassType {
+			match "FattenedRation" {
+				
+			}
+			match "Rangeland" {
+				
+			}
+			match "Cropland" {
+				
+			}
+		}
 		
+		float entericCH4 <- eatenEnergy * Fm * methaneEnergyContent; // kgCH4
+		float metaboCO2 <- (entericCH4 - 12) / 0.0302; // kgCO2
+		
+		ask world {	do saveFlowInMap("C", eatenBiomassType, "OF-ToAtmo", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
 		// TODO une fonction pour vérifier que l'émis n'est pas supérieur au digéré?
 	}
 	

@@ -136,7 +136,7 @@ species household schedules: [] {
 	
 	action renewFattenedAnimals {
  		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2); // TODO DUMMY 0.2
- 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
+// 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
  		if myForagePileBiomassContent != 0.0 and nbFatteningRenewal != 0.0 {
  			nbFatteningRenewal <- nbFatteningRenewal * min(0, max(1, 1 + 1 / myForagePileBiomassContent - 1 / (dailyIntakeRatePerTLU * nbFatteningRenewal * lengthFatteningSeason * 30))); // Doesn't take into account mobileherds
  		}

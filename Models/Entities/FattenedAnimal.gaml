@@ -31,6 +31,8 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 		float eatenQuantity <- 6.0; //TODO DUMMY
 		// ask stock du household >- eatenQuantity
 		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];
+		do emitMetaboIntake("FattenedRation", eatenQuantity);
+		// TODO manque le flux
 	}
 	
 	action fattenedDigest { // reflex ou scheduler?
