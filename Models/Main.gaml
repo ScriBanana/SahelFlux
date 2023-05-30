@@ -24,6 +24,8 @@ global {
 	////	Global parameters	////
 	////	--------------------------	////
 	
+	float startTimeReal <- machine_time;
+	
 	// Simulation calendar
 	int startHour <- wakeUpTime - 1;
 	date starting_date <- date([2020, 11, 1, startHour, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
@@ -185,6 +187,7 @@ global {
 		do computeENAIndicators;
 		do exportStockFlowsOutputData;
 		endSimu <- true; // Stops batch experiments
+		write "Simulation ended. Runtime : " + (machine_time - startTimeReal)/1000 + " s";
 		do pause;
 	}
 	
