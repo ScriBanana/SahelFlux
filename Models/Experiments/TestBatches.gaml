@@ -21,12 +21,12 @@ experiment BatchRun autorun: true type: batch repeat: nbThreads * nbRunsPerThrea
 	
 	reflex saveResults {
 		ask simulations {
-			save [int(self), self.nbHousehold, self.fallowEnabled, self.TT, self.cycle, self.machine_time] to: outputDirectory + "TestBatch.csv" type: "csv" rewrite: (int(self) = 0) ? true : false header: true;
+			save [int(self), self.nbHousehold, self.fallowEnabled, self.TT, self.cycle, self.machine_time] to: outputDirectory + "TestBatch.csv" format: "csv" rewrite: (int(self) = 0) ? true : false header: true;
 		}
 	}
 	
 	permanent {
-		display Troughflow {
+		display Troughflow type: java2D {
 			chart "Throughflow kgN" type: series {
 				data "Total simulation throughflow" value: simulations mean_of TT;
 			}

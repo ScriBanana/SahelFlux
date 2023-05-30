@@ -67,7 +67,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		float entericCH4 <- eatenEnergy * Fm * methaneEnergyContent; // kgCH4
 		float metaboCO2 <- (entericCH4 - 12) / 0.0302; // kgCO2
 		
-		ask world {	do saveFlowInMap("C", eatenBiomassType, "OF-ToAtmo", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
+//		ask world {	do saveFlowInMap("C", eatenBiomassType, "OF-ToAtmo", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
 		// TODO une fonction pour vérifier que l'émis n'est pas supérieur au digéré?
 	}
 	

@@ -70,7 +70,7 @@ experiment SOCDispRun parent: Run {
 			species SOCstock;
 		}
 		
-		display SOCCompartiments refresh:  current_date.day = 1 and updateTimeOfDay {
+		display SOCCompartiments type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
 			chart "Average SOC per compartment (kgC/ha)" type: series {
 				data "Labile C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
 				data "Stable C cropland" value: (SOCstock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
