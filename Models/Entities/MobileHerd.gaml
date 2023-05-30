@@ -143,7 +143,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	// Identify if current cell is suitable enough, in comparison to neighbouring cells.
 	list<landscape> checkSpotQuality { // and return visible cells.
 		list<landscape> cellsAround <- landscape at_distance herdVisionRadius; // TODO Seems to cause slow down
-		float goodSpotThreshold <- meanBiomassContent - biomassContentSD; // Gersie, 2020
+		float goodSpotThreshold <- meanBiomassContent + biomassContentSD; // Gersie, 2020
 		isInGoodSpot <- cellsAround mean_of each.biomassContent > goodSpotThreshold;
 		return cellsAround;
 	}

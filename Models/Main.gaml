@@ -94,7 +94,7 @@ global {
 
 	reflex monthStep when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay) {
 		
-		switch current_date.month {
+		switch current_date.month { // Switch for annual processes, at the start of a specific month. See below for monthly processes
 			
 			match 1 {
 			// New year processes
@@ -142,10 +142,18 @@ global {
 					do transitionFromFallows;
 				}
 			}
-			
 		}
 		
-		// Monthly processes
+		switch current_date.month { // Monthly processes only in a specific season
+			match_between [rainySeasonFirstMonth, drySeasonFirstMonth - 1] {
+				// Necessary to use default.
+			}
+			default {
+				do updateTargetableCellsForChangingSiteInDS;
+			}
+		}
+		
+		// Monthly processes all year round.
 		write string(date(time), "M'/'y");
 		
 		do addWastesToHeaps;

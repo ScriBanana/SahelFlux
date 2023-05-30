@@ -98,6 +98,15 @@ global {
 		biomassContentSD <- standard_deviation(allCellsBiomass);
 	}
 	
+	// Updates mobile herds changing site potential targets
+	action updateTargetableCellsForChangingSiteInDS {
+		write "Updating available targets";
+		targetableCellsForChangingSite <- landscape where (
+			(each.cellLU = "Rangeland" or each.cellLU = "Cropland") and
+			(each.biomassContent > meanBiomassContent + biomassContentSD)
+		);
+	}
+	
 }
 
 grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 optimizer: "JPS" schedules: [] use_regular_agents: false {
@@ -258,6 +267,11 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				180 + (110 - 180) / maxRangelandBiomassContent * biomassContent
 			);
 		}
+		
+//		if self in targetableCellsForChangingSite {
+//			color <- #red;
+//		}
+		
 	}
 
 }
