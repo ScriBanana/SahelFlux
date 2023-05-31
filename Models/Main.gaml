@@ -181,6 +181,11 @@ global {
 				
 			}
 		}
+		
+		ask fattenedAnimal { // Could be someting else than daily.
+			do eat;
+		}
+		
 		dayInDS <- dayInDS + 1;
 	}
 
