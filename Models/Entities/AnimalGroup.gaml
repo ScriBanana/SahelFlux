@@ -27,11 +27,15 @@ global {
 	float ratioNExcretedOnIngested <- 0.43; // Lecomte 2002
 	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
 	float ratioNUrineOnFaeces <- 0.25; // Wade 2016
-	float forageEnergyContent <- 18.45; // MJ/kgDM IPCC 2019
+	float fattenedRationEnergyContent <- 16.24; // MJ/kgDM Surveys, INRA 2018, Feedipedia
+	// TODO Corriger avec le Jarga
+	float milletResiduesEnergyContent <- 17.17; // MJ/kgDM INRA 2018
+	float forageEnergyContentDS <- 18.67; // MJ/kgDM INRA 2018
+	float forageEnergyContentRS <- 17.94; // MJ/kgDM INRA 2018 (mean value)
 	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
 	
 	// TODO à grouper dans un fichier param
-	// C
+	// Carboned gases parameters
 	float coefCO2ToC <- 0.2729; // Proportion of C in the mass of CO2
 	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CO2
 	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
@@ -54,20 +58,21 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		float eatenEnergy;
 		switch eatenBiomassType {
 			match "FattenedRation" {
-				
+				eatenEnergy <- fattenedRationEnergyContent * eatenQuantity;
 			}
 			match "Rangeland" {
-				
+				eatenEnergy <- drySeason ? forageEnergyContentDS * eatenQuantity : forageEnergyContentRS * eatenQuantity;
 			}
 			match "Cropland" {
-				
+				eatenEnergy <- milletResiduesEnergyContent * eatenQuantity;
 			}
 		}
 		
-		float entericCH4 <- eatenEnergy * Fm * methaneEnergyContent; // kgCH4
-		float metaboCO2 <- (entericCH4 - 12) / 0.0302; // kgCO2
+		float entericCH4 <- eatenEnergy * Fm * methaneEnergyContent; // kgCH4/herd/timestep
+		float metaboCO2 <- (entericCH4 - 12) / 0.0302; // kgCO2/herd/timestep
 		
-//		ask world {	do saveFlowInMap("C", eatenBiomassType, "OF-ToAtmo", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
+		string emittingPool <- eatenBiomassType = "FattenedRation" ? "FattenedAn" : "MobileHerds";
+		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
 		// TODO une fonction pour vérifier que l'émis n'est pas supérieur au digéré?
 	}
 	
