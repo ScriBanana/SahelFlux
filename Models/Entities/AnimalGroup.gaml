@@ -55,6 +55,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 	//// Functions
 	
 	action emitMetaboIntake (string eatenBiomassType, float eatenQuantity) {
+		// Has to be daily for the CO2 regression to work
 		float eatenEnergy; // MJ/TLU
 		switch eatenBiomassType {
 			match "FattenedRation" {
@@ -67,9 +68,9 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 				eatenEnergy <- milletResiduesEnergyContent * eatenQuantity;
 			}
 		}
-		assert eatenEnergy >= 0.0;
+		
 		float entericCH4 <- eatenEnergy * Fm / methaneEnergyContent; // kgCH4/herd/timestep
-		float metaboCO2 <- (entericCH4 - 0.01141) / 0.2859; // kgCO2/herd/timestep
+		float metaboCO2 <- max((entericCH4 - 0.01141) / 0.2859, 0.0); // kgCO2/herd/timestep
 		
 		string emittingPool <- eatenBiomassType = "FattenedRation" ? "FattenedAn" : "MobileHerds";
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}

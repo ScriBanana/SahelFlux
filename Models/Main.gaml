@@ -164,6 +164,15 @@ global {
 	}
 	
 	reflex dailyStep when: updateTimeOfDay { // Has to come after monthStep for indentation reasons
+		
+		// Mobile herds mechanisms
+		ask mobileHerd {
+			loop biomassType over: dailyIntakes.keys {
+				do emitMetaboIntake(biomassType, dailyIntakes[biomassType]);
+			}
+		}
+		
+		// Fattening mechanisms
 		if mod(dayInDS, lengthFatteningSeason) = 0 and drySeason {
 			if dayInDS > (365 - lengthRainySeason) * 1 / 4 { // IDK what I'm doing anymore
 				write "	Selling fattenend animals.";

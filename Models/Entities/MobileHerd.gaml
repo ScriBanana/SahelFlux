@@ -63,13 +63,14 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	list<parcel> lastDSPaddockList;
 	list<parcel> lastDSRemainingPaddocks;
 	
-	// Grazing parameters and variables
+	// Grazing local parameters and variables
 	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize; // kgDM/herd/day
 	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float satietyMeter <- 0.0;
 	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
 	landscape currentCell update: first(landscape overlapping self);
+	map<string, float> dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
 	
 	//// FSM behaviour
 	
@@ -180,6 +181,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
+		dailyIntakes[eatenBiomassType] <- dailyIntakes[eatenBiomassType] + eatenQuantity;
 		
 		// Save flows to flows map
 		float biomassDummyCContent <- 0.8; //TODO DUMMY mettre dans input qqpart
@@ -187,8 +189,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		string emittingPool <- eatenBiomassType = "Rangeland" ? "Rangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyCContent);}
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyNContent);}
-		
-		do emitMetaboIntake(eatenBiomassType, eatenQuantity);
 	}
 	
 	// Excretion after digestionLength (Temporality differs with fattened)
