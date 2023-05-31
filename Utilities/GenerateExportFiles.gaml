@@ -26,18 +26,21 @@ global {
 		outputCSVheader <<+ flowsMapTemplate.keys where (each contains "IF-");
 		outputCSVheader <<+ NFlowsMap.keys;
 		
+		
 		do saveSFMatrixDivided (outputCSVheader, "", 1.0);
 		do saveSFMatrixDivided (outputCSVheader, "y_", durationSimu);
 		do saveSFMatrixDivided (outputCSVheader, "ha_y_", totalAreaHa * durationSimu);
-		do saveSFMatrixDivided (outputCSVheader, "TLU_y_", (mobileHerd sum_of each.herdSize) * durationSimu);
+		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
+		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
+		do saveSFMatrixDivided (outputCSVheader, "TLU_y_", (nbTLUHerds) * durationSimu);
 		
 		write "... Done";
 	}
 	
 	action saveSFMatrixDivided (list<string> outputCSVheader, string fileCoreName, float divisionOperand) {
 		
-		save outputCSVheader to: outputDirectory + filePrefix + fileCoreName + "Nmat.csv" type: csv rewrite: true header: false;
-		save outputCSVheader to: outputDirectory + filePrefix + fileCoreName + "Cmat.csv" type: csv rewrite: true header: false;
+		save outputCSVheader to: outputDirectory + filePrefix + fileCoreName + "Nmat.csv" format: csv rewrite: true header: false;
+		save outputCSVheader to: outputDirectory + filePrefix + fileCoreName + "Cmat.csv" format: csv rewrite: true header: false;
 		
 		//Again, could have been a loop over N and C, but Gama doesn't like looping on nested containers.
 		int outputId <- 0;
@@ -46,7 +49,7 @@ global {
 			loop valueToSave over: matLine {
 				lineToSave <+ string(valueToSave / divisionOperand); // TODO ne marche pas pour les fattened
 			}
-			save lineToSave to: outputDirectory + filePrefix + fileCoreName + "Nmat.csv" type: csv rewrite: false;
+			save lineToSave to: outputDirectory + filePrefix + fileCoreName + "Nmat.csv" format: csv rewrite: false;
 			outputId <- outputId +1;
 		}
 		outputId <- 0;
@@ -55,7 +58,7 @@ global {
 			loop valueToSave over: matLine {
 				lineToSave <+ string(valueToSave / divisionOperand);
 			}
-			save lineToSave to: outputDirectory + filePrefix + fileCoreName + "Cmat.csv" type: csv rewrite: false;
+			save lineToSave to: outputDirectory + filePrefix + fileCoreName + "Cmat.csv" format: csv rewrite: false;
 			outputId <- outputId +1;
 		}
 	}
