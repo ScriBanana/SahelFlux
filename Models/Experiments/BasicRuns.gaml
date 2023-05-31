@@ -49,9 +49,11 @@ experiment Run type: gui {
 }
 
 experiment FastAutoRun autorun: true {
-	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 60 min: 0;
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0 updates: [nbTranshumantHh, nbFatteningHh];
+	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 5 min: 0 max: nbHousehold;
+	parameter "Number fattening households" category: "Scenario - Population structure" var: nbFatteningHh <- 5 min: 0 max: nbHousehold;
 	parameter "Short run start date" var: starting_date <- date([2020, 4, 10, eveningTime + 1, 0, 0]);
-	parameter "Short run end date" var: endDate <- date([2020, 6, 1, eveningTime + 1, 0, 0]);
+	parameter "Short run end date" var: endDate <- date([2020, 7, 1, eveningTime + 1, 0, 0]);
 }
 
 experiment FallowtoRun parent: Run autorun: true {

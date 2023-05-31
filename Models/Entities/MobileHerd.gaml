@@ -171,8 +171,8 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	// Graze or browse biomass in cell
 	action graze (landscape cellToGraze) {
 		string eatenBiomassType <- currentCell.cellLU;
-		float eatenQuantity <- eatenBiomassType = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd;
-		assert cellToGraze.biomassContent >= 0.0; // Trying to graze on a depleted cell
+		float eatenQuantity <- eatenBiomassType = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd; // kgDM/herd/timestep
+		assert cellToGraze.biomassContent >= 0.0; // Grazing attempt on a depleted cell
 		
 		eatenQuantity <-  cellToGraze.biomassContent > eatenQuantity ? eatenQuantity : cellToGraze.biomassContent;
 		ask cellToGraze {
