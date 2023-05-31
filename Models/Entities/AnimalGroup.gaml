@@ -37,7 +37,7 @@ global {
 	// TODO à grouper dans un fichier param
 	// Carboned gases parameters
 	float coefCO2ToC <- 0.2729; // Proportion of C in the mass of CO2
-	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CO2
+	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CH4
 	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
 	float methaneEnergyContent <- 55.65; // MJ/kgCH4
 }
@@ -55,7 +55,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 	//// Functions
 	
 	action emitMetaboIntake (string eatenBiomassType, float eatenQuantity) {
-		float eatenEnergy;
+		float eatenEnergy; // MJ/TLU
 		switch eatenBiomassType {
 			match "FattenedRation" {
 				eatenEnergy <- fattenedRationEnergyContent * eatenQuantity;
@@ -67,9 +67,9 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 				eatenEnergy <- milletResiduesEnergyContent * eatenQuantity;
 			}
 		}
-		
-		float entericCH4 <- eatenEnergy * Fm * methaneEnergyContent; // kgCH4/herd/timestep
-		float metaboCO2 <- (entericCH4 - 12) / 0.0302; // kgCO2/herd/timestep
+		assert eatenEnergy >= 0.0;
+		float entericCH4 <- eatenEnergy * Fm / methaneEnergyContent; // kgCH4/herd/timestep
+		float metaboCO2 <- (entericCH4 - 0.01141) / 0.2859; // kgCO2/herd/timestep
 		
 		string emittingPool <- eatenBiomassType = "FattenedRation" ? "FattenedAn" : "MobileHerds";
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}

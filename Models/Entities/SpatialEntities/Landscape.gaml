@@ -100,7 +100,7 @@ global {
 	
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
-		write "Updating available targets";
+//		write "Updating available targets";
 		targetableCellsForChangingSite <- landscape where (
 			(each.cellLU = "Rangeland" or each.cellLU = "Cropland") and
 			(each.biomassContent > meanBiomassContent + biomassContentSD)
