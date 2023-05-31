@@ -169,6 +169,7 @@ global {
 		ask mobileHerd {
 			loop biomassType over: dailyIntakes.keys {
 				do emitMetaboIntake(biomassType, dailyIntakes[biomassType]);
+				dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
 			}
 		}
 		
