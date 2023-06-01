@@ -27,12 +27,31 @@ global {
 	float ratioNExcretedOnIngested <- 0.43; // Lecomte 2002
 	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
 	float ratioNUrineOnFaeces <- 0.25; // Wade 2016
-	float fattenedRationEnergyContent <- 16.24; // MJ/kgDM Surveys, INRA 2018, Feedipedia
-	// TODO Corriger avec le Jarga
-	float milletResiduesEnergyContent <- 17.17; // MJ/kgDM INRA 2018
-	float forageEnergyContentDS <- 18.67; // MJ/kgDM INRA 2018
-	float forageEnergyContentRS <- 17.94; // MJ/kgDM INRA 2018 (mean value)
 	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
+	
+	// Feed nutritional values
+	float milletResiduesEnergyContent <- 17.17; // MJ/kgDM INRA 2018
+	float fattenedRationEnergyContent <- 18.79; // MJ/kgDM Surveys, INRA 2018, Feedipedia
+	float forageDSEnergyContent <- 18.67; // MJ/kgDM INRA 2018
+	float forageRSEnergyContent <- 17.94; // MJ/kgDM INRA 2018 (mean value)
+	float milletResiduesAshContent <- 11.40; // % INRA 2018
+	float fattenedRationAshContent <- 3.838; // % Surveys, INRA 2018, Feedipedia
+	float forageDSAshContent <- 4.6; // % INRA 2018
+	float forageRSAshContent <- 10.25; // % INRA 2018 (mean value)
+	float milletResiduesDigestibility <- 30.0; // % INRA 2018
+	float fattenedRationDigestibility <- 54.9; // % Surveys, INRA 2018, Feedipedia
+	float forageDSDigestibility <- 49.0; // % INRA 2018
+	float forageRSDigestibility <- 60.5; // % INRA 2018 (mean value)
+	
+	// Feed N and C contents
+	float milletResiduesNContent <- 0.006; // kgN/kgDM Grillot 2018
+	float fattenedRationNContent <- 0.01577; // kgN/kgDM Surveys, INRA 2018, Feedipedia
+	float forageDSNContent <- 0.006; // kgN/kgDM Grillot 2018
+	float forageRSNContent <- 0.02; // kgN/kgDM Grillot 2018
+	float milletResiduesCContent <- 0.7; // kgC/kgDM TODO DUMMY
+	float fattenedRationCContent <- 0.7; // kgC/kgDM TODO DUMMY
+	float forageDSCContent <- 0.7; // kgC/kgDM TODO DUMMY
+	float forageRSCContent <- 0.7; // kgC/kgDM TODO DUMMY
 	
 	// TODO à grouper dans un fichier param
 	// Carboned gases parameters
@@ -62,7 +81,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 				eatenEnergy <- fattenedRationEnergyContent * eatenQuantity;
 			}
 			match "Rangeland" {
-				eatenEnergy <- drySeason ? forageEnergyContentDS * eatenQuantity : forageEnergyContentRS * eatenQuantity;
+				eatenEnergy <- drySeason ? forageDSEnergyContent * eatenQuantity : forageRSEnergyContent * eatenQuantity;
 			}
 			match "Cropland" {
 				eatenEnergy <- milletResiduesEnergyContent * eatenQuantity;
@@ -78,33 +97,43 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 	}
 	
 	action excrete (pair someChyme) {
+		
 		string chymeNature <- someChyme.key;
 		float ingestedMS <- float(someChyme.value);
+		
 		// Ration type specific variables
-		float ingestedNContent;
-		float ingestedCContent;
-		float faecesAshContent;
-		float ingestedDigestibility;
+		float ingestedNContent; // kgN/kgDM
+		float ingestedCContent; // kgC/kgDM
+		float faecesAshContent; // %
+		float ingestedDigestibility; // %
+		
 		switch chymeNature {
 			match "Cropland" {
-				ingestedNContent <- 0.2; //TODO Dummy
-				ingestedCContent <- 0.7; //TODO Dummy
-				faecesAshContent <- 0.5; //TODO Dummy
-				ingestedDigestibility <- 0.2; //TODO Dummy
+				ingestedNContent <- milletResiduesNContent;
+				ingestedCContent <- milletResiduesCContent;
+				faecesAshContent <- milletResiduesAshContent;
+				ingestedDigestibility <- milletResiduesDigestibility;
 			}
 
 			match "Rangeland" {
-				ingestedNContent <- 0.2; //TODO Dummy
-				ingestedCContent <- 0.7; //TODO Dummy
-				faecesAshContent <- 0.5; //TODO Dummy
-				ingestedDigestibility <- 0.2; //TODO Dummy
+				if !drySeason {
+					ingestedNContent <- forageRSNContent;
+					ingestedCContent <- forageRSCContent;
+					faecesAshContent <- forageRSAshContent;
+					ingestedDigestibility <- forageRSDigestibility;
+				} else {
+					ingestedNContent <- forageDSNContent;
+					ingestedCContent <- forageDSCContent;
+					faecesAshContent <- forageDSAshContent;
+					ingestedDigestibility <- forageDSDigestibility;
+				}
 			}
 
 			match "FattenedRation" {
-				ingestedNContent <- 0.2; //TODO Dummy
-				ingestedCContent <- 0.7; //TODO Dummy
-				faecesAshContent <- 0.5; //TODO Dummy
-				ingestedDigestibility <- 0.2; //TODO Dummy
+				ingestedNContent <- fattenedRationNContent;
+				ingestedCContent <- fattenedRationCContent;
+				faecesAshContent <- fattenedRationAshContent;
+				ingestedDigestibility <- fattenedRationDigestibility;
 			}
 
 		}
@@ -115,7 +144,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		float faecesNitrogen <- excretedNitrogen * (1 - ratioNUrineOnFaeces);
 		float urineNirogen <- excretedNitrogen * ratioNUrineOnFaeces;
 		 // In soil carbon model
-		float excretedCarbon <- ingestedMS * ingestedCContent;
+		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested;
 		// In CH4 from soils
 		float faecesAsh <- ingestedMS * faecesAshContent; // (Ash are not digested, so ash quantity is the same in ingested and excreta)
 		float volatileSolidExcreted <- ingestedMS * (1 - ingestedDigestibility + urineEnergyFactor) * faecesAshContent; //TODO Besoin du forageEnergyContent ou pas ?
