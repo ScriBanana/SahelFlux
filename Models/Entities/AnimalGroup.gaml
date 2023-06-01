@@ -28,6 +28,7 @@ global {
 	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
 	float ratioNUrineOnFaeces <- 0.25; // Wade 2016
 	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
+	float dietaryEnergyConversionFactor <- 18.45;
 	
 	// Feed nutritional values
 	float milletResiduesEnergyContent <- 17.17; // MJ/kgDM INRA 2018
@@ -106,6 +107,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		float ingestedCContent; // kgC/kgDM
 		float faecesAshContent; // %
 		float ingestedDigestibility; // %
+		float ingestedEnergyContent; // MJ/kgDM
 		
 		switch chymeNature {
 			match "Cropland" {
@@ -113,6 +115,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 				ingestedCContent <- milletResiduesCContent;
 				faecesAshContent <- milletResiduesAshContent;
 				ingestedDigestibility <- milletResiduesDigestibility;
+				ingestedEnergyContent <- milletResiduesEnergyContent;
 			}
 
 			match "Rangeland" {
@@ -121,11 +124,13 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 					ingestedCContent <- forageRSCContent;
 					faecesAshContent <- forageRSAshContent;
 					ingestedDigestibility <- forageRSDigestibility;
+					ingestedEnergyContent <- forageRSEnergyContent;
 				} else {
 					ingestedNContent <- forageDSNContent;
 					ingestedCContent <- forageDSCContent;
 					faecesAshContent <- forageDSAshContent;
 					ingestedDigestibility <- forageDSDigestibility;
+					ingestedEnergyContent <- forageDSEnergyContent;
 				}
 			}
 
@@ -134,23 +139,23 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 				ingestedCContent <- fattenedRationCContent;
 				faecesAshContent <- fattenedRationAshContent;
 				ingestedDigestibility <- fattenedRationDigestibility;
+				ingestedEnergyContent <- fattenedRationEnergyContent;
 			}
 
 		}
 		
 		// Compute outputs, used in other processes :
-		// In nitrogen available for plant growth and N2O and N gases losses from soil
-		float excretedNitrogen <- ingestedMS * ingestedNContent * ratioNExcretedOnIngested;
-		float faecesNitrogen <- excretedNitrogen * (1 - ratioNUrineOnFaeces);
-		float urineNirogen <- excretedNitrogen * ratioNUrineOnFaeces;
-		 // In soil carbon model
-		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested;
 		// In CH4 from soils
-		float faecesAsh <- ingestedMS * faecesAshContent; // (Ash are not digested, so ash quantity is the same in ingested and excreta)
-		float volatileSolidExcreted <- ingestedMS * (1 - ingestedDigestibility + urineEnergyFactor) * faecesAshContent; //TODO Besoin du forageEnergyContent ou pas ?
+		float volatileSolidExcreted <- ingestedMS * ( 1 - faecesAshContent) * (1 - ingestedDigestibility + urineEnergyFactor); // kgDM
+		// In nitrogen available for plant growth and N2O and N gases losses from soil
+		float excretedNitrogen <- ingestedMS * ingestedNContent * ratioNExcretedOnIngested; // kgN
+		float faecesNitrogen <- excretedNitrogen * (1 - ratioNUrineOnFaeces); // kgN
+		float urineNirogen <- excretedNitrogen * ratioNUrineOnFaeces; // kgN
+		 // In soil carbon model
+		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested; // kgC
 		
 		// Return outputs
-		map<string, float> digestatCharacteristics<- ["faecesNitrogen"::faecesNitrogen, "urineNirogen"::urineNirogen, "excretedCarbon"::excretedCarbon]; // TODO manque les ash et VSE, non?
+		map<string, float> digestatCharacteristics<- ["volatileSolidExcreted"::volatileSolidExcreted, "faecesNitrogen"::faecesNitrogen, "urineNirogen"::urineNirogen, "excretedCarbon"::excretedCarbon]; // TODO manque les ash et VSE, non?
 		return digestatCharacteristics;
 
 	}
