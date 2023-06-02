@@ -176,7 +176,7 @@ global {
 		// Fattening mechanisms
 		if mod(dayInDS, lengthFatteningSeason) = 0 and drySeason {
 			if dayInDS > (365 - lengthRainySeason) * 1 / 4 { // IDK what I'm doing anymore
-				write "	Selling fattenend animals.";
+				write "	Selling fattened animals.";
 				ask household where each.doesFattening {
 					do sellFattenedAnimals;
 				}
@@ -184,15 +184,16 @@ global {
 			}
 			
 			if dayInDS < (365 - lengthRainySeason) * 3 / 4 {
-				write "	Renewing fattenend animals.";
 				ask household where each.doesFattening {
 					do renewFattenedAnimals;
 				}
+				write "	Renewed fattened animals. " + length(fattenedAnimal) + " new animals.";
 				
 			}
 		}
 		
 		ask fattenedAnimal { // Could be someting else than daily.
+			do fattenedDigest;
 			do eat;
 		}
 		

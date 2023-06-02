@@ -52,12 +52,23 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", (eatenQuantity - eatenStraw) * fattenedComplementsCContent);}
 	}
 	
-	// TODO Never called
-	action fattenedDigest { // reflex ou scheduler?
-		loop chymeChunk over: chymeChunksList {
-			list excretaOutputs <- excrete(chymeChunk[1]);
-			//ask currentCell   excretaOutputs
+	action fattenedDigest {
+		if !empty(chymeChunksList) {
+			// Compute excreted OM
+			loop while: !empty(chymeChunksList)  {
+				map excretaOutputs <- excrete(first(chymeChunksList)[1]);
+				chymeChunksList >- first(chymeChunksList);
+				
+				// TODO Enregistrer le VSE dans le heap
+				// TODO Enregistrer les inputs de N et de C dans le heap
+				
+				ask world {	do saveFlowInMap("C", "FattenedAn", "TF-ToORPHeaps" , float(excretaOutputs["excretedCarbon"]));}
+				ask world {	do saveFlowInMap("N", "FattenedAn", "TF-ToORPHeaps" ,
+					float(excretaOutputs["faecesNitrogen"]) + float(excretaOutputs["urineNirogen"])
+				);}
+				
+			}
+			chymeChunksList <- [];
 		}
-		chymeChunksList <- [];
 	}
 }

@@ -225,6 +225,8 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool , float(excretaOutputs["excretedCarbon"]));}
 		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool, float(excretaOutputs["faecesNitrogen"]) + float(excretaOutputs["urineNitrogen"]));}
 		
+		// TODO Enregistrer le VSE dans le sol
+		
 	}
 	
 	//// Aspect

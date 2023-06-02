@@ -65,13 +65,14 @@ species ORPHeap schedules: [] {
 //		}
 	}
 	
-	float lastORPNStock <- heapNContentInit;
-	float lastORPCStock <- heapCContentInit;
-	action registerORPFlows {
-		
-		lastORPNStock <- heapNContent;
-		lastORPCStock <- heapCContent;
-	}
+	// TODO find out wtf that is and if it is necessary
+//	float lastORPNStock <- heapNContentInit;
+//	float lastORPCStock <- heapCContentInit;
+//	action registerORPFlows {
+//		
+//		lastORPNStock <- heapNContent;
+//		lastORPCStock <- heapCContent;
+//	}
 }
 
 
