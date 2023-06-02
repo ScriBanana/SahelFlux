@@ -47,10 +47,12 @@ global {
 	// Feed N and C contents
 	float milletResiduesNContent <- 0.006; // kgN/kgDM Grillot 2018
 	float fattenedRationNContent <- 0.01577; // kgN/kgDM Surveys, INRA 2018, Feedipedia
+	float fattenedComplementsNContent <- 0.01814; // kgN/kgDM Surveys, INRA 2018, Feedipedia
 	float forageDSNContent <- 0.006; // kgN/kgDM Grillot 2018
 	float forageRSNContent <- 0.02; // kgN/kgDM Grillot 2018
 	float milletResiduesCContent <- 0.7; // kgC/kgDM TODO DUMMY
 	float fattenedRationCContent <- 0.7; // kgC/kgDM TODO DUMMY
+	float fattenedComplementsCContent <- 0.7; // kgC/kgDM TODO DUMMY
 	float forageDSCContent <- 0.7; // kgC/kgDM TODO DUMMY
 	float forageRSCContent <- 0.7; // kgC/kgDM TODO DUMMY
 	

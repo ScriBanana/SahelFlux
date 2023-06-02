@@ -18,6 +18,7 @@ global {
 	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increase in chance to aquire a new one. Arbitrary value
 	
 	float fattenedTLUDailyIntake <- 9.59; // kgDM/TLU/day Ndiaye 2022
+	float strawInFattenedTLURation <- 2.79; // kgDM/TLU/day Ndiaye 2022, Audouin 2014
 	
 }
 
@@ -31,17 +32,27 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 	
 	action eat {
 		float eatenQuantity <- fattenedTLUDailyIntake * groupSize;
+		float eatenStraw <- strawInFattenedTLURation * groupSize;
 		
-		// TODO ask stock du household >- eatenQuantity
-		
-		
-		
-		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];
+		// Metabolise and prepare for excretion
 		do emitMetaboIntake("FattenedRation", eatenQuantity);
-		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", eatenQuantity * fattenedRationCContent);}
-		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", eatenQuantity * fattenedRationNContent);}
+		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];
+		
+		// Save flows and remove from straw pile if need be
+		if myHousehold.myForagePileBiomassContent >= eatenStraw {
+			myHousehold.myForagePileBiomassContent <- myHousehold.myForagePileBiomassContent - eatenStraw;
+			ask world {	do saveFlowInMap("C", "StrawPiles", "TF-ToFattenedAn", eatenStraw * milletStrawCContent);}
+			ask world {	do saveFlowInMap("N", "StrawPiles", "TF-ToFattenedAn", eatenStraw * milletStrawNContent);}
+		} else {
+			ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", eatenStraw * milletStrawCContent);}
+			ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", eatenStraw * milletStrawNContent);}
+		}
+		
+		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", (eatenQuantity - eatenStraw) * fattenedComplementsNContent);}
+		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", (eatenQuantity - eatenStraw) * fattenedComplementsCContent);}
 	}
 	
+	// TODO Never called
 	action fattenedDigest { // reflex ou scheduler?
 		loop chymeChunk over: chymeChunksList {
 			list excretaOutputs <- excrete(chymeChunk[1]);
