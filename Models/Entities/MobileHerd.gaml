@@ -183,12 +183,29 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
 		dailyIntakes[eatenBiomassType] <- dailyIntakes[eatenBiomassType] + eatenQuantity;
 		
-		// Save flows to flows map
-		float biomassDummyCContent <- 0.8; //TODO DUMMY mettre dans input qqpart
-		float biomassDummyNContent <- 0.1; //TODO DUMMY mettre dans input qqpart
-		string emittingPool <- eatenBiomassType = "Rangeland" ? "Rangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields");
-		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyCContent);}
-		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToMobileHerds", eatenQuantity * biomassDummyNContent);}
+		// emitMetaboIntake is called in main.gaml
+		
+		string emittingPool;
+		float eatenBiomassNContent;
+		float eatenBiomassCContent;
+		
+		if eatenBiomassType = "Rangeland" {
+			emittingPool <- "Rangelands";
+			if drySeason {
+				eatenBiomassNContent <- forageDSNContent;
+				eatenBiomassCContent <- forageDSCContent;
+			} else {
+				eatenBiomassNContent <- forageRSNContent;
+				eatenBiomassCContent <- forageRSCContent;
+			}
+		} else {
+			emittingPool <- currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields";
+			eatenBiomassNContent <- milletResiduesNContent;
+			eatenBiomassCContent <- milletResiduesCContent;
+		}
+		
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToMobileHerds", eatenQuantity * eatenBiomassCContent);}
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToMobileHerds", eatenQuantity * eatenBiomassNContent);}
 	}
 	
 	// Excretion after digestionLength (Temporality differs with fattened)
