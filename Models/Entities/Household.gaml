@@ -81,7 +81,7 @@ global {
 		}
 		
 		assert mobileHerd min_of each.herdSize > 0;
-		write "		Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants, " + length(household where each.isTranshumant) + " fatteners.";
+		write "		Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants, " + length(household where each.doesFattening) + " fatteners.";
 	}
 }
 
@@ -140,12 +140,21 @@ species household schedules: [] {
 	action renewFattenedAnimals {
  		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2); // TODO DUMMY 0.2
 // 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
- 		if myForagePileBiomassContent != 0.0 and nbFatteningRenewal != 0.0 {
- 			nbFatteningRenewal <- nbFatteningRenewal * min(
+ 		write nbFatteningRenewal;
+ 		if
+	 		myForagePileBiomassContent != 0.0 and
+	 		nbFatteningRenewal != 0.0 and
+	 		2 - 2 * myForagePileBiomassContent / (strawInFattenedTLUDailyRation * nbFatteningRenewal * lengthFatteningSeason) >= 0
+ 		{
+ 			nbFatteningRenewal <- nbFatteningRenewal * max(
  				0,
- 				max(1, 1 + 1 / myForagePileBiomassContent - 1 / (dailyIntakeRatePerTLU * nbFatteningRenewal * lengthFatteningSeason * 30))
+ 				min(1,
+ 					-log(2 - 2 * myForagePileBiomassContent / (strawInFattenedTLUDailyRation * nbFatteningRenewal * lengthFatteningSeason))
+ 				)
  			); // Doesn't take into account mobileherds
  		}
+ 		nbFatteningRenewal <- floor(nbFatteningRenewal * 100) / 100; // Less decimals
+ 		write nbFatteningRenewal;
  		
 		float boughtFattenedNFlow <- nbFatteningRenewal * TLUNcontent;
  		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCcontent;
@@ -154,7 +163,8 @@ species household schedules: [] {
  		
  		create fattenedAnimal with: [
 			myHousehold::self,
-			groupSize::nbFatteningRenewal
+			groupSize::nbFatteningRenewal,
+			chymeChunksList::[]
  		] {
 			myHousehold.myFattenedAnimals <- self;
  		}

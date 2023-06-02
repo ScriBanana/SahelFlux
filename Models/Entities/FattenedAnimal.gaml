@@ -18,7 +18,7 @@ global {
 	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increase in chance to aquire a new one. Arbitrary value
 	
 	float fattenedTLUDailyIntake <- 9.59; // kgDM/TLU/day Ndiaye 2022
-	float strawInFattenedTLURation <- 2.79; // kgDM/TLU/day Ndiaye 2022, Audouin 2014
+	float strawInFattenedTLUDailyRation <- 2.79; // kgDM/TLU/day Ndiaye 2022, Audouin 2014
 	
 }
 
@@ -32,7 +32,7 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 	
 	action eat {
 		float eatenQuantity <- fattenedTLUDailyIntake * groupSize;
-		float eatenStraw <- strawInFattenedTLURation * groupSize;
+		float eatenStraw <- strawInFattenedTLUDailyRation * groupSize;
 		
 		// Metabolise and prepare for excretion
 		do emitMetaboIntake("FattenedRation", eatenQuantity);

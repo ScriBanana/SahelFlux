@@ -183,11 +183,11 @@ global {
 				
 			}
 			
-			if dayInDS < (365 - lengthRainySeason) * 3 / 4 {
+			if (current_date != (starting_date add_hours 1)) and (dayInDS < (365 - lengthRainySeason) * 3 / 4) {
 				ask household where each.doesFattening {
 					do renewFattenedAnimals;
 				}
-				write "	Renewed fattened animals. " + length(fattenedAnimal) + " new animals.";
+				write "	Renewed fattened animals. " + length(fattenedAnimal) + " new animals."; // TODO * groupSize
 				
 			}
 		}
