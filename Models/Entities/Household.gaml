@@ -26,6 +26,8 @@ global {
 	
 	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary
 	
+	float meanForagePileBiomassContent <- 300.0; // kgDM TODO DUMMY
+	
 	//// Global households functions
 	
 	action instantiateHouseholds {
@@ -34,6 +36,7 @@ global {
 			assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
 		}
 		create household number: nbHousehold {
+			myForagePileBiomassContent <- gauss(meanForagePileBiomassContent, meanForagePileBiomassContent * 0.1);
 			householdColour <- rnd_color(255);
 			
 			// Associating parcels

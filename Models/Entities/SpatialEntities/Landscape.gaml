@@ -130,7 +130,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	string thisYearReceivingPool;
 	float yearlyBiomassToBeProduced;
 	float yearlyWeedsBiomassToBeProduced;
-	float weedProportionInBiomass;
+	float weedProportionInBiomass <- 0.0; // As of now, no weed in the simulation
 	
 	//// Functions
 	
@@ -217,11 +217,12 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		float exportedStrawCFlow; // kgC
 		string emittingPool;
 		
+		// Compute exported flows
 		switch myParcel.currentYearCover {
 			match "Millet" {
 				emittingPool <- "Millet";
 				exportedCropsBiomass <- milletExportedAgriProductRatio * (1 - weedProportionInBiomass) * self.biomassContent;
-				exportedStrawBiomass <- milletExportedStrawRatio * exportedCropsBiomass;
+				exportedStrawBiomass <- milletExportedStrawRatio * (self.biomassContent - exportedCropsBiomass);
 				
 				exportedCropsNFlow <- exportedCropsBiomass * milletEarNContent; // kgN
 				exportedCropsCFlow <- exportedCropsBiomass * milletEarCContent; // kgC
@@ -244,10 +245,17 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 			}
 		}
 		
+		// Remove harvested biomass from self
 		self.biomassContent <- self.biomassContent - exportedCropsBiomass - exportedStrawBiomass;
 		
-		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHomeFields", exportedCropsNFlow);}
-		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHomeFields", exportedCropsCFlow);}
+		// Credit straw pile with harvested straw
+		if myParcel.myOwner != nil {
+			myParcel.myOwner.myForagePileBiomassContent <- myParcel.myOwner.myForagePileBiomassContent + exportedStrawBiomass;
+		}
+		
+		// Save flows
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHouseholds", exportedCropsNFlow);}
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHouseholds", exportedCropsCFlow);}
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToStrawPiles", exportedStrawNFlow);}
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToStrawPiles", exportedStrawCFlow);}
 	}

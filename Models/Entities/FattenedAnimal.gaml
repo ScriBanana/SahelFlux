@@ -34,10 +34,12 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 		
 		// TODO ask stock du household >- eatenQuantity
 		
+		
+		
 		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];
 		do emitMetaboIntake("FattenedRation", eatenQuantity);
-		ask world {	do saveFlowInMap("C", "IF-FromMarket", "TF-ToFattenedAn", eatenQuantity * fattenedRationCContent);}
-		ask world {	do saveFlowInMap("N", "IF-FromMarket", "TF-ToFattenedAn", eatenQuantity * fattenedRationNContent);}
+		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", eatenQuantity * fattenedRationCContent);}
+		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", eatenQuantity * fattenedRationNContent);}
 	}
 	
 	action fattenedDigest { // reflex ou scheduler?
