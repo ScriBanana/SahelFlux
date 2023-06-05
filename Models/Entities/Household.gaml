@@ -140,7 +140,6 @@ species household schedules: [] {
 	action renewFattenedAnimals {
  		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2); // TODO DUMMY 0.2
 // 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
- 		write nbFatteningRenewal;
  		if
 	 		myForagePileBiomassContent != 0.0 and
 	 		nbFatteningRenewal != 0.0 and
@@ -154,19 +153,20 @@ species household schedules: [] {
  			); // Doesn't take into account mobileherds
  		}
  		nbFatteningRenewal <- floor(nbFatteningRenewal * 100) / 100; // Less decimals
- 		write nbFatteningRenewal;
  		
-		float boughtFattenedNFlow <- nbFatteningRenewal * TLUNcontent;
- 		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCcontent;
- 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", boughtFattenedNFlow);}
- 		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", boughtFattenedCFlow);}
- 		
- 		create fattenedAnimal with: [
-			myHousehold::self,
-			groupSize::nbFatteningRenewal,
-			chymeChunksList::[]
- 		] {
-			myHousehold.myFattenedAnimals <- self;
+ 		if nbFatteningRenewal >= 0.0 {
+			float boughtFattenedNFlow <- nbFatteningRenewal * TLUNcontent;
+	 		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCcontent;
+	 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", boughtFattenedNFlow);}
+	 		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", boughtFattenedCFlow);}
+	 		
+	 		create fattenedAnimal with: [
+				myHousehold::self,
+				groupSize::nbFatteningRenewal,
+				chymeChunksList::[]
+	 		] {
+				myHousehold.myFattenedAnimals <- self;
+	 		}
  		}
 	}
 	

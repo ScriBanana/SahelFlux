@@ -187,7 +187,7 @@ global {
 				ask household where each.doesFattening {
 					do renewFattenedAnimals;
 				}
-				write "	Renewed fattened animals. " + length(fattenedAnimal) + " new animals."; // TODO * groupSize
+				write "	Renewed fattened animals. " +  fattenedAnimal sum_of each.groupSize + " new animals.";
 				
 			}
 		}
