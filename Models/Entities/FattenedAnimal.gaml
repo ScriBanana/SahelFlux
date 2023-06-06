@@ -15,10 +15,14 @@ global {
 	//// Global fattening parameters
 	
 	float meanFattenedGroupSize <- 1.0; // TLU TODO DUMMY
-	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increase in chance to aquire a new one. Arbitrary value
 	
-	float fattenedTLUDailyIntake <- 9.59; // kgDM/TLU/day Ndiaye 2022
+	float fattenedTLUDailyIntake <- 9.59; // kgDM/TLU/day Ndiaye 2022 TODO too high. 7.5 Valenza
 	float strawInFattenedTLUDailyRation <- 2.79; // kgDM/TLU/day Ndiaye 2022, Audouin 2014
+	
+	float weightWhenSold <- 320.0; // kg Valenza, 1971
+	float ratioWeightSoldOnBought <- weightWhenSold / weightTLU;
+	
+	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increase in chance to aquire a new one. Arbitrary value
 	
 }
 

@@ -15,11 +15,13 @@ global {
 	//// Global Animals parameters
 	
 	// Animal constitution
+	float weightTLU <- 250.0; //kg live weight
 	float TLUNcontent <- 5.0; // kgN TODO DUMMY
-	float TLUCcontent <- 250.0; // kgN TODO DUMMY
+	float TLUCcontent <- 250.0; // kgC TODO DUMMY
 	
 	// Shared parameters for mobile and fattened
-	float dailyIntakeRatePerTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
+	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
+	// TODO Remplacer par Wade à 4.87? Mais perdrait l'intérêt agent et une métrique.
 	
 	// Digestion parameters
 	int digestionLengthParamAsInt; // More readable

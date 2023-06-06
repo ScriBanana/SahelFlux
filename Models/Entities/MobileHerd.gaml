@@ -34,9 +34,7 @@ global {
 	// Zootechnical data
 	float IIRRangelandTLU <- 14.2; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	float IIRCroplandTLU <- 10.9; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
-	
-	float ratioExcretionIngestion <- 0.55; // TODO DUMMY Dung excreted over ingested biomass (dry matter). Source : Wade (2016)
-	
+		
 }
 
 species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: true { // Parallel dangerous? Anyway, saves a lot of computation time
@@ -64,7 +62,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 	list<parcel> lastDSRemainingPaddocks;
 	
 	// Grazing local parameters and variables
-	float dailyIntakeRatePerHerd <- dailyIntakeRatePerTLU * herdSize; // kgDM/herd/day
+	float dailyIntakeRatePerHerd <- dailyIntakeRatePerMobileTLU * herdSize; // kgDM/herd/day
 	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float satietyMeter <- 0.0;

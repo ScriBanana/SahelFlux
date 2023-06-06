@@ -124,8 +124,8 @@ species household schedules: [] {
 	
 	action sellFattenedAnimals {
 		if !empty(myFattenedAnimals) {
- 			float soldFattenedNFlow <- myFattenedAnimals.groupSize * TLUNcontent;
-	 		float soldFattenedCFlow <- myFattenedAnimals.groupSize * TLUCcontent;
+ 			float soldFattenedNFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUNcontent;
+	 		float soldFattenedCFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUCcontent;
 	 		ask world {	do saveFlowInMap("N", "FattenedAn", "OF-SoldOnMarket", soldFattenedNFlow);}
 	 		ask world {	do saveFlowInMap("C", "FattenedAn", "OF-SoldOnMarket", soldFattenedCFlow);}
 	 		
