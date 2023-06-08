@@ -39,7 +39,7 @@ global {
 	int lengthRainySeason <- int(milliseconds_between(date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])) / 86400000.0); // days. Weird, but hard to find better
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
 	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
-	int lengthFatteningSeason <- 80; // Days. field survey.
+	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
 	
 	// Time related variables
 	bool drySeason;

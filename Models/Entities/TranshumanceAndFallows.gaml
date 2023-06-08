@@ -15,8 +15,8 @@ global {
 	action captureRemainingTranshumants {
 		write "	Sending remaining transhuming herds to transhumance";
 		
- 		float leavingHerdNFlow <- mobileHerd where (each.myHousehold.isTranshumant) sum_of (each.herdSize * TLUNcontent);
- 		float leavingHerdCFlow <- mobileHerd where (each.myHousehold.isTranshumant) sum_of (each.herdSize  * TLUCcontent);
+ 		float leavingHerdNFlow <- mobileHerd where (each.myHousehold.isTranshumant) sum_of (each.herdSize * TLUNContent * weightTLU);
+ 		float leavingHerdCFlow <- mobileHerd where (each.myHousehold.isTranshumant) sum_of (each.herdSize  * TLUCContent * weightTLU);
  		ask world {	do saveFlowInMap("N", "MobileHerds", "OF-ToTranshu", leavingHerdNFlow);}
  		ask world {	do saveFlowInMap("C", "MobileHerds", "OF-ToTranshu", leavingHerdCFlow);}
  		
@@ -100,8 +100,8 @@ global {
  	action returnHerdsToLandscape {
  		write "	Herds return from transhumance";
  		
- 		float returningTranshumersNFlow <- transhumingHerd sum_of (each.herdSize * TLUNcontent);
- 		float returningTranshumersCFlow <- transhumingHerd sum_of (each.herdSize * TLUCcontent);
+ 		float returningTranshumersNFlow <- transhumingHerd sum_of (each.herdSize * TLUNContent * weightTLU);
+ 		float returningTranshumersCFlow <- transhumingHerd sum_of (each.herdSize * TLUCContent * weightTLU);
  		ask world {	do saveFlowInMap("N", "MobileHerds", "IF-FromTranshu", returningTranshumersNFlow);}
  		ask world {	do saveFlowInMap("C", "MobileHerds", "IF-FromTranshu", returningTranshumersCFlow);}
  		

@@ -111,8 +111,8 @@ species household schedules: [] {
 		if (myForagePileBiomassContent + (sumBiomassContent / nbHousehold)) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu {
 			write "	" + myMobileHerd + " is leaving for transhumance early."; // TODO remove after calibration
 			
-	 		float leavingHerdNFlow <- myMobileHerd.herdSize * TLUNcontent;
-	 		float leavingHerdCFlow <- myMobileHerd.herdSize * TLUCcontent;
+	 		float leavingHerdNFlow <- myMobileHerd.herdSize * TLUNContent * weightTLU;
+	 		float leavingHerdCFlow <- myMobileHerd.herdSize * TLUCContent * weightTLU;
 	 		ask world {	do saveFlowInMap("N", "MobileHerds", "OF-ToTranshu", leavingHerdNFlow);}
 	 		ask world {	do saveFlowInMap("C", "MobileHerds", "OF-ToTranshu", leavingHerdCFlow);}
 	 		
@@ -124,8 +124,8 @@ species household schedules: [] {
 	
 	action sellFattenedAnimals {
 		if !empty(myFattenedAnimals) {
- 			float soldFattenedNFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUNcontent;
-	 		float soldFattenedCFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUCcontent;
+ 			float soldFattenedNFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUNContent * weightTLU;
+	 		float soldFattenedCFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUCContent * weightTLU;
 	 		ask world {	do saveFlowInMap("N", "FattenedAn", "OF-SoldOnMarket", soldFattenedNFlow);}
 	 		ask world {	do saveFlowInMap("C", "FattenedAn", "OF-SoldOnMarket", soldFattenedCFlow);}
 	 		
@@ -155,8 +155,8 @@ species household schedules: [] {
  		nbFatteningRenewal <- floor(nbFatteningRenewal * 100) / 100; // Less decimals
  		
  		if nbFatteningRenewal >= 0.0 {
-			float boughtFattenedNFlow <- nbFatteningRenewal * TLUNcontent;
-	 		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCcontent;
+			float boughtFattenedNFlow <- nbFatteningRenewal * TLUNContent * weightTLU;
+	 		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCContent * weightTLU;
 	 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", boughtFattenedNFlow);}
 	 		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", boughtFattenedCFlow);}
 	 		

@@ -16,8 +16,8 @@ global {
 	
 	// Animal constitution
 	float weightTLU <- 250.0; //kg live weight
-	float TLUNcontent <- 5.0; // kgN TODO DUMMY
-	float TLUCcontent <- 250.0; // kgC TODO DUMMY
+	float TLUNContent <- 0.0294; // kgN/kg Le Noë 2017 and own calculation
+	float TLUCContent <- 0.273; // kgC/kg Le Noë 2017 and own calculation
 	
 	// Shared parameters for mobile and fattened
 	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
