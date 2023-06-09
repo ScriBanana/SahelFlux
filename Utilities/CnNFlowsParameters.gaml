@@ -19,7 +19,9 @@ global {
 	// Gas
 	float coefCO2ToC <- 0.2729; // Proportion of C in the mass of CO2
 	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CH4
-	float coefCOToC;
+	float coefCOToC <- 0.4288; // Proportion of C in the mass of CH4
+	float coefN2OToN <- 0.6365; // Proportion of N in the mass of N2O
+	float coefNOxToN <- 0.3045; // Proportion of N in the mass of NO2 (default)
 	
 	// C and N contents of crops TODO utilisé dans le grow pour la photosynth et dans la récolte (cohérence?)
 	float rangelandVegCContent <- forageRSCContent; // kgC/kgDM

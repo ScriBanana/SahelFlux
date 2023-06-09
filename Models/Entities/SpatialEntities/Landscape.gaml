@@ -94,6 +94,28 @@ global {
 		biomassContentSD <- standard_deviation(allCellsBiomass);
 	}
 	
+	action burnMilletRemainingResidues {
+		write "	Burning remaining millet residues.";
+		ask landscape where (each.cellLU = "Cropland" and each.myParcel != nil) {
+			if myParcel.lastRSCover = "Millet" {
+				float CO2FromBurning <- milletCombustionFactor * fireCO2EmissionFactor;
+				float COFromBurning <- milletCombustionFactor * fireCOEmissionFactor;
+				float CH4FromBurning <- milletCombustionFactor * fireCH4EmissionFactor;
+				float N2OFromBurning <- milletCombustionFactor * fireN2OEmissionFactor;
+				float NOxFromBurning <- milletCombustionFactor * fireNOxEmissionFactor;
+				
+				string emittingPool <- myParcel.homeField ? "HomeFields" : "BushFields";
+				ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG",
+					CO2FromBurning * coefCO2ToC + COFromBurning * coefCOToC + CH4FromBurning * coefCH4ToC
+				);}
+				ask world {	do saveFlowInMap("N", emittingPool, "OF-GHG", N2OFromBurning * coefN2OToN);}
+				ask world {	do saveFlowInMap("N", emittingPool, "OF-AtmoLosses", NOxFromBurning * coefNOxToN);}
+				
+				biomassContent <- 0.0;
+			}
+		}
+	}
+	
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
 //		write "Updating available targets";
@@ -168,7 +190,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 			
 		} else if myParcel != nil {
-			switch myParcel.currentYearCover {
+			switch myParcel.nextRSCover {
 				
 				match "Millet" {
 					thisYearNFlowReceivingPool <- "TF-ToMillet";
@@ -222,7 +244,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		string emittingPool;
 		
 		// Compute exported flows
-		switch myParcel.currentYearCover {
+		switch myParcel.nextRSCover {
 			match "Millet" {
 				emittingPool <- "Millet";
 				exportedCropsBiomass <- milletExportedAgriProductRatio * (1 - weedProportionInBiomass) * self.biomassContent;

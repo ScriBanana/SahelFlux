@@ -99,23 +99,32 @@ global {
 		ask parcel {
 			if !fallowEnabled {
 				myRotation <- homeField ? ["Millet"] : ["Millet", "Groundnut"];
-				currentYearCover <- one_of(myRotation);
+				nextRSCover <- one_of(myRotation);
+				lastRSCover <- homeField ? "Millet" : (nextRSCover = "Millet" ? "Groundnut" : "Millet");
 			} else {
 				if homeField {
 					myRotation <- ["Millet"];
-					currentYearCover <- one_of(myRotation);
-					coverColourMap[currentYearCover] <- coverColourMap[currentYearCover] / 1.05; // Arbitrary esthetic factor
+					nextRSCover <- one_of(myRotation);
+					lastRSCover <- one_of(myRotation);
+					coverColourMap[nextRSCover] <- coverColourMap[nextRSCover] / 1.05; // Arbitrary esthetic factor
 				} else {
 					myRotation <- ["Millet", "Groundnut", "Fallow"];
 					float midXaxis <- centroid(world).x;
 					float midYaxis <- centroid(world).y;
 					// Divides the map into three quadrants, using the less flexible function to ever be written, because my last math lesson is far away
-					if location.x < midXaxis and (location.y < - sqrt(3) * (location.x - midXaxis) + midYaxis) and (location.y > sqrt(3) * (location.x - midXaxis) + midYaxis) { // Ugly as all hell and an insult to my all my math teachers. Sorry.
-						currentYearCover <- myRotation[0];
+					if location.x < midXaxis and (
+						location.y < - sqrt(3) * (location.x - midXaxis) + midYaxis
+					) and (
+						location.y > sqrt(3) * (location.x - midXaxis) + midYaxis
+					) { // Ugly as all hell and an insult to my all my math teachers. Sorry.
+						nextRSCover <- myRotation[0];
+						lastRSCover <- myRotation[2];
 					} else if location.y < midYaxis {
-						currentYearCover <- myRotation[1];
+						nextRSCover <- myRotation[1];
+						lastRSCover <- myRotation[0];
 					} else {
-						currentYearCover <- myRotation[2];
+						nextRSCover <- myRotation[2];
+						lastRSCover <- myRotation[1];
 					}
 				}
 			}
@@ -127,8 +136,9 @@ global {
 	
 	action updateParcelsCovers {
 		ask parcel {
-			int coverIdInRot <- myRotation index_of currentYearCover;
-			currentYearCover <- coverIdInRot >= rotationLength - 1 ? myRotation[0] : myRotation[coverIdInRot + 1];
+			int coverIdInRot <- myRotation index_of nextRSCover;
+			lastRSCover <- nextRSCover;
+			nextRSCover <- coverIdInRot >= rotationLength - 1 ? myRotation[0] : myRotation[coverIdInRot + 1];
 		}
 	}
 	
@@ -144,7 +154,8 @@ species parcel parallel: true schedules: [] {
 	
 	list<string> myRotation;
 	int rotationLength;
-	string currentYearCover;
+	string nextRSCover;
+	string lastRSCover;
 	
 	rgb parcelColour;
 	map<string, rgb> coverColourMap <- ["Millet"::#yellow, "Groundnut"::#brown, "Fallow"::#green];
@@ -155,7 +166,7 @@ species parcel parallel: true schedules: [] {
 				draw shape color: #transparent border: parcelColour;
 			}
 			match "Cover" {
-				draw shape color: #transparent border: coverColourMap[currentYearCover];
+				draw shape color: #transparent border: coverColourMap[nextRSCover];
 			}
 		}
 	}

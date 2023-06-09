@@ -77,7 +77,7 @@ species soilNProcesses parallel: true schedules: [] {
 		
 		float NAtmoMicroOrga <- baseNAtmoMicroOrga;
 		float NAtmoGroundnut <- myCell.myParcel != nil and
-			myCell.myParcel.currentYearCover = "Groundnut" ? baseNAtmoGroundnut : 0.0;
+			myCell.myParcel.nextRSCover = "Groundnut" ? baseNAtmoGroundnut : 0.0;
 		float NAtmoFromTrees <- baseNAtmoPerTree * myCell.nbTrees;
 		
 		string inflowRecievingPool <- myCell.cellLU = "Rangeland" ?

@@ -114,6 +114,8 @@ global {
 					do transitionToFallows;
 				}
 				
+				do burnMilletRemainingResidues;
+				
 				write "	Computing plant biomass production for the upcoming rainy season.";
 				ask landscape where each.biomassProducer {
 					do computeYearlyBiomassProduction;

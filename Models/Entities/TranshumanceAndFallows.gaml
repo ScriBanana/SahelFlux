@@ -34,11 +34,11 @@ global {
 		write "Restrincting remaining herds to fallows and contiguous rangelands.";
 		
 		// Restrict grazable area
-		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.currentYearCover = "Fallow")));
-		targetableCellsForChangingSite <- landscape where (each.myParcel != nil and each.myParcel.currentYearCover = "Fallow");
+		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.nextRSCover = "Fallow")));
+		targetableCellsForChangingSite <- landscape where (each.myParcel != nil and each.myParcel.nextRSCover = "Fallow");
 		
 		// Moving herds
-		list<parcel> fallowParcelsNotPaddockedList <- listAllBushParcels where (each.currentYearCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
+		list<parcel> fallowParcelsNotPaddockedList <- listAllBushParcels where (each.nextRSCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
 		ask mobileHerd where !(each.myHousehold.isTranshumant) { // Revamp condition (useless as of now) if additionnal cases emerge
 			
 			// Store paddocking data for next dry season
@@ -51,7 +51,7 @@ global {
 			
 			// New paddocks attribution. Owner parcels first, then the rest
 			myPaddockList <- [];
-			list<parcel> myOwnerFallowParcels <- myHousehold.myBushParcelsList where (each.currentYearCover = "Fallow");
+			list<parcel> myOwnerFallowParcels <- myHousehold.myBushParcelsList where (each.nextRSCover = "Fallow");
 			if !empty(myOwnerFallowParcels) {
 				myPaddockList <- maxNbFallowPaddock among myOwnerFallowParcels;
 				fallowParcelsNotPaddockedList >>- myPaddockList;
@@ -59,7 +59,7 @@ global {
 			if length(myPaddockList) < maxNbFallowPaddock { // Apparently loop times: 0 is a thing, but I'm too scared.
 				if empty(fallowParcelsNotPaddockedList) {
 					// Reset availiable parcels if need be. Several herds can end up in the same paddock.
-					fallowParcelsNotPaddockedList <- listAllBushParcels where (each.currentYearCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
+					fallowParcelsNotPaddockedList <- listAllBushParcels where (each.nextRSCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
 				}
 				loop times: maxNbFallowPaddock - length(myPaddockList) {
 					myPaddockList <+ one_of(fallowParcelsNotPaddockedList);
