@@ -8,6 +8,7 @@
 
 model Household
 
+import "../../Utilities/CnNFlowsParameters.gaml"
 import "SpatialEntities/Parcel.gaml"
 import "MobileHerd.gaml"
 import "FattenedAnimal.gaml"

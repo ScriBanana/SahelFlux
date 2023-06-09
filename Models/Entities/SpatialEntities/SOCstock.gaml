@@ -69,8 +69,8 @@ species SOCstock parallel: true schedules: [] {
 		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
 		
 		// Flows to and from the two pools
-		float emissionsFromLabile;
-		float emissionsFromStable;
+		float emissionsFromLabile; // kgC
+		float emissionsFromStable; // kgC
 		
 		// Update pools SOC content using Euler method (semi-implicit for stableCPool)
 		int solverIterations <- int(ceil(1 / boundaryNbStepForDiscretisation)); // Default 2

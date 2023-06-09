@@ -14,9 +14,6 @@ global {
 	
 	//// Global manure heap parameters
 	
-	float heapNContentInit <- 0.0; // kgN Init value is 0 because start of dry season?
-	float heapCContentInit <- 0.0; // kgC Init value is 0 because start of dry season?
-	
 	float kitchenWasteInputRate <- 0.33; // kgDM/day/hh
 	float otherWastesInputRate <- 0.25; // kgDM/day/hh (Grillot 2018)
 	float kitchenWastesNInputRate <- 0.594; // kgN/day/hh (Grillot 2018)

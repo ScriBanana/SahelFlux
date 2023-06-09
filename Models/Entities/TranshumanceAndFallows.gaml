@@ -7,6 +7,8 @@
 
 model TranshumanceAndFallows
 
+
+import "../../Utilities/CnNFlowsParameters.gaml"
 import "MobileHerd.gaml"
 
 global {

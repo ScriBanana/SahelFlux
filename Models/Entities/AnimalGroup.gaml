@@ -9,6 +9,7 @@
 model AnimalGroup
 
 import "Household.gaml"
+import "../../Utilities/CnNFlowsParameters.gaml"
 
 global {
 	
@@ -16,8 +17,6 @@ global {
 	
 	// Animal constitution
 	float weightTLU <- 250.0; //kg live weight
-	float TLUNContent <- 0.0294; // kgN/kg Le Noë 2017 and own calculation
-	float TLUCContent <- 0.273; // kgC/kg Le Noë 2017 and own calculation
 	
 	// Shared parameters for mobile and fattened
 	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of forage biomass consumed daily. (Rivière, 1991)
@@ -45,22 +44,8 @@ global {
 	float forageDSDigestibility <- 49.0; // % INRA 2018
 	float forageRSDigestibility <- 60.5; // % INRA 2018 (mean value)
 	
-	// Feed N and C contents
-	float milletResiduesNContent <- 0.010; // kgN/kgDM Grillot 2018
-	float fattenedRationNContent <- 0.01577; // kgN/kgDM Surveys, INRA 2018, Feedipedia
-	float fattenedComplementsNContent <- 0.018; // kgN/kgDM Surveys, INRA 2018, Feedipedia
-	float forageDSNContent <- 0.006; // kgN/kgDM Grillot 2018
-	float forageRSNContent <- 0.02; // kgN/kgDM Grillot 2018
-	float milletResiduesCContent <- 0.431; // kgC/kgDM INRA 2018
-	float fattenedRationCContent <- 0.457; // kgC/kgDM Surveys, INRA 2018, Feedipedia
-	float fattenedComplementsCContent <- 0.462; // kgC/kgDM Surveys, INRA 2018, Feedipedia
-	float forageDSCContent <- 0.468; // kgC/kgDM INRA 2018
-	float forageRSCContent <- 0.427; // kgC/kgDM INRA 2018
-	
 	// TODO à grouper dans un fichier param
 	// Carboned gases parameters
-	float coefCO2ToC <- 0.2729; // Proportion of C in the mass of CO2
-	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CH4
 	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
 	float methaneEnergyContent <- 55.65; // MJ/kgCH4
 }

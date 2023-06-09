@@ -10,6 +10,7 @@ model Landscape
 
 import "../../Main.gaml"
 import "../../../Utilities/ImportZoning.gaml"
+import "../../../Utilities/CnNFlowsParameters.gaml"
 import "Parcel.gaml"
 import "SOCstock.gaml"
 import "SoilNProcesses.gaml"
@@ -36,18 +37,13 @@ global {
 	float groundnutExportedBiomassRatio <- 1.0;
 	float fallowExportedBiomass <- 0.55; // Surveys
 	
-	// C and N contents of crops TODO utilisé dans le grow pour la photosynth et dans la récolte (cohérence?)
-	float rangelandVegCContent <- forageRSCContent; // kgC/kgDM
-	float milletEarNContent <- 0.024; // kgN/kgDM Grillot 2016
-	float milletEarCContent <- 0.353; // kgC/kgDM Manlay 2000
-	float milletStrawNContent <- 0.010; // kgN/kgDM Feedipedia
-	float milletStrawCContent <- 0.444; // kgC/kgDM Feedipedia
-	float wholeMilletCContent <- 0.355; // kgC/kgDM Manlay 2000
-	float groundnutAerialPartNContent <- 0.0193; // Manlay, 2000
-	float groundnutAerialPartCContent <- 0.375; // Manlay, 2000
-	float fallowVegNContent <- forageRSNContent; // kgN/kgDM
-	float fallowVegCContent <- forageRSCContent; // kgC/kgDM
-	float weedsCContent <- 0.0; // Weeds out
+	// Fire parameters
+	float milletCombustionFactor <- 0.85; // IPCC tab2.6
+	float fireCO2EmissionFactor <- 1.51500;  // IPCC tab2.4
+	float fireCOEmissionFactor <- 0.09200;  // IPCC tab2.4
+	float fireCH4EmissionFactor <- 0.00270;  // IPCC tab2.4
+	float fireN2OEmissionFactor <- 0.00007;  // IPCC tab2.4
+	float fireNOxEmissionFactor <- 0.00250;  // IPCC tab2.4
 	
 	// Variables
 	list<landscape> grazableLandscape;
@@ -149,10 +145,9 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
 		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}
-		ask world {	do saveFlowInMap("C", emittingPool,  "TF-ToWeeds", weedsCFlowToSaveEachCall);}
+		ask world {	do saveFlowInMap("C", "Weeds",  "IF-FromAtmo", weedsCFlowToSaveEachCall);}
 		
 		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
-		// TODO Devrait être from atmo pour le C, non? photosynthese
 	}
 	
 	action computeYearlyBiomassProduction {
