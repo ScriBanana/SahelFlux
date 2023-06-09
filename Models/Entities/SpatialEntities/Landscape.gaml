@@ -40,8 +40,8 @@ global {
 	float rangelandVegCContent <- 0.5; // TODO DUMMY
 	float milletEarNContent <- 0.5; // TODO DUMMY
 	float milletEarCContent <- 0.5; // TODO DUMMY
-	float milletStrawNContent <- 0.5; // TODO DUMMY
-	float milletStrawCContent <- 0.5; // TODO DUMMY
+	float milletStrawNContent <- 0.010; // kgN/kgDM Feedipedia
+	float milletStrawCContent <- 0.444; // kgN/kgDM Feedipedia
 	float wholeMilletCContent <- 0.5; // TODO DUMMY
 	float groundnutPlantNContent <- 0.5; // TODO DUMMY
 	float groundnutPlantCContent <- 0.5; // TODO DUMMY
@@ -252,6 +252,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		if myParcel.myOwner != nil {
 			myParcel.myOwner.myForagePileBiomassContent <- myParcel.myOwner.myForagePileBiomassContent + exportedStrawBiomass;
 		}
+		
+		// TODO ajouter une partie qui part dans l'ICBM?
 		
 		// Save flows
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHouseholds", exportedCropsNFlow);}

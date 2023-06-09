@@ -20,8 +20,7 @@ global {
 	float TLUCContent <- 0.273; // kgC/kg Le Noë 2017 and own calculation
 	
 	// Shared parameters for mobile and fattened
-	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of biomass consumed daily. (Assouma et al., 2018)
-	// TODO Remplacer par Wade à 4.87? Mais perdrait l'intérêt agent et une métrique.
+	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of forage biomass consumed daily. (Rivière, 1991)
 	
 	// Digestion parameters
 	int digestionLengthParamAsInt; // More readable
@@ -47,16 +46,16 @@ global {
 	float forageRSDigestibility <- 60.5; // % INRA 2018 (mean value)
 	
 	// Feed N and C contents
-	float milletResiduesNContent <- 0.006; // kgN/kgDM Grillot 2018
+	float milletResiduesNContent <- 0.010; // kgN/kgDM Grillot 2018
 	float fattenedRationNContent <- 0.01577; // kgN/kgDM Surveys, INRA 2018, Feedipedia
-	float fattenedComplementsNContent <- 0.01814; // kgN/kgDM Surveys, INRA 2018, Feedipedia
+	float fattenedComplementsNContent <- 0.018; // kgN/kgDM Surveys, INRA 2018, Feedipedia
 	float forageDSNContent <- 0.006; // kgN/kgDM Grillot 2018
 	float forageRSNContent <- 0.02; // kgN/kgDM Grillot 2018
-	float milletResiduesCContent <- 0.7; // kgC/kgDM TODO DUMMY
-	float fattenedRationCContent <- 0.7; // kgC/kgDM TODO DUMMY
-	float fattenedComplementsCContent <- 0.7; // kgC/kgDM TODO DUMMY
-	float forageDSCContent <- 0.7; // kgC/kgDM TODO DUMMY
-	float forageRSCContent <- 0.7; // kgC/kgDM TODO DUMMY
+	float milletResiduesCContent <- 0.431; // kgC/kgDM INRA 2018
+	float fattenedRationCContent <- 0.457; // kgC/kgDM Surveys, INRA 2018, Feedipedia
+	float fattenedComplementsCContent <- 0.462; // kgC/kgDM Surveys, INRA 2018, Feedipedia
+	float forageDSCContent <- 0.468; // kgC/kgDM INRA 2018
+	float forageRSCContent <- 0.427; // kgC/kgDM INRA 2018
 	
 	// TODO à grouper dans un fichier param
 	// Carboned gases parameters
