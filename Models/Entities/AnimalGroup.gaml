@@ -143,7 +143,12 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested; // kgC
 		
 		// Return outputs
-		map<string, float> digestatCharacteristics<- ["volatileSolidExcreted"::volatileSolidExcreted, "faecesNitrogen"::faecesNitrogen, "urineNirogen"::urineNirogen, "excretedCarbon"::excretedCarbon]; // TODO manque les ash et VSE, non?
+		map<string, float> digestatCharacteristics<- [
+			"volatileSolidExcreted"::volatileSolidExcreted,
+			"faecesNitrogen"::faecesNitrogen,
+			"urineNirogen"::urineNirogen,
+			"excretedCarbon"::excretedCarbon
+		];
 		return digestatCharacteristics;
 
 	}

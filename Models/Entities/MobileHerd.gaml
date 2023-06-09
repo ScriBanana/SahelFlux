@@ -213,8 +213,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		chymeChunksList >- first(chymeChunksList);
 		
 		// Save N and C in cell
-		currentCell.mySOCstock.periodCInputMap["HerdsDung"] <- currentCell.mySOCstock.periodCInputMap["HerdsDung"] + float(excretaOutputs["excretedCarbon"]);
-		// TODO complexifier pour fitter à l'équation d'émissions de CH4
+		currentCell.mySOCstock.carbonInputsList <+ ["HerdsDung", float(excretaOutputs["volatileSolidExcreted"]), float(excretaOutputs["excretedCarbon"])];
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <- currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"]);
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <- currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"]);
 		
@@ -222,8 +221,6 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");
 		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool , float(excretaOutputs["excretedCarbon"]));}
 		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool, float(excretaOutputs["faecesNitrogen"]) + float(excretaOutputs["urineNitrogen"]));}
-		
-		// TODO Enregistrer le VSE dans le sol
 		
 	}
 	

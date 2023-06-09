@@ -12,7 +12,7 @@ import "../../Main.gaml"
 import "../../../Utilities/ImportZoning.gaml"
 import "../../../Utilities/CnNFlowsParameters.gaml"
 import "Parcel.gaml"
-import "SOCstock.gaml"
+import "SOCStock.gaml"
 import "SoilNProcesses.gaml"
 import "../GlobalProcesses.gaml"
 
@@ -57,7 +57,7 @@ global {
 			
 			biomassContent <- cellLU = "Cropland" ? gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1) : gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1);
 			
-			create SOCstock with: [myCell::self] {
+			create SOCStock with: [myCell::self] {
 				myself.mySOCstock <- self;
 				location <- myself.location;
 				
@@ -138,7 +138,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	// Part of a parcel
 	parcel myParcel;
 	// Internal N and C stock and processes
-	SOCstock mySOCstock;
+	SOCStock mySOCstock;
 	soilNProcesses mySoilNProcesses;
 	
 	// Grazable biomass

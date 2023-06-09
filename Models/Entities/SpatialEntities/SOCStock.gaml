@@ -1,12 +1,12 @@
 /**
 * In: SahelFlux
-* Name: SOCstock
+* Name: SOCStock
 * Soil organic carbon stock
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
-model SOCstock
+model SOCStock
 
 import "Landscape.gaml"
 import "../../OutputProcesses/RecordFlows.gaml"
@@ -39,34 +39,39 @@ global {
 	// C emissions parameters
 	float dummyCEmittedAtDungDepositFactor <- 0.3; // TODO DUMMY (duh)
 	
+	// CH4 from soils emissions parameters
+	float methaneProdFromManure <- 0.087; // kgCH4/kgDM IPCC 10.16
+	float methaneConversionFactorHerd <- 0.02; // dimless IPCC 10.17
+	float methaneConversionFactorORPPile <- 0.05; // dimless IPCC 10.17
+	float methaneConversionFactorORPSpread <- 0.01; // dimless IPCC 10.17
+	
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
 }
 
-species SOCstock parallel: true schedules: [] {
+species SOCStock parallel: true schedules: [] {
 	
 	//// Parameters
 	
 	landscape myCell;
-	map<string, float> periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0]; // kg/cell
+	list carbonInputsList; // string::type, float::VSE, float::CAmount
 	float labileCPool; // kgC/cell
 	float stableCPool; // kgC/cell
 	float totalSOC; // kgC/cell
-	float CToBeEmittedInRainySeason;
+	float CH4ToBeEmittedInRainySeason;
 	
 	//// Functions
 	
 	action updateCarbonPools {
 		
-		// Remove emitted gases // TODO very DUMMY
-		CToBeEmittedInRainySeason <- periodCInputMap["HerdsDung"] * dummyCEmittedAtDungDepositFactor;
-		periodCInputMap["HerdsDung"] <- periodCInputMap["HerdsDung"] - CToBeEmittedInRainySeason;
-		// TODO add the rest
-		
 		// Aggregate input
-		float periodCInput <- sum(periodCInputMap);
-		periodCInputMap <- ["HerdsDung"::0.0, "Straw"::0.0, "ORP"::0.0];
+		float periodCInput; // kgC
+		
+		// TODO periodCInput <- periodCInput + Other inputs
+		
+		periodCInput <- periodCInput + aggregateRSCH4Emissions();
+		// Could have been yearly, but eases memory load if monthly.
 		
 		// Flows to and from the two pools
 		float emissionsFromLabile; // kgC
@@ -92,8 +97,25 @@ species SOCstock parallel: true schedules: [] {
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
 	}
 	
-	action rainSeasonEmit { // TODO
-		//CToBeEmittedInRainySeason que herd pour le moment
+	float aggregateRSCH4Emissions {
+		
+		float totalCarbonInput; // kgC
+		loop dungDeposit over: carbonInputsList {
+			
+			float methaneConversionFactor <- dungDeposit[0] = "HerdDung" ? methaneConversionFactorHerd : methaneConversionFactorORPSpread;
+			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactor * float(dungDeposit[1]); // kgCH4
+			CH4ToBeEmittedInRainySeason <- CH4ToBeEmittedInRainySeason + futureCH4Emission;
+			totalCarbonInput <- totalCarbonInput + float(dungDeposit[2]) - CH4ToBeEmittedInRainySeason * coefCH4ToC;
+		}
+		
+		carbonInputsList <- [];
+		return totalCarbonInput;
+	}
+	
+	action emitRSSoilCH4 {
+		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , myself.CH4ToBeEmittedInRainySeason * coefCH4ToC);}
+		CH4ToBeEmittedInRainySeason <- 0.0;
 	}
 	
 	aspect default {

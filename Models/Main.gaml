@@ -114,6 +114,9 @@ global {
 					do transitionToFallows;
 				}
 				
+				ask SOCStock {
+					do emitRSSoilCH4;
+				}
 				do burnMilletRemainingResidues;
 				
 				write "	Computing plant biomass production for the upcoming rainy season.";
@@ -159,7 +162,7 @@ global {
 		write string(date(time), "M'/'y");
 		
 		do addWastesToHeaps;
-		ask SOCstock {
+		ask SOCStock {
 			do updateCarbonPools;
 		}
 		
