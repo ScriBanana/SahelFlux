@@ -36,18 +36,18 @@ global {
 	float groundnutExportedBiomassRatio <- 1.0;
 	float fallowExportedBiomass <- 0.55; // Surveys
 	
-	// C and N contents of crops TODO unify utilisé dans le grow pour la photosynth et dans la récolte (cohérence?)
-	float rangelandVegCContent <- 0.5; // TODO DUMMY
-	float milletEarNContent <- 0.5; // TODO DUMMY
-	float milletEarCContent <- 0.5; // TODO DUMMY
+	// C and N contents of crops TODO utilisé dans le grow pour la photosynth et dans la récolte (cohérence?)
+	float rangelandVegCContent <- forageRSCContent; // kgC/kgDM
+	float milletEarNContent <- 0.024; // kgN/kgDM Grillot 2016
+	float milletEarCContent <- 0.353; // kgC/kgDM Manlay 2000
 	float milletStrawNContent <- 0.010; // kgN/kgDM Feedipedia
-	float milletStrawCContent <- 0.444; // kgN/kgDM Feedipedia
-	float wholeMilletCContent <- 0.5; // TODO DUMMY
-	float groundnutPlantNContent <- 0.5; // TODO DUMMY
-	float groundnutPlantCContent <- 0.5; // TODO DUMMY
-	float fallowVegNContent <- 0.5; // TODO DUMMY
-	float fallowVegCContent <- 0.5; // TODO DUMMY
-	float weedsCContent <- 0.5; // TODO DUMMY
+	float milletStrawCContent <- 0.444; // kgC/kgDM Feedipedia
+	float wholeMilletCContent <- 0.355; // kgC/kgDM Manlay 2000
+	float groundnutAerialPartNContent <- 0.0193; // Manlay, 2000
+	float groundnutAerialPartCContent <- 0.375; // Manlay, 2000
+	float fallowVegNContent <- forageRSNContent; // kgN/kgDM
+	float fallowVegCContent <- forageRSCContent; // kgC/kgDM
+	float weedsCContent <- 0.0; // Weeds out
 	
 	// Variables
 	list<landscape> grazableLandscape;
@@ -185,7 +185,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				} match "Groundnut" {
 					thisYearNFlowReceivingPool <- "TF-ToGroundnut";
 					thisYearCFlowReceivingPool <- "Groundnut";
-					thisYearBiomassCContent <- groundnutPlantCContent;
+					thisYearBiomassCContent <- groundnutAerialPartCContent;
 					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
 					
@@ -242,8 +242,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				emittingPool <- "Groundnut";
 				exportedCropsBiomass <- groundnutExportedBiomassRatio * (1 - weedProportionInBiomass) * self.biomassContent;
 				
-				exportedCropsNFlow <- exportedCropsBiomass * groundnutPlantNContent; // kgN
-				exportedCropsCFlow <- exportedCropsBiomass * groundnutPlantCContent; // kgC
+				exportedCropsNFlow <- exportedCropsBiomass * groundnutAerialPartNContent; // kgN
+				exportedCropsCFlow <- exportedCropsBiomass * groundnutAerialPartCContent; // kgC
 			}
 			match "Fallow" {
 				emittingPool <- "FallowVeg";
