@@ -127,7 +127,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	float biomassContent min: 0.0; // kgDM
 	float thisYearNAvailable;
 	float thisYearBiomassCContent;
-	string thisYearReceivingPool;
+	string thisYearNFlowReceivingPool;
+	string thisYearCFlowReceivingPool;
 	float yearlyBiomassToBeProduced;
 	float yearlyWeedsBiomassToBeProduced;
 	float weedProportionInBiomass <- 0.0; // As of now, no weed in the simulation
@@ -145,12 +146,13 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
 		float weedsCFlowToSaveEachCall <- yearlyWeedsBiomassToBeProduced * weedsCContent / nbBiophUpdatesDuringRainySeason;
 		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
-		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
+		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
-		ask world {	do saveFlowInMap("C", emittingPool, myself.thisYearReceivingPool, cropCFlowsToSaveEachCall);}
+		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}
 		ask world {	do saveFlowInMap("C", emittingPool,  "TF-ToWeeds", weedsCFlowToSaveEachCall);}
 		
 		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
+		// TODO Devrait être from atmo pour le C, non? photosynthese
 	}
 	
 	action computeYearlyBiomassProduction {
@@ -164,7 +166,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		float nitrogenReductionFactor;
 		
 		if cellLU = "Rangeland" {
-			thisYearReceivingPool <- "TF-ToSpontVeget";
+			thisYearNFlowReceivingPool <- "TF-ToSpontVeget";
+			thisYearCFlowReceivingPool <- "SpontVeg";
 			thisYearBiomassCContent <- rangelandVegCContent;
 			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
@@ -173,19 +176,22 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 			switch myParcel.currentYearCover {
 				
 				match "Millet" {
-					thisYearReceivingPool <- "TF-ToMillet";
+					thisYearNFlowReceivingPool <- "TF-ToMillet";
+					thisYearCFlowReceivingPool <- "Millet";
 					thisYearBiomassCContent <- wholeMilletCContent;
 					waterLimitedYieldHa <- max(0.0, min(3775.0, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
 				
 				} match "Groundnut" {
-					thisYearReceivingPool <- "TF-ToGroundnut";
+					thisYearNFlowReceivingPool <- "TF-ToGroundnut";
+					thisYearCFlowReceivingPool <- "Groundnut";
 					thisYearBiomassCContent <- groundnutPlantCContent;
 					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
 					
 				} match "Fallow" {
-					thisYearReceivingPool <- "TF-ToFallowVeget";
+					thisYearNFlowReceivingPool <- "TF-ToFallowVeget";
+					thisYearCFlowReceivingPool <- "FallowVeg";
 					// Same as rangeland veg
 					thisYearBiomassCContent <- fallowVegCContent;
 					waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
@@ -194,9 +200,12 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				}
 			}
 		} else {
+			// TODO Manque un truc ici, du coup
+			
 			// TODO Gros bullshit
 			// Tout à 0 car hors rotation
-			thisYearReceivingPool <- "TF-ToWeeds";
+			thisYearNFlowReceivingPool <- "TF-ToWeeds";
+			thisYearCFlowReceivingPool <- "Weeds";
 			thisYearBiomassCContent <- fallowVegCContent;
 		}
 		
