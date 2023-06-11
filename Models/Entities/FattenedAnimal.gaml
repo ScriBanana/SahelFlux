@@ -63,8 +63,12 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 				map excretaOutputs <- excrete(first(chymeChunksList)[1]);
 				chymeChunksList >- first(chymeChunksList);
 				
-				// TODO Enregistrer le VSE dans le heap
-				// TODO Enregistrer les inputs de N et de C dans le heap
+				myHousehold.myORPHeap.heapFattenedInput <+ [
+					excretaOutputs["volatileSolidExcreted"],
+					excretaOutputs["excretedCarbon"],
+					float(excretaOutputs["faecesNitrogen"]),
+					float(excretaOutputs["urineNirogen"])
+				];
 				
 				ask world {	do saveFlowInMap("C", "FattenedAn", "TF-ToORPHeaps" , float(excretaOutputs["excretedCarbon"]));}
 				ask world {	do saveFlowInMap("N", "FattenedAn", "TF-ToORPHeaps" ,

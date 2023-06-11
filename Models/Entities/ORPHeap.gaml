@@ -41,8 +41,12 @@ species ORPHeap schedules: [] {
 	
 	household myHousehold;
 	
+	list heapFattenedInput; // float::VSE, float::CAmount, float::NAmount
+	
 	float heapNContent;
 	float heapCContent;
+	
+	float heapCH4ToBeEmittedInRainySeason;
 	
 	//// Functions
 	
@@ -54,6 +58,24 @@ species ORPHeap schedules: [] {
 		heapCContent <- heapCContent + wastesCAddition;
 		ask world {	do saveFlowInMap("N", "Households", "TF-ToORPHeaps" , wastesNAddition);}
 		ask world {	do saveFlowInMap("C", "Households", "TF-ToORPHeaps" , wastesCAddition);}
+	}
+	
+	action accumulateInputs {
+		float totalCarbonInput; // kgC
+		loop dungDeposit over: heapFattenedInput {
+			
+			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactorORPPile * float(dungDeposit[0]); // kgCH4
+			heapCH4ToBeEmittedInRainySeason <- heapCH4ToBeEmittedInRainySeason + futureCH4Emission;
+			heapCContent <- heapCContent + float(dungDeposit[1]) - heapCH4ToBeEmittedInRainySeason * coefCH4ToC;
+			heapNContent <- heapNContent + float(dungDeposit[2]) + float(dungDeposit[3]);
+		}
+		
+		heapFattenedInput <- [];
+	}
+	
+	action emitRSHeapsCH4 {
+		ask world {	do saveFlowInMap("C", "ORPHeaps", "OF-GHG" , myself.heapCH4ToBeEmittedInRainySeason * coefCH4ToC);}
+		heapCH4ToBeEmittedInRainySeason <- 0.0;
 	}
 	
 	action spreadORPOnParcels {

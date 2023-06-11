@@ -213,9 +213,15 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		chymeChunksList >- first(chymeChunksList);
 		
 		// Save N and C in cell
-		currentCell.mySOCstock.carbonInputsList <+ ["HerdsDung", float(excretaOutputs["volatileSolidExcreted"]), float(excretaOutputs["excretedCarbon"])];
-		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <- currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"]);
-		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <- currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"]);
+		currentCell.mySOCstock.carbonInputsList <+ [
+			"HerdsDung", float(excretaOutputs["volatileSolidExcreted"]), float(excretaOutputs["excretedCarbon"])
+		];
+		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <-
+			currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"])
+		;
+		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <-
+			currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"])
+		;
 		
 		// Save flows to flows map
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (currentCell.myParcel != nil and currentCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");

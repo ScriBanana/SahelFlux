@@ -117,6 +117,9 @@ global {
 				ask SOCStock {
 					do emitRSSoilCH4;
 				}
+				ask ORPHeap {
+					do emitRSHeapsCH4;
+				}
 				do burnMilletRemainingResidues;
 				
 				write "	Computing plant biomass production for the upcoming rainy season.";
@@ -164,6 +167,9 @@ global {
 		do addWastesToHeaps;
 		ask SOCStock {
 			do updateCarbonPools;
+		}
+		ask ORPHeap {
+			do accumulateInputs;
 		}
 		
 	}
