@@ -61,12 +61,12 @@ species ORPHeap schedules: [] {
 	}
 	
 	action accumulateInputs {
-		float totalCarbonInput; // kgC
 		loop dungDeposit over: heapFattenedInput {
 			
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactorORPPile * float(dungDeposit[0]); // kgCH4
 			heapCH4ToBeEmittedInRainySeason <- heapCH4ToBeEmittedInRainySeason + futureCH4Emission;
-			heapCContent <- heapCContent + float(dungDeposit[1]) - heapCH4ToBeEmittedInRainySeason * coefCH4ToC;
+			heapCContent <- heapCContent + min(0, float(dungDeposit[1]) - futureCH4Emission * coefCH4ToC);
+			// Wastes don't contribute to CH4 emissions, then. They are just added to soils C stock.
 			heapNContent <- heapNContent + float(dungDeposit[2]) + float(dungDeposit[3]);
 		}
 		
