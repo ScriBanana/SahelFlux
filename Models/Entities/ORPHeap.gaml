@@ -16,10 +16,7 @@ global {
 	
 	float kitchenWasteInputRate <- 0.33; // kgDM/day/hh
 	float otherWastesInputRate <- 0.25; // kgDM/day/hh (Grillot 2018)
-	float kitchenWastesNInputRate <- 0.594; // kgN/day/hh (Grillot 2018)
-	float otherWastesNContent <- 0.001; // kgN/kgDM TODO DUMMY
-	float kitchenWastesCContent <- 0.6; // kgC/kgDM TODO DUMMY
-	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
+	float ratioStrawToManureInORP <- 29/71; // kgDM/kgDM, Wade 2016
 	
 	map<string, float> flowsMapORPHeap <- ["Inflows"::0.0, "ToHomeFields"::0.0, "ToBushFields"::0.0];
 	
@@ -68,6 +65,11 @@ species ORPHeap schedules: [] {
 			heapCContent <- heapCContent + min(0, float(dungDeposit[1]) - futureCH4Emission * coefCH4ToC);
 			// Wastes don't contribute to CH4 emissions, then. They are just added to soils C stock.
 			heapNContent <- heapNContent + float(dungDeposit[2]) + float(dungDeposit[3]);
+			
+			float addedStraw <- float(dungDeposit[0]) * ratioStrawToManureInORP;
+			heapCContent <- heapCContent + addedStraw * milletStrawCContent;
+			heapNContent <- heapNContent + addedStraw * milletStrawNContent;
+			
 		}
 		
 		heapFattenedInput <- [];

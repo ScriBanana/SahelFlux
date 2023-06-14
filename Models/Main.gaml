@@ -40,6 +40,7 @@ global {
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
 	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
 	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
+	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields
 	
 	// Time related variables
 	bool drySeason;
@@ -153,10 +154,10 @@ global {
 		}
 		
 		switch current_date.month { // Monthly processes only in a specific season
-			match_between [rainySeasonFirstMonth, drySeasonFirstMonth - 1] {
+			match_between [rainySeasonFirstMonth, drySeasonFirstMonth - 1] { // Rainy season
 				// Necessary to use default.
 			}
-			default {
+			default { // Dry season
 				do updateTargetableCellsForChangingSiteInDS;
 			}
 		}

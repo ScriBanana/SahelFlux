@@ -52,4 +52,10 @@ global {
 	float heapNContentInit <- 0.0; // kgN Init value is 0 because start of dry season?
 	float heapCContentInit <- 0.0; // kgC Init value is 0 because start of dry season?
 	
+	// Wastes
+	float kitchenWastesNInputRate <- 0.594; // kgN/day/hh (Grillot 2018)
+	float otherWastesNContent <- 0.001; // kgN/kgDM TODO DUMMY
+	float kitchenWastesCContent <- 0.6; // kgC/kgDM TODO DUMMY
+	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
+	
 }
