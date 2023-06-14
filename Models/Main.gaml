@@ -40,8 +40,8 @@ global {
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
 	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
 	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
-	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields
-	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period
+	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields; Surveys
+	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period TODO DUMMY
 	
 	// Time related variables
 	bool drySeason;
@@ -173,7 +173,7 @@ global {
 			do updateCarbonPools;
 		}
 		ask ORPHeap {
-			do accumulateInputs;
+			do accumulateFattenedInputs;
 		}
 		
 	}

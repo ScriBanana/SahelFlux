@@ -14,11 +14,13 @@ global {
 	
 	//// Global manure heap parameters
 	
+	// Input
 	float kitchenWasteInputRate <- 0.33; // kgDM/day/hh
 	float otherWastesInputRate <- 0.25; // kgDM/day/hh (Grillot 2018)
 	float ratioStrawToManureInORP <- 29/71; // kgDM/kgDM, Wade 2016
 	
-	map<string, float> flowsMapORPHeap <- ["Inflows"::0.0, "ToHomeFields"::0.0, "ToBushFields"::0.0];
+	// Spreading
+	float maxManureCartWeight <- 300 / 2; // kgDM expert knowledge
 	
 	//// Global manure heap functions
 	
@@ -40,8 +42,9 @@ species ORPHeap schedules: [] {
 	
 	list heapFattenedInput; // float::VSE, float::CAmount, float::NAmount
 	
-	float heapNContent;
-	float heapCContent;
+	float heapQuantity; // kgDM
+	float heapNContent; // kgN
+	float heapCContent; // kgC
 	
 	float heapCH4ToBeEmittedInRainySeason;
 	
@@ -49,6 +52,7 @@ species ORPHeap schedules: [] {
 	
 	action addWastes {
 		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days TODO utiliser time
+		heapQuantity <- heapQuantity + (kitchenWasteInputRate + otherWastesInputRate) * ORPAccumulationPeriodLength;
 		float wastesNAddition <- (kitchenWastesNInputRate + otherWastesInputRate * otherWastesNContent) * ORPAccumulationPeriodLength;
 		float wastesCAddition <- (kitchenWasteInputRate * kitchenWastesCContent + otherWastesInputRate * otherWastesCContent) * ORPAccumulationPeriodLength;
 		heapNContent <- heapNContent + wastesNAddition;
@@ -57,16 +61,20 @@ species ORPHeap schedules: [] {
 		ask world {	do saveFlowInMap("C", "Households", "TF-ToORPHeaps" , wastesCAddition);}
 	}
 	
-	action accumulateInputs {
+	action accumulateFattenedInputs {
 		loop dungDeposit over: heapFattenedInput {
 			
+			// Fattened manure
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactorORPPile * float(dungDeposit[0]); // kgCH4
 			heapCH4ToBeEmittedInRainySeason <- heapCH4ToBeEmittedInRainySeason + futureCH4Emission;
+			heapQuantity <- heapQuantity + float(dungDeposit[0]) - futureCH4Emission;
 			heapCContent <- heapCContent + min(0, float(dungDeposit[1]) - futureCH4Emission * coefCH4ToC);
 			// Wastes don't contribute to CH4 emissions, then. They are just added to soils C stock.
 			heapNContent <- heapNContent + float(dungDeposit[2]) + float(dungDeposit[3]);
 			
+			// Refusals
 			float addedStraw <- float(dungDeposit[0]) * ratioStrawToManureInORP;
+			heapQuantity <- heapQuantity + addedStraw;
 			heapCContent <- heapCContent + addedStraw * milletStrawCContent;
 			heapNContent <- heapNContent + addedStraw * milletStrawNContent;
 			
@@ -81,19 +89,16 @@ species ORPHeap schedules: [] {
 	}
 	
 	action spreadORPOnParcels {
+		if heapQuantity >= 0.0 {
+			float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
+			
+		}
+		
 //		ask myHousehold.myHomeParcelsList {
 //			currentCell.mySOCstock.periodCInputMap["ORP"] <- currentCell.mySOCstock.periodCInputMap["ORP"] + heapCContent;
 //		}
 	}
 	
-	// TODO find out wtf that is and if it is necessary
-//	float lastORPNStock <- heapNContentInit;
-//	float lastORPCStock <- heapCContentInit;
-//	action registerORPFlows {
-//		
-//		lastORPNStock <- heapNContent;
-//		lastORPCStock <- heapCContent;
-//	}
 }
 
 
