@@ -41,10 +41,12 @@ global {
 	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
 	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
 	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields
+	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period
 	
 	// Time related variables
 	bool drySeason;
 	int dayInDS <- 0;
+	int daysSinceSpread <- 0;
 	
 	////	--------------------------	////
 	////			Global init			////
@@ -134,6 +136,7 @@ global {
 				write "DRY SEASON STARTS.";
 				drySeason <- true;
 				dayInDS <- 0;
+				daysSinceSpread <- 0;
 				
 				ask landscape where (each.myParcel != nil) {
 					do getHarvested;
@@ -182,6 +185,22 @@ global {
 			loop biomassType over: dailyIntakes.keys {
 				do emitMetaboIntake(biomassType, dailyIntakes[biomassType]);
 				dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
+			}
+		}
+		
+		// ORP spreading mechanisms
+		if 
+			current_date.month < rainySeasonFirstMonth and
+			current_date.month >= rainySeasonFirstMonth - ORPSpreadingPeriodLength
+			// Probably an ABS function would be more elegant, but I'm tired
+		{
+			daysSinceSpread <- daysSinceSpread + 1;
+			if daysSinceSpread >= 3 {
+				ask ORPHeap {
+					do spreadORPOnParcels;
+				}
+				
+				daysSinceSpread <- 0;
 			}
 		}
 		
