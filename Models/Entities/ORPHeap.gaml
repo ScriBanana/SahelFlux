@@ -43,6 +43,7 @@ species ORPHeap schedules: [] {
 	list heapFattenedInput; // float::VSE, float::CAmount, float::NAmount
 	
 	float heapQuantity; // kgDM
+	float manureInHeap; // kgDM manure
 	float heapNContent; // kgN
 	float heapCContent; // kgC
 	
@@ -72,6 +73,7 @@ species ORPHeap schedules: [] {
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactorORPPile * float(dungDeposit[0]); // kgCH4
 			heapCH4ToBeEmittedInRainySeason <- heapCH4ToBeEmittedInRainySeason + futureCH4Emission;
 			heapQuantity <- heapQuantity + float(dungDeposit[0]) - futureCH4Emission;
+			manureInHeap <- manureInHeap + float(dungDeposit[0]) - futureCH4Emission;
 			heapCContent <- heapCContent + min(0, float(dungDeposit[1]) - futureCH4Emission * coefCH4ToC);
 			// Wastes don't contribute to CH4 emissions, then. They are just added to soils C stock.
 			heapNContent <- heapNContent + float(dungDeposit[2]) + float(dungDeposit[3]);
@@ -102,16 +104,23 @@ species ORPHeap schedules: [] {
 		}
 		
 		float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
+		float spreadManureInSpreadORPQuantity <- (manureInHeap / heapQuantity) * spreadORPQuantity;
 		float spreadCQuantity <- heapQuantity / spreadORPQuantity * heapCContent;
 		float spreadNQuantity <- heapQuantity / spreadORPQuantity * heapNContent;
 		
-		// CH4 pour émission RS
+		// Add quantity for parcel rotation
+		ORPSpreadOnCurrentParcel <- ORPSpreadOnCurrentParcel + spreadORPQuantity;
+		
+		// Add carbon and manure for CH4 emissions
+		ask parcelSpreadOn.myCells {
+			mySOCstock.carbonInputsList <+ [
+				"ORP", spreadManureInSpreadORPQuantity, spreadCQuantity
+			];
+		}
 		
 		// N2O direct
 		
 		// Indirect RS
-		
-		// C incorporé
 		
 		// N incorporé (N avail)
 		

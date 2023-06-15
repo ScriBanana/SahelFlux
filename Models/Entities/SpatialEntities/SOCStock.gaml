@@ -70,7 +70,8 @@ species SOCStock parallel: true schedules: [] {
 		
 		// TODO periodCInput <- periodCInput + Other inputs
 		
-		periodCInput <- periodCInput + aggregateRSCH4Emissions();
+		// Mobile herds and ORP
+		periodCInput <- periodCInput + aggregateRSDungCH4Emissions();
 		// Could have been yearly, but eases memory load if monthly.
 		
 		// Flows to and from the two pools
@@ -97,19 +98,19 @@ species SOCStock parallel: true schedules: [] {
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
 	}
 	
-	float aggregateRSCH4Emissions {
+	float aggregateRSDungCH4Emissions {
 		
-		float totalCarbonInput; // kgC
+		float soilCarbonInput; // kgC
 		loop dungDeposit over: carbonInputsList {
 			
 			float methaneConversionFactor <- dungDeposit[0] = "HerdDung" ? methaneConversionFactorHerd : methaneConversionFactorORPSpread;
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactor * float(dungDeposit[1]); // kgCH4
 			CH4ToBeEmittedInRainySeason <- CH4ToBeEmittedInRainySeason + futureCH4Emission;
-			totalCarbonInput <- totalCarbonInput + float(dungDeposit[2]) - CH4ToBeEmittedInRainySeason * coefCH4ToC;
+			soilCarbonInput <- soilCarbonInput + float(dungDeposit[2]) - CH4ToBeEmittedInRainySeason * coefCH4ToC;
 		}
 		
 		carbonInputsList <- [];
-		return totalCarbonInput;
+		return soilCarbonInput;
 	}
 	
 	action emitRSSoilCH4 {
