@@ -154,6 +154,10 @@ global {
 					do transitionFromFallows;
 				}
 			}
+			
+			match rainySeasonFirstMonth - ORPSpreadingPeriodLength {
+				write "	ORP spreading starts.";
+			}
 		}
 		
 		switch current_date.month { // Monthly processes only in a specific season

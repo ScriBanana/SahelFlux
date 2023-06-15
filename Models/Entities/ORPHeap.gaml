@@ -48,6 +48,10 @@ species ORPHeap schedules: [] {
 	
 	float heapCH4ToBeEmittedInRainySeason;
 	
+	list<parcel> nextSpreadParcelsOrder; // = myHomeParcelsList, but rotates
+	parcel parcelSpreadOn;
+	float ORPSpreadOnCurrentParcel <- 0.0;
+	
 	//// Functions
 	
 	action addWastes {
@@ -90,7 +94,12 @@ species ORPHeap schedules: [] {
 	
 	action spreadORPOnParcels {
 		
-		// Sélection parcelle
+		// Select new parcel if need be
+		if ORPSpreadOnCurrentParcel / parcelSpreadOn.parcelSurface > maxORPSpreadPerParcel {
+			parcelSpreadOn <- first(nextSpreadParcelsOrder);
+			nextSpreadParcelsOrder >- first(nextSpreadParcelsOrder);
+			nextSpreadParcelsOrder <+ parcelSpreadOn;
+		}
 		
 		float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
 		float spreadCQuantity <- heapQuantity / spreadORPQuantity * heapCContent;
@@ -104,7 +113,7 @@ species ORPHeap schedules: [] {
 		
 		// C incorporé
 		
-		// N incorporé
+		// N incorporé (N avail)
 		
 	}
 	

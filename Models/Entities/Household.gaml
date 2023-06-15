@@ -68,6 +68,8 @@ global {
 			// Assiciating an ORP heap
 			create ORPHeap with: [myHousehold::self] {	
 				myHousehold.myORPHeap <- self;
+				nextSpreadParcelsOrder <- myself.myHomeParcelsList;
+				parcelSpreadOn <- first(nextSpreadParcelsOrder);
 			}
 		}
 		ask nbTranshumantHh among household {

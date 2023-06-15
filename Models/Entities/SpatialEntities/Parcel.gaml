@@ -17,7 +17,7 @@ global {
 	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
 	bool fallowEnabled;
-	float maxORPSpread <- 15500.0; // kgDM ORP Spread on each home parcel each year
+	float maxORPSpreadPerParcel <- 15500.0; // kgDM/ha ORP Spread on each home parcel each year
 	
 	// Variables
 	list<parcel> listAllHomeParcels;
@@ -71,6 +71,7 @@ global {
 									availableCroplandCells >- self;
 								}
 							}
+							parcelSurface <- length(myCells) / hectareToCell;
 						}
 						
 						newParc <- newParc + 1;
@@ -150,6 +151,7 @@ species parcel parallel: true schedules: [] {
 	//// Parameters
 	
 	list<landscape> myCells;
+	float parcelSurface; // ha
 	household myOwner;
 	bool homeField <- false;
 	
