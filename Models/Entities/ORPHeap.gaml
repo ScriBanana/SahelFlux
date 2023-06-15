@@ -111,19 +111,36 @@ species ORPHeap schedules: [] {
 		// Add quantity for parcel rotation
 		ORPSpreadOnCurrentParcel <- ORPSpreadOnCurrentParcel + spreadORPQuantity;
 		
-		// Add carbon and manure for CH4 emissions
+		int nbSpreadCells <- length(parcelSpreadOn.myCells);
+		float spreadNPerCell <- spreadNQuantity / nbSpreadCells;
+		float parcelIncorporatedN <- 0.0;
 		ask parcelSpreadOn.myCells {
+			// Add carbon and manure for CH4 emissions
 			mySOCstock.carbonInputsList <+ [
-				"ORP", spreadManureInSpreadORPQuantity, spreadCQuantity
+				"ORP", spreadManureInSpreadORPQuantity / nbSpreadCells, spreadCQuantity / nbSpreadCells
 			];
+			
+			float spreadNInCell <- spreadNPerCell;
+			
+			// N2O direct
+			float spreadORPDirectN2OEmissions;
+			// / nbSpreadCells
+			// TODO compute emissions and saveflow
+			spreadNInCell <- spreadNInCell - spreadORPDirectN2OEmissions;
+			
+			// Indirect RS
+			float spreadORPGasLoss;
+			// / nbSpreadCells
+			// TODO compute emissions and saveflow
+			spreadNInCell <- spreadNInCell - spreadORPGasLoss;
+			
+			// Incorporate non-emitted N
+			mySoilNProcesses.NInflows["ORP"] <- mySoilNProcesses.NInflows["ORP"] + spreadNInCell;
+			parcelIncorporatedN <- parcelIncorporatedN + spreadNInCell;
 		}
 		
-		// N2O direct
-		
-		// Indirect RS
-		
-		// N incorporé (N avail)
-		
+		ask world {	do saveFlowInMap("C", "ORPHeaps", "TF-ToHomeFields" , spreadCQuantity);}
+		ask world {	do saveFlowInMap("N", "ORPHeaps", "TF-ToHomeFields" , parcelIncorporatedN);}
 	}
 	
 }

@@ -15,7 +15,7 @@ global {
 	
 	//// Global soil N parameters
 	
-	map<string, list> dungMineraPercentMatrix <- [ // N available over the years for : 
+	map<string, list> dungMineraPercentMatrix <- [ // Proportion of N available over the years for : 
 		"HerdsDung"::[0.6, 0.4, 0.0],
 		"HerdsUrine"::[1.0, 0.0, 0.0],
 		"ORP"::[0.4, 0.3, 0.3],
