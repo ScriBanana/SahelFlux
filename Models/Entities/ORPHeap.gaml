@@ -79,9 +79,9 @@ species ORPHeap schedules: [] {
 			heapNContent <- heapNContent + addedStraw * milletStrawNContent;
 			
 		}
-		
-		heapFattenedInput <- [];
+		heapFattenedInput <- []; // Useless but safer
 	}
+	
 	
 	action emitRSHeapsCH4 {
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "OF-GHG" , myself.heapCH4ToBeEmittedInRainySeason * coefCH4ToC);}
@@ -89,14 +89,23 @@ species ORPHeap schedules: [] {
 	}
 	
 	action spreadORPOnParcels {
-		if heapQuantity >= 0.0 {
-			float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
-			
-		}
 		
-//		ask myHousehold.myHomeParcelsList {
-//			currentCell.mySOCstock.periodCInputMap["ORP"] <- currentCell.mySOCstock.periodCInputMap["ORP"] + heapCContent;
-//		}
+		// Sélection parcelle
+		
+		float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
+		float spreadCQuantity <- heapQuantity / spreadORPQuantity * heapCContent;
+		float spreadNQuantity <- heapQuantity / spreadORPQuantity * heapNContent;
+		
+		// CH4 pour émission RS
+		
+		// N2O direct
+		
+		// Indirect RS
+		
+		// C incorporé
+		
+		// N incorporé
+		
 	}
 	
 }

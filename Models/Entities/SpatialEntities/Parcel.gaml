@@ -17,6 +17,7 @@ global {
 	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
 	bool fallowEnabled;
+	float maxORPSpread <- 15500.0; // kgDM ORP Spread on each home parcel each year
 	
 	// Variables
 	list<parcel> listAllHomeParcels;

@@ -172,7 +172,7 @@ global {
 		ask SOCStock {
 			do updateCarbonPools;
 		}
-		ask ORPHeap {
+		ask ORPHeap where (each.myHousehold.myFattenedAnimals != nil) {
 			do accumulateFattenedInputs;
 		}
 		
@@ -196,7 +196,7 @@ global {
 		{
 			daysSinceSpread <- daysSinceSpread + 1;
 			if daysSinceSpread >= 3 {
-				ask ORPHeap {
+				ask ORPHeap where (each.heapQuantity > 0.0) {
 					do spreadORPOnParcels;
 				}
 				
