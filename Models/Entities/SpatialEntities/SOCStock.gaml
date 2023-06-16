@@ -36,15 +36,6 @@ global {
 	float criticalNbStepForDiscretisation <- min(criticalNbStepLabileForDiscretisation, criticalNbStepStableForDiscretisation); // Stable is way higher with default parameters
 	float boundaryNbStepForDiscretisation <- 0.8 * criticalNbStepForDiscretisation; // 0.8 factor for safety
 	
-	// C emissions parameters
-	float dummyCEmittedAtDungDepositFactor <- 0.3; // TODO DUMMY (duh)
-	
-	// CH4 from soils emissions parameters
-	float methaneProdFromManure <- 0.087; // kgCH4/kgDM IPCC 10.16
-	float methaneConversionFactorHerd <- 0.02; // dimless IPCC 10.17
-	float methaneConversionFactorORPPile <- 0.05; // dimless IPCC 10.17
-	float methaneConversionFactorORPSpread <- 0.01; // dimless IPCC 10.17
-	
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	

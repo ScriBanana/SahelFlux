@@ -22,12 +22,6 @@ global {
 		"MineralFerti"::[1.0, 0.0, 0.0]
 	];
 	
-	// N gases emission factors
-	float emissionFactorN2ODeposits <- 0.005; // IPCC t11.1
-	float emissionFactorN2ODungUrine <- 0.002; // IPCC t11.1
-	float fractionGasLossMineralFerti <- 0.15; // IPCC t11.3
-	float fractionGasLossOrganicFerti <- 0.21; // IPCC t11.3
-	
 }
 
 species soilNProcesses parallel: true schedules: [] {
@@ -41,7 +35,7 @@ species soilNProcesses parallel: true schedules: [] {
 	map<string, float> thisYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	map<string, float> nextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	
-	float gasLossNToEmitInRS; // kgN TODO emit at some point (register in matrix?)
+	float soilGasLossNToEmitInRS; // kgN TODO emit at some point (register in matrix?)
 	
 	//// Functions
 	

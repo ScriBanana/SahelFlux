@@ -48,6 +48,7 @@ species ORPHeap schedules: [] {
 	float heapCContent; // kgC
 	
 	float heapCH4ToBeEmittedInRainySeason; // kgC
+	float heapGasLossNToEmitInRS; // kgN TODO emit at some point (register in matrix?)
 	
 	list<parcel> nextSpreadParcelsOrder; // = myHomeParcelsList, but rotates
 	parcel parcelSpreadOn;
@@ -57,28 +58,49 @@ species ORPHeap schedules: [] {
 	
 	action addWastes {
 		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days TODO utiliser time
-		heapQuantity <- heapQuantity + (kitchenWasteInputRate + otherWastesInputRate) * ORPAccumulationPeriodLength;
 		float wastesNAddition <- (kitchenWastesNInputRate + otherWastesInputRate * otherWastesNContent) * ORPAccumulationPeriodLength;
-		float wastesCAddition <- (kitchenWasteInputRate * kitchenWastesCContent + otherWastesInputRate * otherWastesCContent) * ORPAccumulationPeriodLength;
-		heapNContent <- heapNContent + wastesNAddition;
-		heapCContent <- heapCContent + wastesCAddition;
+		float wastesCAddition <- (
+			kitchenWasteInputRate * kitchenWastesCContent + otherWastesInputRate * otherWastesCContent
+		) * ORPAccumulationPeriodLength;
+		
+		float emittedN2OFromWastesAddition <- wastesNAddition * emissionFactorN2OInHeap; // kgN
+		
 		ask world {	do saveFlowInMap("N", "Households", "TF-ToORPHeaps" , wastesNAddition);}
 		ask world {	do saveFlowInMap("C", "Households", "TF-ToORPHeaps" , wastesCAddition);}
+		ask world {	do saveFlowInMap("N", "HomeFields", "OF-GHG" , emittedN2OFromWastesAddition);}
+		
+		heapQuantity <- heapQuantity + (kitchenWasteInputRate + otherWastesInputRate) * ORPAccumulationPeriodLength;
+		heapNContent <- heapNContent + wastesNAddition;
+		heapCContent <- heapCContent + wastesCAddition;
 	}
 	
 	action accumulateFattenedInputs {
 		loop dungDeposit over: heapFattenedInput {
 			
-			// Fattened manure
+			// Compute CH4 emissions
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactorORPPile * float(dungDeposit[0]); // kgCH4
 			heapCH4ToBeEmittedInRainySeason <- heapCH4ToBeEmittedInRainySeason + futureCH4Emission;
+			
+			// Compute N2O emissions
+			float emittedN2OFromFattenedInput <- (float(dungDeposit[2]) + float(dungDeposit[3])) * emissionFactorN2OInHeap; // kgN
+			ask world {	do saveFlowInMap("N", "ORPHeaps", "OF-GHG" , emittedN2OFromFattenedInput);}
+			
+			// Compute NOx gas losses
+			float lostNGasFromFattenedInput <- (float(dungDeposit[2]) + float(dungDeposit[3])) * fractionGasLossORPHeap; // kgN
+			heapGasLossNToEmitInRS <- heapGasLossNToEmitInRS + lostNGasFromFattenedInput;
+			ask world {	do saveFlowInMap("N", "ORPHeaps", "OF-AtmoLosses" , lostNGasFromFattenedInput);}
+			
+			// Balance balances
 			heapQuantity <- heapQuantity + float(dungDeposit[0]) - futureCH4Emission;
 			manureInHeap <- manureInHeap + float(dungDeposit[0]) - futureCH4Emission;
 			heapCContent <- heapCContent + min(0, float(dungDeposit[1]) - futureCH4Emission * coefCH4ToC);
 			// Wastes don't contribute to CH4 emissions, then. They are just added to soils C stock.
-			heapNContent <- heapNContent + float(dungDeposit[2]) + float(dungDeposit[3]);
+			heapNContent <- heapNContent + min(
+				0,
+				float(dungDeposit[2]) + float(dungDeposit[3]) - emittedN2OFromFattenedInput - lostNGasFromFattenedInput
+			); // Mins mathematically useless, but, oh well, who doesn't fancy failsafes...
 			
-			// Refusals
+			// Refusals - No emissions ?
 			float addedStraw <- float(dungDeposit[0]) * ratioStrawToManureInORP;
 			heapQuantity <- heapQuantity + addedStraw;
 			heapCContent <- heapCContent + addedStraw * milletStrawCContent;
@@ -131,7 +153,7 @@ species ORPHeap schedules: [] {
 			// Incorporate non-emitted N
 			mySoilNProcesses.NInflows["ORP"] <- mySoilNProcesses.NInflows["ORP"] + incorporatedN / nbSpreadCells;
 			// And gas losses for RS
-			mySoilNProcesses.gasLossNToEmitInRS <- mySoilNProcesses.gasLossNToEmitInRS + spreadORPNGasLoss / nbSpreadCells;
+			mySoilNProcesses.soilGasLossNToEmitInRS <- mySoilNProcesses.soilGasLossNToEmitInRS + spreadORPNGasLoss / nbSpreadCells;
 		}
 		
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "TF-ToHomeFields" , spreadCQuantity);}

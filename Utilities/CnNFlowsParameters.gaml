@@ -54,6 +54,12 @@ global {
 	float kitchenWastesCContent <- 0.6; // kgC/kgDM TODO DUMMY
 	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
 	
+	// CH4 from soils emissions parameters
+	float methaneProdFromManure <- 0.087; // kgCH4/kgDM IPCC 10.16
+	float methaneConversionFactorHerd <- 0.02; // dimless IPCC 10.17
+	float methaneConversionFactorORPPile <- 0.05; // dimless IPCC 10.17
+	float methaneConversionFactorORPSpread <- 0.01; // dimless IPCC 10.17
+	
 	// Soil N model
 	float baseNFromSoilHomefieldsHa <- 27.5; // kgN/ha; Grillot et al., 2018
 	float baseNFromSoilBushfieldsHa <- 12.0; // kgN/ha; Grillot et al., 2018
@@ -64,5 +70,13 @@ global {
 	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell; // kgN/cell
 	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell; // kgN/cell
 	float baseNAtmoPerTree <- 4.0; // kgN; Grillot et al., 2018
+	
+	// N gases emission factors
+	float emissionFactorN2OInHeap <- 0.01; // IPCC t10.21
+	float emissionFactorN2ODeposits <- 0.005; // IPCC t11.1
+	float emissionFactorN2ODungUrine <- 0.002; // IPCC t11.1
+	float fractionGasLossMineralFerti <- 0.15; // IPCC t11.3
+	float fractionGasLossOrganicFerti <- 0.21; // IPCC t11.3
+	float fractionGasLossORPHeap <- 0.45; // IPCC t10.22
 	
 }
