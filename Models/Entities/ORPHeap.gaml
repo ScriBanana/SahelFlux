@@ -140,7 +140,7 @@ species ORPHeap schedules: [] {
 		float spreadORPNGasLoss <- spreadNQuantity * fractionGasLossOrganicFerti; // kgN
 		ask world {	do saveFlowInMap("N", "HomeFields", "OF-AtmoLosses" , spreadORPNGasLoss);}
 		
-		float incorporatedN <- spreadNQuantity - (spreadORPNDirectN2OEmissions + spreadORPNGasLoss) * coefN2OToN;
+		float incorporatedN <- spreadNQuantity - (spreadORPNDirectN2OEmissions + spreadORPNGasLoss);
 		
 		// Save flows in the parcel's cells
 		int nbSpreadCells <- length(parcelSpreadOn.myCells);

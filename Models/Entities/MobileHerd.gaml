@@ -212,23 +212,53 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		map excretaOutputs <- excrete(first(chymeChunksList)[1]);
 		chymeChunksList >- first(chymeChunksList);
 		
+		// Emit N gases
+		// N2O direct
+		float mobileHerdNDirectFaecesN2OEmissions <- float(excretaOutputs["faecesNitrogen"]) * emissionFactorN2ODungUrine; // kgN
+		float mobileHerdNDirectUrineN2OEmissions <- float(excretaOutputs["urineNitrogen"]) * emissionFactorN2ODungUrine; // kgN
+		
+		// Indirect RS
+		float mobileHerdFaecesNGasLoss <- float(excretaOutputs["faecesNitrogen"]) * fractionGasLossOrganicFerti; // kgN
+		float mobileHerdUrineNGasLoss <- float(excretaOutputs["urineNitrogen"]) * fractionGasLossOrganicFerti; // kgN
+		
+		// The rest gets incorporated
+		float mobileHerdIncorporatedFaecesN <-
+			float(excretaOutputs["faecesNitrogen"]) - (mobileHerdNDirectFaecesN2OEmissions + mobileHerdFaecesNGasLoss)
+		;
+		float mobileHerdIncorporatedUrineN <-
+			float(excretaOutputs["urineNitrogen"]) - (mobileHerdNDirectUrineN2OEmissions + mobileHerdUrineNGasLoss)
+		;
+		
 		// Save N and C in cell
 		currentCell.mySOCstock.carbonInputsList <+ [
 			"HerdsDung", float(excretaOutputs["volatileSolidExcreted"]), float(excretaOutputs["excretedCarbon"])
 		];
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <-
-			currentCell.mySoilNProcesses.NInflows["HerdsDung"] + float(excretaOutputs["faecesNitrogen"])
+			currentCell.mySoilNProcesses.NInflows["HerdsDung"] + mobileHerdIncorporatedFaecesN
 		;
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <-
-			currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + float(excretaOutputs["urineNitrogen"])
+			currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + mobileHerdIncorporatedUrineN
 		;
 		
 		// Save flows to flows map
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (
 			currentCell.myParcel != nil and currentCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields"
 		);
-		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool , float(excretaOutputs["excretedCarbon"]));}
-		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool, float(excretaOutputs["faecesNitrogen"]) + float(excretaOutputs["urineNitrogen"]));}
+		string emissionsEmittingPool <- currentCell.cellLU = "Rangeland" ? "Rangelands" : (
+			currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields"
+		);
+		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool,
+			float(excretaOutputs["excretedCarbon"])
+		);}
+		ask world {	do saveFlowInMap("N", emissionsEmittingPool, "OF-GHG" ,
+			mobileHerdNDirectFaecesN2OEmissions + mobileHerdNDirectUrineN2OEmissions
+		);}
+		ask world {	do saveFlowInMap("N", emissionsEmittingPool, "OF-AtmoLosses" ,
+			mobileHerdFaecesNGasLoss + mobileHerdUrineNGasLoss
+		);}
+		ask world {	do saveFlowInMap("N", "MobileHerds", receivingPool,
+			float(excretaOutputs["faecesNitrogen"]) + float(excretaOutputs["urineNitrogen"])
+		);}
 		
 	}
 	

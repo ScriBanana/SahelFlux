@@ -46,11 +46,11 @@ species SOCStock parallel: true schedules: [] {
 	//// Parameters
 	
 	landscape myCell;
-	list carbonInputsList; // string::type, float::VSE, float::CAmount
+	list carbonInputsList; // [[string::type, float::VSE, float::CAmount]]
 	float labileCPool; // kgC/cell
 	float stableCPool; // kgC/cell
 	float totalSOC; // kgC/cell
-	float CH4ToBeEmittedInRainySeason;
+	float CH4ToBeEmittedInRainySeason; // kgCH4/cell
 	
 	//// Functions
 	
@@ -58,8 +58,6 @@ species SOCStock parallel: true schedules: [] {
 		
 		// Aggregate input
 		float periodCInput; // kgC
-		
-		// TODO periodCInput <- periodCInput + Other inputs
 		
 		// Mobile herds and ORP
 		periodCInput <- periodCInput + aggregateRSDungCH4Emissions();
@@ -79,7 +77,9 @@ species SOCStock parallel: true schedules: [] {
 			
 			// Solve for stocks variations
 			labileCPool <- labileCPool + (periodCInput - kineticLabile * edaphicClimateFactor * labileCPool) * solverDeltaT;
-			stableCPool <- stableCPool + (humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool - kineticStable * edaphicClimateFactor * stableCPool) * solverDeltaT;
+			stableCPool <- stableCPool + (
+				humificationCoef * kineticLabile * edaphicClimateFactor * labileCPool - kineticStable * edaphicClimateFactor * stableCPool
+			) * solverDeltaT;
 		}
 		totalSOC <- labileCPool + stableCPool;
 		
