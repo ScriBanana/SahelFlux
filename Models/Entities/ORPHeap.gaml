@@ -47,11 +47,11 @@ species ORPHeap schedules: [] {
 	float heapNContent; // kgN
 	float heapCContent; // kgC
 	
-	float heapCH4ToBeEmittedInRainySeason;
+	float heapCH4ToBeEmittedInRainySeason; // kgC
 	
 	list<parcel> nextSpreadParcelsOrder; // = myHomeParcelsList, but rotates
 	parcel parcelSpreadOn;
-	float ORPSpreadOnCurrentParcel <- 0.0;
+	float ORPSpreadOnCurrentParcel <- 0.0; // kgDM
 	
 	//// Functions
 	
@@ -101,16 +101,14 @@ species ORPHeap schedules: [] {
 			parcelSpreadOn <- first(nextSpreadParcelsOrder);
 			nextSpreadParcelsOrder >- first(nextSpreadParcelsOrder);
 			nextSpreadParcelsOrder <+ parcelSpreadOn;
+			ORPSpreadOnCurrentParcel <- 0.0;
 		}
 		
 		float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
 		float spreadManureInSpreadORPQuantity <- (manureInHeap / heapQuantity) * spreadORPQuantity;
 		float spreadCQuantity <- heapQuantity / spreadORPQuantity * heapCContent;
 		float spreadNQuantity <- heapQuantity / spreadORPQuantity * heapNContent;
-		
-		// Add quantity for parcel rotation
-		ORPSpreadOnCurrentParcel <- ORPSpreadOnCurrentParcel + spreadORPQuantity;
-		
+				
 		// Emit N gases
 		// N2O direct
 		float spreadORPNDirectN2OEmissions <- spreadNQuantity * emissionFactorN2ODeposits; // kgN
@@ -138,6 +136,15 @@ species ORPHeap schedules: [] {
 		
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "TF-ToHomeFields" , spreadCQuantity);}
 		ask world {	do saveFlowInMap("N", "ORPHeaps", "TF-ToHomeFields" , incorporatedN);}
+		
+		// Add quantity for parcel rotation
+		ORPSpreadOnCurrentParcel <- ORPSpreadOnCurrentParcel + spreadORPQuantity;
+		
+		// Balance balances
+		heapQuantity <- heapQuantity - spreadORPQuantity;
+		manureInHeap <- manureInHeap - spreadManureInSpreadORPQuantity;
+		heapCContent <- heapCContent - spreadCQuantity;
+		heapNContent <- heapNContent - spreadNQuantity;
 	}
 	
 }

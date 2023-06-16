@@ -43,6 +43,7 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 		chymeChunksList <+ [time, "FattenedRation"::eatenQuantity];
 		
 		// Save flows and remove from straw pile if need be
+		// TODO refusals not taken into account
 		if myHousehold.myForagePileBiomassContent >= eatenStraw {
 			myHousehold.myForagePileBiomassContent <- myHousehold.myForagePileBiomassContent - eatenStraw;
 			ask world {	do saveFlowInMap("C", "StrawPiles", "TF-ToFattenedAn", eatenStraw * milletStrawCContent);}
