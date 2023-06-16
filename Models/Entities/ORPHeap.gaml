@@ -111,36 +111,33 @@ species ORPHeap schedules: [] {
 		// Add quantity for parcel rotation
 		ORPSpreadOnCurrentParcel <- ORPSpreadOnCurrentParcel + spreadORPQuantity;
 		
+		// Emit N gases
+		// N2O direct
+		float spreadORPNDirectN2OEmissions <- spreadNQuantity * emissionFactorN2ODeposits; // kgN
+		ask world {	do saveFlowInMap("N", "HomeFields", "OF-GHG" , spreadORPNDirectN2OEmissions);}
+		
+		// Indirect RS
+		float spreadORPNGasLoss <- spreadNQuantity * fractionGasLossOrganicFerti; // kgN
+		ask world {	do saveFlowInMap("N", "HomeFields", "OF-AtmoLosses" , spreadORPNGasLoss);}
+		
+		float incorporatedN <- spreadNQuantity - (spreadORPNDirectN2OEmissions + spreadORPNGasLoss) * coefN2OToN;
+		
+		// Save flows in the parcel's cells
 		int nbSpreadCells <- length(parcelSpreadOn.myCells);
-		float spreadNPerCell <- spreadNQuantity / nbSpreadCells;
-		float parcelIncorporatedN <- 0.0;
 		ask parcelSpreadOn.myCells {
 			// Add carbon and manure for CH4 emissions
 			mySOCstock.carbonInputsList <+ [
 				"ORP", spreadManureInSpreadORPQuantity / nbSpreadCells, spreadCQuantity / nbSpreadCells
 			];
 			
-			float spreadNInCell <- spreadNPerCell;
-			
-			// N2O direct
-			float spreadORPDirectN2OEmissions;
-			// / nbSpreadCells
-			// TODO compute emissions and saveflow
-			spreadNInCell <- spreadNInCell - spreadORPDirectN2OEmissions;
-			
-			// Indirect RS
-			float spreadORPGasLoss;
-			// / nbSpreadCells
-			// TODO compute emissions and saveflow
-			spreadNInCell <- spreadNInCell - spreadORPGasLoss;
-			
 			// Incorporate non-emitted N
-			mySoilNProcesses.NInflows["ORP"] <- mySoilNProcesses.NInflows["ORP"] + spreadNInCell;
-			parcelIncorporatedN <- parcelIncorporatedN + spreadNInCell;
+			mySoilNProcesses.NInflows["ORP"] <- mySoilNProcesses.NInflows["ORP"] + incorporatedN / nbSpreadCells;
+			// And gas losses for RS
+			mySoilNProcesses.gasLossNToEmitInRS <- mySoilNProcesses.gasLossNToEmitInRS + spreadORPNGasLoss / nbSpreadCells;
 		}
 		
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "TF-ToHomeFields" , spreadCQuantity);}
-		ask world {	do saveFlowInMap("N", "ORPHeaps", "TF-ToHomeFields" , parcelIncorporatedN);}
+		ask world {	do saveFlowInMap("N", "ORPHeaps", "TF-ToHomeFields" , incorporatedN);}
 	}
 	
 }

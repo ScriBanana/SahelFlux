@@ -22,15 +22,11 @@ global {
 		"MineralFerti"::[1.0, 0.0, 0.0]
 	];
 	
-	float baseNFromSoilHomefieldsHa <- 27.5; // kgN/ha; Grillot et al., 2018
-	float baseNFromSoilBushfieldsHa <- 12.0; // kgN/ha; Grillot et al., 2018
-	float baseNAtmoMicroOrgaHa <- 7.5; // kgN/ha; Grillot et al., 2018
-	float baseNAtmoGroundnutHa <- 20.0; // kgN/ha; Grillot et al., 2018
-	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectareToCell; // kgN/cell
-	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectareToCell; // kgN/cell
-	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell; // kgN/cell
-	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell; // kgN/cell
-	float baseNAtmoPerTree <- 4.0; // kgN; Grillot et al., 2018
+	// N gases emission factors
+	float emissionFactorN2ODeposits <- 0.005; // IPCC t11.1
+	float emissionFactorN2ODungUrine <- 0.002; // IPCC t11.1
+	float fractionGasLossMineralFerti <- 0.15; // IPCC t11.3
+	float fractionGasLossOrganicFerti <- 0.21; // IPCC t11.3
 	
 }
 
@@ -45,9 +41,11 @@ species soilNProcesses parallel: true schedules: [] {
 	map<string, float> thisYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	map<string, float> nextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	
+	float gasLossNToEmitInRS; // kgN TODO emit at some point (register in matrix?)
+	
 	//// Functions
 	
-	float computeNAvailable {
+	float computeNAvailable { // Yearly
 		
 		float NFromSoil <- computeNFromSoil();
 		list<float> NAtmo <- computeNAtmo();
@@ -95,9 +93,9 @@ species soilNProcesses parallel: true schedules: [] {
 	}
 	
 	map<string, float> computeNDepositsAndAfterEffect {
-		// TODO Virer les emissions
 		
 		// Computing directly mineralised N and after-effect from the period NInflows
+		// Emissions and gas losses must be removed at the source (temporality discrepancy)
 		map<string, float> NInflowsDirectlyMineralised <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 		map<string, float> NInflowsNextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 		map<string, float> NInflowsInTwoYearsAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];

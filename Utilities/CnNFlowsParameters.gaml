@@ -8,20 +8,20 @@
 
 model CnNFlowsParameters
 
-/* Insert your model definition here */
+import "ImportZoning.gaml"
 
 global {
 	
-	// Animals
-	float TLUNContent <- 0.0294; // kgN/kg Le Noë 2017 and own calculation
-	float TLUCContent <- 0.273; // kgC/kg Le Noë 2017 and own calculation
-	
-	// Gas
+	// Gas stoichiometry
 	float coefCO2ToC <- 0.2729; // Proportion of C in the mass of CO2
 	float coefCH4ToC <- 0.7487; // Proportion of C in the mass of CH4
 	float coefCOToC <- 0.4288; // Proportion of C in the mass of CH4
 	float coefN2OToN <- 0.6365; // Proportion of N in the mass of N2O
 	float coefNOxToN <- 0.3045; // Proportion of N in the mass of NO2 (default)
+	
+	// Animals
+	float TLUNContent <- 0.0294; // kgN/kg Le Noë 2017 and own calculation
+	float TLUCContent <- 0.273; // kgC/kg Le Noë 2017 and own calculation
 	
 	// C and N contents of crops TODO utilisé dans le grow pour la photosynth et dans la récolte (cohérence?)
 	float rangelandVegCContent <- forageRSCContent; // kgC/kgDM
@@ -53,5 +53,16 @@ global {
 	float otherWastesNContent <- 0.001; // kgN/kgDM TODO DUMMY
 	float kitchenWastesCContent <- 0.6; // kgC/kgDM TODO DUMMY
 	float otherWastesCContent <- 0.4; // kgC/kgDM TODO DUMMY
+	
+	// Soil N model
+	float baseNFromSoilHomefieldsHa <- 27.5; // kgN/ha; Grillot et al., 2018
+	float baseNFromSoilBushfieldsHa <- 12.0; // kgN/ha; Grillot et al., 2018
+	float baseNAtmoMicroOrgaHa <- 7.5; // kgN/ha; Grillot et al., 2018
+	float baseNAtmoGroundnutHa <- 20.0; // kgN/ha; Grillot et al., 2018
+	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectareToCell; // kgN/cell
+	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectareToCell; // kgN/cell
+	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell; // kgN/cell
+	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell; // kgN/cell
+	float baseNAtmoPerTree <- 4.0; // kgN; Grillot et al., 2018
 	
 }
