@@ -26,10 +26,9 @@ global {
 		outputCSVheader <<+ flowsMapTemplate.keys where (each contains "IF-");
 		outputCSVheader <<+ NFlowsMap.keys;
 		
-		
 		do saveSFMatrixDivided (outputCSVheader, "", 1.0);
 		do saveSFMatrixDivided (outputCSVheader, "y_", durationSimu);
-		do saveSFMatrixDivided (outputCSVheader, "ha_y_", totalAreaHa * durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
 		do saveSFMatrixDivided (outputCSVheader, "TLU_y_", (nbTLUHerds) * durationSimu);

@@ -20,8 +20,8 @@ global {
 	//// Global households parameters
 	
 	int nbHousehold; // Parameter
-	int nbTranshumantHh;
-	int nbFatteningHh;
+	int nbTranshumantHh <- 8;
+	int nbFatteningHh <- 8;
 	int nbBushFieldsPerHh <- 10; // TODO Dummy
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
 	

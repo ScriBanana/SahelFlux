@@ -57,8 +57,11 @@ species ORPHeap schedules: [] {
 	//// Functions
 	
 	action addWastes {
-		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days TODO utiliser time
-		float wastesNAddition <- (kitchenWastesNInputRate + otherWastesInputRate * otherWastesNContent) * ORPAccumulationPeriodLength;
+		float ORPAccumulationPeriodLength <- (current_date - lastORPAddition) / 86400; // Converted in days
+		
+		float wastesNAddition <- (
+			kitchenWastesNInputRate + otherWastesInputRate * otherWastesNContent
+		) * ORPAccumulationPeriodLength;
 		float wastesCAddition <- (
 			kitchenWasteInputRate * kitchenWastesCContent + otherWastesInputRate * otherWastesCContent
 		) * ORPAccumulationPeriodLength;
@@ -110,7 +113,6 @@ species ORPHeap schedules: [] {
 		heapFattenedInput <- []; // Useless but safer
 	}
 	
-	
 	action emitRSHeapsCH4 {
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "OF-GHG" , myself.heapCH4ToBeEmittedInRainySeason * coefCH4ToC);}
 		heapCH4ToBeEmittedInRainySeason <- 0.0;
@@ -126,11 +128,11 @@ species ORPHeap schedules: [] {
 			ORPSpreadOnCurrentParcel <- 0.0;
 		}
 		
-		float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity;
-		float spreadManureInSpreadORPQuantity <- (manureInHeap / heapQuantity) * spreadORPQuantity;
-		float spreadCQuantity <- heapQuantity / spreadORPQuantity * heapCContent;
-		float spreadNQuantity <- heapQuantity / spreadORPQuantity * heapNContent;
-				
+		float spreadORPQuantity <- heapQuantity > maxManureCartWeight ? maxManureCartWeight : heapQuantity; // kgDM
+		float spreadManureInSpreadORPQuantity <- (manureInHeap / heapQuantity) * spreadORPQuantity; // kgDM
+		float spreadCQuantity <- heapCContent * spreadORPQuantity / heapQuantity; // kgC
+		float spreadNQuantity <- heapNContent * spreadORPQuantity / heapQuantity; // kgN
+		
 		// Emit N gases
 		// N2O direct
 		float spreadORPNDirectN2OEmissions <- spreadNQuantity * emissionFactorN2ODeposits; // kgN
