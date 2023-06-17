@@ -25,6 +25,7 @@ global {
 	////	--------------------------	////
 	
 	float startTimeReal <- machine_time;
+	bool batchOn <- false;
 	
 	// Simulation calendar
 	int startHour <- wakeUpTime - 1;
@@ -243,10 +244,13 @@ global {
 		write "=== END OF SIMULATION ===";
 		do gatherFlows;
 		do computeENAIndicators;
-		do exportStockFlowsOutputData;
-		endSimu <- true; // Stops batch experiments
 		write "Simulation ended. Runtime : " + (machine_time - startTimeReal)/1000 + " s";
-		do pause;
+		if batchOn {
+			endSimu <- true;
+		} else {
+			do exportStockFlowsOutputData;
+			do pause;
+		}
 	}
 	
 }
