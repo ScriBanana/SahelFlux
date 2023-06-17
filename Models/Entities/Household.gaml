@@ -126,7 +126,7 @@ species household schedules: [] {
 	}
 	
 	action sellFattenedAnimals {
-		if !empty(myFattenedAnimals) {
+		if !dead(myFattenedAnimals){
  			float soldFattenedNFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUNContent * weightTLU;
 	 		float soldFattenedCFlow <- myFattenedAnimals.groupSize * ratioWeightSoldOnBought * TLUCContent * weightTLU;
 	 		ask world {	do saveFlowInMap("N", "FattenedAn", "OF-SoldOnMarket", soldFattenedNFlow);}
@@ -157,7 +157,7 @@ species household schedules: [] {
  		}
  		nbFatteningRenewal <- floor(nbFatteningRenewal * 100) / 100; // Less decimals
  		
- 		if nbFatteningRenewal >= 0.0 {
+ 		if nbFatteningRenewal > 0.0 {
 			float boughtFattenedNFlow <- nbFatteningRenewal * TLUNContent * weightTLU;
 	 		float boughtFattenedCFlow <- nbFatteningRenewal * TLUCContent * weightTLU;
 	 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", boughtFattenedNFlow);}
