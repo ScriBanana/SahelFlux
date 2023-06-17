@@ -31,7 +31,7 @@ experiment BatchRun autorun: true type: batch repeat: 8 until: (endSimu or stopC
 			save [
 				int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
 				self.cycle, self.machine_time,
-				self.TT, self.CThroughflow
+				self.TotalNFlows, self.TotalCFlows, self.TT, self.CThroughflow
 			] to: outputDirectory + "BatchRunsForSampling.csv" format: "csv" rewrite: (int(self) = 0) ? true : false header: true;
 		}
 	}

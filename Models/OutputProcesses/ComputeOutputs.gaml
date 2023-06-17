@@ -12,6 +12,8 @@ import "RecordFlows.gaml"
 
 global {
 	
+	float TotalNFlows;
+	float TotalCFlows;
 	float TT;
 	float TST;
 	float ICR;
@@ -21,6 +23,9 @@ global {
 		
 		// TT
 		loop subMap over: NFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
+			loop flowPair over: subMap.pairs {
+				TotalNFlows <- TotalNFlows + float(flowPair.value);
+			}
 			loop flowPair over: subMap.pairs where (each.key contains "TF-") {
 				TT <- TT + float(flowPair.value);
 			}
@@ -42,6 +47,9 @@ global {
 		
 		// Carbon balance
 		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
+			loop flowPair over: subMap.pairs {
+				TotalCFlows <- TotalCFlows + float(flowPair.value);
+			}
 			loop flowPair over: subMap.pairs where (each.key contains "TF-") {
 				CThroughflow <- CThroughflow + float(flowPair.value);
 			}
