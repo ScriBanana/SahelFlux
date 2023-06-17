@@ -15,7 +15,9 @@ global {
 	float TT;
 	float TST;
 	float ICR;
-	action computeENAIndicators {
+	float CThroughflow;
+	
+	action computeOutputs {
 		
 		// TT
 		loop subMap over: NFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
@@ -37,5 +39,13 @@ global {
 		// Prompt
 //		write "		TST : " + TST / hectareToCell + " kgN/ha";
 //		write "		ICR : " + ICR;
+		
+		// Carbon balance
+		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
+			loop flowPair over: subMap.pairs where (each.key contains "TF-") {
+				CThroughflow <- CThroughflow + float(flowPair.value);
+			}
+		}
+		write "		C throughflow : " + int(floor(CThroughflow)) + " kgC";
 	}
 }

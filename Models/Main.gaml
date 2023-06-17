@@ -243,7 +243,7 @@ global {
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";
 		do gatherFlows;
-		do computeENAIndicators;
+		do computeOutputs;
 		write "Simulation ended. Runtime : " + (machine_time - startTimeReal)/1000 + " s";
 		if batchOn {
 			endSimu <- true;
