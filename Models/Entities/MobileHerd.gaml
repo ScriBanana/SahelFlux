@@ -230,9 +230,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		;
 		
 		// Save N and C in cell
-		currentCell.mySOCstock.carbonInputsList <+ [
-			"HerdsDung", float(excretaOutputs["volatileSolidExcreted"]), float(excretaOutputs["excretedCarbon"])
-		];
+		float currentVSE <- float(excretaOutputs["volatileSolidExcreted"]);
+		float currentCFlow <- float(excretaOutputs["excretedCarbon"]);
+		currentCell.mySOCstock.carbonInputsList <+ ["HerdsDung", currentVSE, currentCFlow];
 		currentCell.mySoilNProcesses.NInflows["HerdsDung"] <-
 			currentCell.mySoilNProcesses.NInflows["HerdsDung"] + mobileHerdIncorporatedFaecesN
 		;
