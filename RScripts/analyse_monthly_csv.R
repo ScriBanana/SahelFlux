@@ -57,6 +57,7 @@ ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   facet_grid(. ~ variable, scales = "free_y") +
   labs(title = "Moyenne de 25 réplications de 2020 à 2032")+
   theme_bw()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        legend.position = "none")
 
 ggsave("../img/monthly_grouped.png", height = 7, width = 9)
