@@ -37,7 +37,8 @@ global {
 		
 }
 
-species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: true { // Parallel dangerous? Anyway, saves a lot of computation time
+species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: false {
+	// Use parallel: true for normal runs (saves a lot of computation time), false for batches (messes up with Java array handling).
 	
 	//// Parameters
 	
@@ -228,7 +229,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: t
 		float mobileHerdIncorporatedUrineN <-
 			float(excretaOutputs["urineNitrogen"]) - (mobileHerdNDirectUrineN2OEmissions + mobileHerdUrineNGasLoss)
 		;
-		
+		 
 		// Save N and C in cell
 		float currentVSE <- float(excretaOutputs["volatileSolidExcreted"]);
 		float currentCFlow <- float(excretaOutputs["excretedCarbon"]);

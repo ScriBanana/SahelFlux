@@ -49,6 +49,7 @@ experiment Run type: gui {
 }
 
 experiment FastAutoRun autorun: true {
+	// 3 month short auto run 
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0 updates: [nbTranshumantHh, nbFatteningHh];
 	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 5 min: 0 max: nbHousehold;
 	parameter "Number fattening households" category: "Scenario - Population structure" var: nbFatteningHh <- 5 min: 0 max: nbHousehold;
@@ -57,12 +58,30 @@ experiment FastAutoRun autorun: true {
 }
 
 experiment FallowtoRun parent: Run autorun: true {
+	// Auto run for the fallow period only
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 20 min: 0;
 	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 10 min: 0 max: nbHousehold;
 	parameter "Short run start date" var: starting_date <- date([2020, 6, 10, eveningTime + 1, 0, 0]);
 	parameter "Short run end date" var: endDate <- date([2020, 12, 30, eveningTime + 1, 0, 0]);
 	parameter "Parcels borders as" category: "Display options" var: parcelsAspect <- "Cover" among: ["Owner", "Cover"];
 	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- true;
+}
+
+experiment LongRun {
+	// 20 year run that records output matrixes each month
+	parameter "Long run start date" category: "Scenario - Time" var: starting_date;
+	parameter "Long run end date" category: "Scenario - Time" var: endDate <- date([2040, 11, 1, eveningTime + 1, 0, 0]);
+	
+	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- false;
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 50 min: 0;// updates: [nbTranshumantHh, nbFatteningHh];
+//	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 10 min: 0 max: nbHousehold;
+//	parameter "Number fattening households" category: "Scenario - Population structure" var: nbFatteningHh <- 10 min: 0 max: nbHousehold;
+	
+	reflex monthlyOutputSave when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay) {
+		ask simulation {
+			do saveOutputsDuringSim;
+		}
+	}
 }
 
 experiment SOCDispRun parent: Run {

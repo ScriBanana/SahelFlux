@@ -30,7 +30,7 @@ global {
 	
 	action placeParcels {
 		// Instantiate parcels
-		write "	Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
+		write "Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
 
 		int newParc <- 0;
 		list<landscape> availableCroplandCells <- landscape where (each.cellLU = "Cropland");
@@ -80,11 +80,11 @@ global {
 			}
 		}
 		listAllBushParcels <- copy(list(parcel));
-		write "		Done. " + length(parcel) + " parcels placed.";
+		write "	Done. " + length(parcel) + " parcels placed.";
 	}
 	
 	action segregateBushFields {
-		write "	Segregating bush and home fields.";
+		write "Segregating bush and home fields.";
 		
 		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
@@ -94,7 +94,7 @@ global {
 				listAllBushParcels >- self;
 			}
 		}
-		write "		Done. " + length(listAllHomeParcels) + " home parcels.";
+		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
 	}
 		
 	action initiateRotations {

@@ -55,7 +55,7 @@ global {
 	init {
 		do inputUnitTests;
 		
-		write "=== MODEL INITIALISATION ===";
+		write "=== RUN " + int(self) + " INITIALISATION ===";
 		drySeason <- !(starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth);
 		// All init actions defined in related species files.
 		do resetFlowsMaps;
@@ -66,9 +66,10 @@ global {
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
 		create transhumance;
 		do initiateRotations;
+		write "Initialising meteorological conditions for year 1";
 		do updateMeteo;
 		
-		write "	Start date : " + starting_date;
+		write "Start date : " + starting_date + ", end date : " + endDate;
 		write "=== MODEL INITIALISED ===";
 	}
 
@@ -246,6 +247,7 @@ global {
 		do computeOutputs;
 		write "Simulation ended. Runtime : " + (machine_time - startTimeReal)/1000 + " s";
 		if batchOn {
+			do saveBatchRunOutput;
 			endSimu <- true;
 		} else {
 			do exportStockFlowsOutputData;

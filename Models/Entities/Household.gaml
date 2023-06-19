@@ -32,7 +32,7 @@ global {
 	//// Global households functions
 	
 	action instantiateHouseholds {
-		write "	Populating the village.";
+		write "Populating the village.";
 		if nbHomeFieldsPerHh != 0 {
 			assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
 		}
@@ -84,7 +84,7 @@ global {
 		}
 		
 		assert mobileHerd min_of each.herdSize > 0;
-		write "		Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants, " + length(household where each.doesFattening) + " fatteners.";
+		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants, " + length(household where each.doesFattening) + " fatteners.";
 	}
 }
 

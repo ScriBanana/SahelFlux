@@ -62,4 +62,28 @@ global {
 		}
 	}
 	
+	action saveBatchRunOutput {
+		write "Saving output for simulation " + int(self);
+		save [
+			int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
+			self.cycle, self.machine_time,
+			self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
+		] to: outputDirectory + "BatchSamples/SamplingRun-" + floor(rnd(1.0) * 10000000) + ".csv" format: "csv" rewrite: true header: true;
+	}
+	
+	action saveOutputsDuringSim {
+		do gatherFlows;
+		do computeOutputs;
+		
+		save [
+			current_date.year, current_date.month,
+			cycle, machine_time,
+			totalNFlows, totalCFlows, TT, CThroughflow
+		]
+			to: outputDirectory + "MonthlySaves-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "Ft" + fallowEnabled + "Fl.csv"
+			format: "csv"
+			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
+			header: true
+		;
+	}
 }

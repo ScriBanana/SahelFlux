@@ -23,7 +23,6 @@ global {
 	//// Global external processes functions
 	
 	action updateMeteo {
-		write "Setting meteorological conditions for the year to come.";
 		switch meteoUpdateType {
 			match "Fixed" {
 				yearRainfall <- meanRainfall;
@@ -38,7 +37,7 @@ global {
 				assert false; // TODO Not implemented yet
 			}
 		}
-		write "	Done. " + yearRainfall + " mm, " + int(floor(yearMeteoQuality * 10)) + " /10 meteorological quality.";
+		write "	Meteo for the year to come : " + yearRainfall + " mm, " + int(floor(yearMeteoQuality * 10)) + " /10 groundnut quality.";
 		
 	}
 	

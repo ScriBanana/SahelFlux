@@ -24,17 +24,19 @@ global {
 	}
 }
 
-experiment BatchRun autorun: true type: batch repeat: 8 until: (endSimu or stopCondition) {
+experiment BatchRun autorun: true type: batch repeat: 12 until: (endSimu or stopCondition) {
 	
-	reflex saveResults {
-		ask simulations {
-			save [
-				int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
-				self.cycle, self.machine_time,
-				self.TotalNFlows, self.TotalCFlows, self.TT, self.CThroughflow
-			] to: outputDirectory + "SamplingRun-" + int(self) + ".csv" format: "csv" rewrite: (int(self) = 0) ? true : false header: true;
-		}
-	}
+//	reflex saveResults {
+//		write "Dabedi dabeda";
+//		ask simulations {
+//			write "Saving output for simulation " + int(self);
+//			save [
+//				int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
+//				self.cycle, self.machine_time,
+//				self.TotalNFlows, self.TotalCFlows, self.TT, self.CThroughflow
+//			] to: outputDirectory + "SamplingRun-" + floor(rnd(1.0) * 100000) + ".csv" format: "csv" rewrite: false header: true;
+//		}
+//	}
 	
 //	permanent {
 //		display Troughflow type: java2D {
