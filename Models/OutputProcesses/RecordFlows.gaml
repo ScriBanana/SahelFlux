@@ -114,8 +114,6 @@ global {
 			}
 			originPoolId <- originPoolId + 1;
 		}
-		write "N flows :";
-		write NFlowsMatrix;
 		
 		// C flows
 		originPoolId <- 0;
@@ -136,8 +134,6 @@ global {
 			}
 			originPoolId <- originPoolId + 1;
 		}
-		write "C flows :";
-		write CFlowsMatrix;
 		
 //		do resetFlowsMaps; TODO Tester si avoir un gather régulier améliore la perf
 	}

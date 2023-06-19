@@ -30,7 +30,6 @@ global {
 				TT <- TT + float(flowPair.value);
 			}
 		}
-		write "		TT : " + int(floor(TT)) + " kgN";
 
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;
@@ -54,6 +53,5 @@ global {
 				CThroughflow <- CThroughflow + float(flowPair.value);
 			}
 		}
-		write "		C throughflow : " + int(floor(CThroughflow)) + " kgC";
 	}
 }

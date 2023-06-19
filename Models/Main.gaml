@@ -173,13 +173,17 @@ global {
 		
 		// Monthly processes all year round.
 		write string(date(time), "M'/'y");
-		
+		// TODO do some of these come before what's above?
 		do addWastesToHeaps;
 		ask SOCStock {
 			do updateCarbonPools;
 		}
 		ask ORPHeap where (each.myHousehold.myFattenedAnimals != nil) {
 			do accumulateFattenedInputs;
+		}
+		
+		if generateMonthlySaves {
+			do saveOutputsDuringSim;
 		}
 		
 	}
@@ -241,15 +245,27 @@ global {
 	////	--------------------------		////
 	
 	bool endSimu <- false;
+	float runTime; // seconds
 	reflex endSim when: current_date = endDate {
 		write "=== END OF SIMULATION ===";
+		
 		do gatherFlows;
 		do computeOutputs;
-		write "Simulation ended. Runtime : " + (machine_time - startTimeReal)/1000 + " s";
+		
+		runTime <- (machine_time - startTimeReal)/1000;
+		write "Simulation ended. Runtime : " + runTime + " s";
+		
 		if batchOn {
 			do saveBatchRunOutput;
 			endSimu <- true;
 		} else {
+			write "N flows :";
+			write NFlowsMatrix;
+			write "C flows :";
+			write CFlowsMatrix;
+			write "		TT : " + int(floor(TT)) + " kgN";
+			write "		C throughflow : " + int(floor(CThroughflow)) + " kgC";
+			
 			do exportStockFlowsOutputData;
 			do pause;
 		}

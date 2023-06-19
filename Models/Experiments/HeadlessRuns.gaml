@@ -28,11 +28,10 @@ experiment LongRun {
 //	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 10 min: 0 max: nbHousehold;
 //	parameter "Number fattening households" category: "Scenario - Population structure" var: nbFatteningHh <- 10 min: 0 max: nbHousehold;
 	
-	reflex monthlyOutputSave when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay) {
-		ask simulation {
-			do saveOutputsDuringSim;
-		}
+	init {
+		generateMonthlySaves <- true;
 	}
+	
 }
 
 

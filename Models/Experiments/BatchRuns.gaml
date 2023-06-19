@@ -32,7 +32,7 @@ experiment BatchRun autorun: true type: batch repeat: 24 until: endSimu {
 			write "Saving output for simulation " + int(self);
 			save [
 				int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
-				self.cycle, self.machine_time,
+				self.cycle, self.machine_time, self.runTime,
 				self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
 			] to: outputDirectory + "BatchSamplesBackup/SamplingRun-" + floor(rnd(1.0) * 100000) + ".csv" format: "csv" rewrite: false header: true;
 		}
@@ -47,3 +47,12 @@ experiment BatchRun autorun: true type: batch repeat: 24 until: endSimu {
 //	}
 }
 
+experiment BatchLongRuns autorun: true type: batch repeat: 48 until: endSimu {
+	
+	parameter "Simulation length (years)" var: lengthSimu <- 50.0;
+	
+	init {
+		generateMonthlySaves <- true;
+		fallowEnabled <- true;
+	}
+}

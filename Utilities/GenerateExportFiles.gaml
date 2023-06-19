@@ -13,6 +13,7 @@ import "ImportZoning.gaml"
 global {
 	string outputDirectory <- "../../OutputFiles/";
 	string filePrefix <- "SahelFlux-Out-";
+	bool generateMonthlySaves <- false;
 	
 	action exportStockFlowsOutputData {
 		write "Saving data in " + outputDirectory;
@@ -66,7 +67,7 @@ global {
 		write "Saving output for simulation " + int(self);
 		save [
 			int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
-			self.cycle, self.machine_time,
+			self.cycle, self.machine_time, runTime,
 			self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
 		]
 			to: outputDirectory + "BatchSamples.csv"
@@ -82,10 +83,10 @@ global {
 		
 		save [
 			current_date.year, current_date.month,
-			cycle, machine_time,
+			cycle, machine_time, runTime,
 			totalNFlows, totalCFlows, TT, CThroughflow
 		]
-			to: outputDirectory + "MonthlySaves-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "Ft" + fallowEnabled + "Fl.csv"
+			to: outputDirectory + "MonthlyOutputs/MonthlySaves-Batch" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true
