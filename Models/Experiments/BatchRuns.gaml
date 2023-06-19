@@ -24,7 +24,7 @@ global {
 
 experiment BatchRun autorun: true type: batch repeat: 24 until: endSimu {
 	
-	parameter "Simulation length (years)" var: lengthSimu <- 0.1;
+	parameter "Simulation length (years)" var: lengthSimu <- 2.0;
 	
 	reflex saveResults { // Redundant with saveBatchRunOutput, but backuping is good
 		write "End of batch, backing up outputs.";

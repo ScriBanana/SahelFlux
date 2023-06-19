@@ -86,7 +86,7 @@ global {
 			cycle, machine_time, runTime,
 			totalNFlows, totalCFlows, TT, CThroughflow
 		]
-			to: outputDirectory + "MonthlyOutputs/MonthlySaves-Batch" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
+			to: outputDirectory + "MonthlyOutputs/MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true
