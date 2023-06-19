@@ -15,7 +15,7 @@ df <- data.frame()
 
 for (i in 1:length(file.names)){
   tmp <- read.csv(paste0(path,file.names[i]))                            ##lecture du premier CSV qui contient un nombre
-  df <- rbind(data.df, tmp)                                         ##ajout a data frame général, les données de tmp 
+  df <- rbind(df, tmp)                                         ##ajout a data frame général, les données de tmp 
 }
 
 
