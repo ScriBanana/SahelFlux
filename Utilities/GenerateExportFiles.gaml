@@ -68,7 +68,12 @@ global {
 			int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
 			self.cycle, self.machine_time,
 			self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
-		] to: outputDirectory + "BatchSamples/SamplingRun-" + floor(rnd(1.0) * 10000000) + ".csv" format: "csv" rewrite: true header: true;
+		]
+			to: outputDirectory + "BatchSamples.csv"
+			format: "csv"
+			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
+			header: true
+		;
 	}
 	
 	action saveOutputsDuringSim {

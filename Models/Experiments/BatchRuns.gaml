@@ -1,32 +1,32 @@
 /**
 * In: SahelFlux
-* Name: TestBatches
-* Simple batches to test out specific processes
+* Name: BatchRuns
+* Plain batches (replications only)
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-model TestBatches
+model BatchRuns
 
 import "../Main.gaml"
 
 global {
-	
-	int nbThreads <- 8;
-	int nbRunsPerThread <- 10;
-	// repeat facet has to be set directly to allow parallelism, somehow
-	
-	float lengthSimu <- 4 #years;
-	bool stopCondition <- cycle > lengthSimu;
+		
+	float lengthSimu <- 4.0;
+	float simuDuration;
+	float lengthYear <- 31536000.0; // seconds in a year
 	
 	init {
 		batchOn <- true;
-		endDate <- starting_date + lengthSimu;
+		simuDuration <- lengthYear * lengthSimu;
+		endDate <- starting_date + simuDuration;
 	}
 }
 
-experiment BatchRun autorun: true type: batch repeat: 12 until: (endSimu or stopCondition) {
+experiment BatchRun autorun: true type: batch repeat: 24 until: endSimu {
 	
-	reflex saveResults {
+	parameter "Simulation length (years)" var: lengthSimu <- 0.1;
+	
+	reflex saveResults { // Redundant with saveBatchRunOutput, but backuping is good
 		write "End of batch, backing up outputs.";
 		ask simulations {
 			write "Saving output for simulation " + int(self);
@@ -45,6 +45,5 @@ experiment BatchRun autorun: true type: batch repeat: 12 until: (endSimu or stop
 //			}
 //		}
 //	}
-	
 }
 
