@@ -7,23 +7,56 @@
 library("dplyr")
 library("ggplot2")
 library("stringr")
+library("reshape2")
+
+rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "~/Téléchargements/runGama_arthur/"
-file.names <- list.files("~/Téléchargements/runGama_arthur/")
+path <- "../OutputFilesBackups/MonthlySaves/"
+file.names <- list.files(paste0(path))
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
 
 data.df <- data.frame()
 
-for (i in 1:length(file.names)){
+for (i in 1:(length(file.names))){
   tmp <- read.csv(paste0(path,file.names[i]))                            ##lecture du premier CSV qui contient un nombre
-  tmp$run <- as.numeric(stringr::str_extract(file.names[i], "\\d"))      ## extraction du nombre depuis le nom du fichier
+  # Appliquer la soustraction de chaque ligne avec la valeur précédente
+  tmp1 <- as.data.frame(lapply(tmp[,6:9], function(x) c(x[1], diff(x))))
+  tmp <- cbind(tmp[,1:5],tmp1)
+  tmp$run <- i      ## extraction du nombre depuis le nom du fichier
   data.df <- rbind(data.df, tmp)                                         ##ajout a data frame général, les données de tmp 
 }
 
 
-saveRDS(data.df, "~/Téléchargements/runGama_arthur/bigDataFrame.rds") #sauvegarde dans un format compressé des données samplé
+# saveRDS(data.df, "~/Téléchargements/runGama_arthur/bigDataFrame.rds") #sauvegarde dans un format compressé des données samplé
 # truc <- readRDS("~/Téléchargements/runGama_arthur/bigDataFrame.rds")
 
+# Calculer la moyenne par groupe
+df_grouped <- data.df %>%
+  group_by(current_date.month, current_date.year) %>%
+  summarize(totalNflow = mean(totalNFlows), 
+            totalCflow = mean(totalCFlows), 
+            TT = mean(TT), 
+            CThroughflow = mean(CThroughflow),
+            .groups = 'drop'
+            )
+
+df_grouped$date <- as.Date(paste(df_grouped$current_date.year, sprintf("%02d", df_grouped$current_date.month), "01", sep = "-"), format = "%Y-%m-%d")
+df_grouped <- df_grouped[,-c(1:2)]
+
+write.csv(df_grouped, file="../OutputFilesBackups/Monthly_grouped.csv")
+
+# Conversion du data frame en format long avec la fonction melt()
+df_long <- melt(df_grouped, id.vars = "date")
+
+# Création du graphique en utilisant ggplot2 et facet_grid()
+ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
+  geom_line() +
+  facet_grid(. ~ variable, scales = "free_y") +
+  labs(title = "Moyenne de 25 réplications de 2020 à 2032")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave("../img/monthly_grouped.png", height = 7, width = 9)
