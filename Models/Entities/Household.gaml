@@ -146,7 +146,7 @@ species household schedules: [] {
  		if
 	 		myForagePileBiomassContent != 0.0 and
 	 		nbFatteningRenewal != 0.0 and
-	 		2 - 2 * myForagePileBiomassContent / (strawInFattenedTLUDailyRation * nbFatteningRenewal * lengthFatteningSeason) >= 0
+	 		2 - 2 * myForagePileBiomassContent / (strawInFattenedTLUDailyRation * nbFatteningRenewal * lengthFatteningSeason) > 0
  		{
  			nbFatteningRenewal <- nbFatteningRenewal * max(
  				0,
