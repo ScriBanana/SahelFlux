@@ -252,7 +252,7 @@ global {
 		do gatherFlows;
 		do computeOutputs;
 		
-		runTime <- (machine_time - startTimeReal)/1000;
+		runTime <- (machine_time - startTimeReal) / 1000;
 		write "Simulation ended. Runtime : " + runTime + " s";
 		
 		if batchOn {

@@ -19,7 +19,7 @@ global {
 	
 	//// Global households parameters
 	
-	int nbHousehold <- 50; // Parameter
+	int nbHousehold <- 84; // Parameter
 	int nbTranshumantHh <- 45;
 	int nbFatteningHh <- 30;
 	int nbBushFieldsPerHh <- 10; // TODO Dummy

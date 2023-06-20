@@ -10,7 +10,7 @@ model BatchRuns
 import "../Main.gaml"
 
 global {
-		
+	
 	float lengthSimu <- 4.0;
 	float simuDuration;
 	float lengthYear <- 31536000.0; // seconds in a year
@@ -22,21 +22,21 @@ global {
 	}
 }
 
-experiment BatchRun autorun: true type: batch repeat: 24 until: endSimu {
+experiment BatchRun autorun: true type: batch repeat: 1014 until: endSimu {
 	
 	parameter "Simulation length (years)" var: lengthSimu <- 2.0;
 	
-	reflex saveResults { // Redundant with saveBatchRunOutput, but backuping is good
-		write "End of batch, backing up outputs.";
-		ask simulations {
-			write "Saving output for simulation " + int(self);
-			save [
-				int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
-				self.cycle, self.machine_time, self.runTime,
-				self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
-			] to: outputDirectory + "BatchSamplesBackup/SamplingRun-" + floor(rnd(1.0) * 100000) + ".csv" format: "csv" rewrite: false header: true;
-		}
-	}
+//	reflex saveResults { // Redundant with saveBatchRunOutput, but backuping is good
+//		write "End of batch, backing up outputs.";
+//		ask simulations {
+//			write "Saving output for simulation " + int(self);
+//			save [
+//				int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
+//				self.cycle, self.machine_time, self.runTime,
+//				self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
+//			] to: outputDirectory + "BatchSamplesBackup/SamplingRun-" + floor(rnd(1.0) * 100000) + ".csv" format: "csv" rewrite: false header: true;
+//		}
+//	}
 	
 //	permanent {
 //		display Troughflow type: java2D {
