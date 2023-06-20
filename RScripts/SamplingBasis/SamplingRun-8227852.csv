@@ -1,2 +1,0 @@
-int(self),self.nbHousehold,self.nbTranshumantHh,self.nbFatteningHh,self.fallowEnabled,self.cycle,self.machine_time,self.totalNFlows,self.totalCFlows,self.TT,self.CThroughflow
-117,50,45,30,false,70080,1687175624870.0,1491879.1084941658,7381413.4454801,984160.2393873627,2221562.5319097857

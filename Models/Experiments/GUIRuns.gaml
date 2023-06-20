@@ -9,7 +9,14 @@ model GUIRuns
 
 import "../Main.gaml"
 
+global {
+	init {
+		parallelHerds <- true;
+	}
+}
+
 experiment Run type: gui {
+	
 	// Parameters - Tests in UnitTests.gaml
 	parameter "Start date" category: "Scenario - Time" var: starting_date;
 	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;

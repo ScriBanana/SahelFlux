@@ -15,6 +15,8 @@ global {
 	
 	//// Global mobile herds parameters
 	
+	bool parallelHerds <- false; // Needs to be false for parallel batch runs
+	
 	//int nbHerds <- 10; // TODO DUMMY 84; // (Grillot et al, 2018)
 	float meanHerdSize <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018) TODO DUMMY
 	float SDHerdSize <- 3.7 * 0.4; // TODO DUMMY
@@ -37,7 +39,7 @@ global {
 		
 }
 
-species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: false {
+species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: parallelHerds {
 	// Use parallel: true for normal runs (saves a lot of computation time), false for batches (messes up with Java array handling).
 	
 	//// Parameters

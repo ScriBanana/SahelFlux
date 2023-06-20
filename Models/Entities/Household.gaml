@@ -19,10 +19,10 @@ global {
 	
 	//// Global households parameters
 	
-	int nbHousehold <- 84; // Parameter
-	int nbTranshumantHh <- 45;
-	int nbFatteningHh <- 30;
-	int nbBushFieldsPerHh <- 10; // TODO Dummy
+	int nbHousehold <- 84; // Grillot 2018
+	int nbTranshumantHh <- round(0.4 * nbHousehold); // TODO DUMMY
+	int nbFatteningHh <- round(0.114 * nbHousehold); // Audouin 2014 Diohine
+	int nbBushFieldsPerHh <- 10; // TODO Dummy 
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
 	
 	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary

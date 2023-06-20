@@ -30,7 +30,7 @@ global {
 	// Simulation calendar
 	int startHour <- wakeUpTime - 1;
 	date starting_date <- date([2020, 11, 1, startHour, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
-	date endDate <- date([2022, 11, 1, eveningTime + 1, 0, 0]);
+	date endDate <- date([2026, 11, 1, eveningTime + 1, 0, 0]);
 	int drySeasonFirstMonth <- 11; // Tweaks have to be made to run with new year during the rainy season
 	int rainySeasonFirstMonth <- 7;
 	

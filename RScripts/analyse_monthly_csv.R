@@ -13,7 +13,7 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "../OutputFilesBackups/MonthlySaves/"
+path <- "../OutputFiles/Monthly/"
 file.names <- list.files(paste0(path))
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
@@ -46,7 +46,7 @@ df_grouped <- data.df %>%
 df_grouped$date <- as.Date(paste(df_grouped$current_date.year, sprintf("%02d", df_grouped$current_date.month), "01", sep = "-"), format = "%Y-%m-%d")
 df_grouped <- df_grouped[,-c(1:2)]
 
-write.csv(df_grouped, file="../OutputFilesBackups/Monthly_grouped.csv")
+write.csv(df_grouped, file="../OutputFiles/OutputsRScripts/Monthly_grouped50.csv")
 
 # Conversion du data frame en format long avec la fonction melt()
 df_long <- melt(df_grouped, id.vars = "date")
@@ -55,9 +55,9 @@ df_long <- melt(df_grouped, id.vars = "date")
 ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
   facet_grid(. ~ variable, scales = "free_y") +
-  labs(title = "Moyenne de 25 réplications de 2020 à 2032")+
+  labs(title = "Moyenne de 104 réplications de 2020 à 2070")+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
-ggsave("../img/monthly_grouped.png", height = 7, width = 9)
+ggsave("../OutputFiles/img/monthly_grouped50.png", height = 7, width = 9)

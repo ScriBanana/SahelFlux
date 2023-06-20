@@ -8,7 +8,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de t
 
 ### avc du multi script
 
-path <- "SamplingBasis/"
+path <- "../OutputFiles/Batches/"
 file.names <- list.files(paste0(path))
 
 df <- data.frame()
@@ -37,5 +37,5 @@ for(i in sample.v){
     labs(x  = "sample", title = paste("nombre de réplication:", i))+
     #ylim(0.8,0.95)+ a fixer quand tu aura itentifier le range des Y pour facilité la lecture
     theme_bw()
-  ggsave(paste0("../img/sample/sample",i,".png"))
+  ggsave(paste0("../OutputFiles/img/samples/sample",i,".png"))
 }

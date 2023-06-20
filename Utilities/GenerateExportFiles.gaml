@@ -12,8 +12,13 @@ import "ImportZoning.gaml"
 
 global {
 	string outputDirectory <- "../../OutputFiles/";
-	string filePrefix <- "SahelFlux-Out-";
+	string universalPrefix <- "" + machine_time + "-SahFl-";
 	bool generateMonthlySaves <- false;
+	
+	action exportParameterData {
+		//TODO build and call
+		
+	}
 	
 	action exportStockFlowsOutputData {
 		write "Saving data in " + outputDirectory;
@@ -27,20 +32,23 @@ global {
 		outputCSVheader <<+ flowsMapTemplate.keys where (each contains "IF-");
 		outputCSVheader <<+ NFlowsMap.keys;
 		
-		do saveSFMatrixDivided (outputCSVheader, "", 1.0);
-		do saveSFMatrixDivided (outputCSVheader, "y_", durationSimu);
-		do saveSFMatrixDivided (outputCSVheader, "ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "Out-", 1.0);
+		do saveSFMatrixDivided (outputCSVheader, "Out-y_", durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "Out-ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
-		do saveSFMatrixDivided (outputCSVheader, "TLU_y_", (nbTLUHerds) * durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "Out-TLU_y_", (nbTLUHerds) * durationSimu);
 		
 		write "... Done";
 	}
 	
 	action saveSFMatrixDivided (list<string> outputCSVheader, string fileCoreName, float divisionOperand) {
 		
-		save outputCSVheader to: outputDirectory + filePrefix + fileCoreName + "Nmat.csv" format: csv rewrite: true header: false;
-		save outputCSVheader to: outputDirectory + filePrefix + fileCoreName + "Cmat.csv" format: csv rewrite: true header: false;
+		string pathN <-  outputDirectory + "Single/" + universalPrefix + fileCoreName + "Nmat.csv";
+		string pathC <-  outputDirectory + "Single/" + universalPrefix + fileCoreName + "Cmat.csv";
+		
+		save outputCSVheader to: pathN format: csv rewrite: true header: false;
+		save outputCSVheader to: pathC format: csv rewrite: true header: false;
 		
 		//Again, could have been a loop over N and C, but Gama doesn't like looping on nested containers.
 		int outputId <- 0;
@@ -49,7 +57,7 @@ global {
 			loop valueToSave over: matLine {
 				lineToSave <+ string(valueToSave / divisionOperand); // TODO ne marche pas pour les fattened
 			}
-			save lineToSave to: outputDirectory + filePrefix + fileCoreName + "Nmat.csv" format: csv rewrite: false;
+			save lineToSave to: pathN format: csv rewrite: false;
 			outputId <- outputId +1;
 		}
 		outputId <- 0;
@@ -58,7 +66,7 @@ global {
 			loop valueToSave over: matLine {
 				lineToSave <+ string(valueToSave / divisionOperand);
 			}
-			save lineToSave to: outputDirectory + filePrefix + fileCoreName + "Cmat.csv" format: csv rewrite: false;
+			save lineToSave to: pathC format: csv rewrite: false;
 			outputId <- outputId +1;
 		}
 	}
@@ -70,7 +78,7 @@ global {
 			self.cycle, self.machine_time, runTime,
 			self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
 		]
-			to: outputDirectory + filePrefix + "BatchSamples.csv"
+			to: outputDirectory + "Batches/" + universalPrefix + "Out-BatchSamples.csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true
@@ -86,7 +94,7 @@ global {
 			cycle, machine_time, runTime,
 			totalNFlows, totalCFlows, TT, CThroughflow
 		]
-			to: outputDirectory + "MonthlyOutputs/" + filePrefix + "MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
+			to: outputDirectory + "Monthly/" + universalPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true
