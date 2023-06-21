@@ -40,4 +40,11 @@ experiment LongRun {
 	
 }
 
+experiment BenchmarkRun benchmark: true autorun: true {
+	
+	init {
+		parallelHerds <- false;
+	}
+}
+
 
