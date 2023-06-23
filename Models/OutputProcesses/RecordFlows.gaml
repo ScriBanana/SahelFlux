@@ -140,7 +140,6 @@ global {
 //		do resetFlowsMaps; TODO Tester si avoir un gather régulier améliore la perf
 	}
 	
-	
 	// Used by agents in ask world statement to save emitted flows in the flows maps
 	action saveFlowInMap (string flowType, string emittingPool, string flowDestination, float flowValue) {
 		if enableDebug {
@@ -161,9 +160,6 @@ global {
 			}
 		}
 	}
-	
 	// Compute global ENA indicators at the end of the simulation (Stark, 2016; Balandier, 2017, Latham, 2006)
 	
 }
-
-

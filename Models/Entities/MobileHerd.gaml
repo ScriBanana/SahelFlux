@@ -86,9 +86,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	
 	// States
 	state isGoingToSleepSpot {
-		if !(location overlaps currentSleepSpot.location) {
+//		if !(location overlaps currentSleepSpot.location) {
 			do goto on: grazableLandscape speed: herdSpeed target: currentSleepSpot recompute_path: false;
-		}
+//		}
 		
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}
@@ -115,7 +115,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		}
 
 		do checkSpotQuality;
-		if !isInGoodSpot and !sleepTime {
+		if !isInGoodSpot {//and !sleepTime {
 			do goto on: grazableLandscape target: targetCell speed: herdSpeed recompute_path: false;
 		}
 		
@@ -132,7 +132,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent {
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
-			if !sleepTime and hungry and !restTime and isInGoodSpot {
+			if isInGoodSpot {//and !sleepTime and hungry and !restTime {
 				do goto on: grazableLandscape target: currentGrazingCell speed: herdSpeed recompute_path: false;
 			}
 			cellsAround <- checkSpotQuality();
