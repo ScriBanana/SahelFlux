@@ -26,16 +26,21 @@ global {
 	float herdVisionRadius <- 20.0 #m; // (Gersie, 2020)
 	int wakeUpTime <- 7; // Time of the day (24h) at which animals are released in the morning (Own accelerometer data)
 	int eveningTime <- 19; // Time of the day (24h) at which animals come back to their sleeping spot (Own accelerometer data)
-	bool sleepTime <- true update: !(abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) < (eveningTime - wakeUpTime - 1) / 2);
+	bool sleepTime <- true; 
 	int dailyRestStartTime <- 12; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	int dailyRestEndTime <- 15; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
-	bool restTime <- false update: abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2;
+	bool restTime <- false;
 	int maxNbNightsPerCellInPaddock <- 4; // Field data TODO Doit être un UBT/cell demandé à Jonathan
 	int maxNbFallowPaddock <- 2; // TODO Confirm
 	
 	// Zootechnical data
 	float IIRRangelandTLU <- 14.2; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	float IIRCroplandTLU <- 10.9; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
+	
+	reflex herdsInternalClock { // Unsure if time is gained over updates.
+		sleepTime <- !(abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) < (eveningTime - wakeUpTime - 1) / 2) ? true : false;
+		restTime <- abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2 ? true : false;
+	}
 		
 }
 
@@ -69,7 +74,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float satietyMeter <- 0.0;
-	bool hungry <- true update: (satietyMeter <= dailyIntakeRatePerHerd);
+	bool hungry;
 	landscape currentCell update: first(landscape overlapping self);
 	map<string, float> dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
 	
@@ -81,7 +86,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	
 	// States
 	state isGoingToSleepSpot {
-		do goto on: grazableLandscape speed: herdSpeed target: currentSleepSpot recompute_path: false;
+		if !(location overlaps currentSleepSpot.location) {
+			do goto on: grazableLandscape speed: herdSpeed target: currentSleepSpot recompute_path: false;
+		}
 		
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}
@@ -89,6 +96,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	state isSleepingInPaddock initial: true {
 		enter {
 			satietyMeter <- 0.0;
+			hungry <- true;
 		}
 
 		transition to: isChangingSite when: !sleepTime;
@@ -107,7 +115,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		}
 
 		do checkSpotQuality;
-		if !isInGoodSpot {
+		if !isInGoodSpot and !sleepTime {
 			do goto on: grazableLandscape target: targetCell speed: herdSpeed recompute_path: false;
 		}
 		
@@ -124,7 +132,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		if currentGrazingCell.biomassContent < cellsAround mean_of each.biomassContent {
 			landscape juiciestCellAround <- one_of(cellsAround with_max_of (each.biomassContent));
 			currentGrazingCell <- juiciestCellAround;
-			do goto on: grazableLandscape target: currentGrazingCell speed: herdSpeed recompute_path: false;
+			if !sleepTime and hungry and !restTime and isInGoodSpot {
+				do goto on: grazableLandscape target: currentGrazingCell speed: herdSpeed recompute_path: false;
+			}
 			cellsAround <- checkSpotQuality();
 		}
 
@@ -181,6 +191,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 			self.biomassContent <- self.biomassContent - eatenQuantity;
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;
+		hungry <- satietyMeter <= dailyIntakeRatePerHerd;
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
 		dailyIntakes[eatenBiomassType] <- dailyIntakes[eatenBiomassType] + eatenQuantity;
 		

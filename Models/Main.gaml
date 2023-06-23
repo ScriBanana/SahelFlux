@@ -26,6 +26,7 @@ global {
 	
 	float startTimeReal <- machine_time;
 	bool batchOn <- false;
+	bool enabledGUI <- false;
 	
 	// Simulation calendar
 	int startHour <- wakeUpTime - 1;
@@ -37,9 +38,12 @@ global {
 	// Time step parameters
 	float step <- 30.0 #minutes;
 	int biophysicalProcessesUpdateFreq <- 15; // In days
-	int lengthRainySeason <- int(milliseconds_between(date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])) / 86400000.0); // days. Weird, but hard to find better
+	int lengthRainySeason <- int(milliseconds_between(
+		date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])
+	) / 86400000.0); // days. Weird, but hard to find better
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
-	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0 update: current_date.hour = startHour + 1 and current_date.minute = 0;
+	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0
+		update: current_date.hour = startHour + 1 and current_date.minute = 0;
 	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
 	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields; Surveys
 	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period TODO DUMMY
@@ -81,7 +85,14 @@ global {
 		
 		do updateGlobalBiomassMeanAndSD;
 		ask landscape where each.biomassProducer {
-			do updateColour;
+			
+			if enabledGUI {
+				do updateColour;
+			}
+			
+			if !drySeason {// TODO faire gaffe au scheduling, notamment en début de saison
+				do growBiomass;
+			}
 		}
 		
 		if drySeason {
@@ -89,12 +100,7 @@ global {
 			ask household where (each.isTranshumant and !dead(each.myMobileHerd)) {
 				do checkTranshuCondition;
 			}
-		} else { // TODO faire gaffe au scheduling, notamment en début de saison
-			ask landscape where each.biomassProducer {
-				do growBiomass;
-			}
 		}
-		
 	}
 
 	reflex monthStep when: current_date != (starting_date add_hours 1) and (current_date.day = 1 and updateTimeOfDay) {
@@ -143,8 +149,10 @@ global {
 				ask landscape where (each.myParcel != nil) {
 					do getHarvested;
 				}
-				ask landscape where each.biomassProducer {
-					do updateColour;
+				if enabledGUI {
+					ask landscape where each.biomassProducer {
+						do updateColour;
+					}
 				}
 				do updateParcelsCovers; // Crop rotation
 				

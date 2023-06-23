@@ -12,6 +12,7 @@ import "../Main.gaml"
 global {
 	init {
 		parallelHerds <- true;
+		enableDebug <- true;
 	}
 }
 
@@ -44,6 +45,7 @@ experiment BenchmarkRun benchmark: true autorun: true {
 	
 	init {
 		parallelHerds <- false;
+		enableDebug <- false;
 	}
 }
 

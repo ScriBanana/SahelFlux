@@ -35,6 +35,8 @@ global {
 	float criticalNbStepStableForDiscretisation <- 2 / (kineticStable * edaphicClimateFactor);
 	float criticalNbStepForDiscretisation <- min(criticalNbStepLabileForDiscretisation, criticalNbStepStableForDiscretisation); // Stable is way higher with default parameters
 	float boundaryNbStepForDiscretisation <- 0.8 * criticalNbStepForDiscretisation; // 0.8 factor for safety
+	int solverIterations <- int(ceil(1 / boundaryNbStepForDiscretisation)); // Default 2
+	float solverDeltaT <- boundaryNbStepForDiscretisation / solverIterations; // Default 0.5
 	
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
@@ -68,8 +70,6 @@ species SOCStock parallel: true schedules: [] {
 		float emissionsFromStable; // kgC
 		
 		// Update pools SOC content using Euler method (semi-implicit for stableCPool)
-		int solverIterations <- int(ceil(1 / boundaryNbStepForDiscretisation)); // Default 2
-		float solverDeltaT <- boundaryNbStepForDiscretisation / solverIterations; // Default 0.5
 		loop i from: 0 to: solverIterations {
 			// Store emissions (could it be outside the loop? Maybe)
 			emissionsFromLabile <- ((1 - humificationCoef) * kineticLabile * edaphicClimateFactor * labileCPool) * solverDeltaT;

@@ -12,6 +12,8 @@ import "../Main.gaml"
 global {
 	init {
 		parallelHerds <- true;
+		enableDebug <- true;
+		enabledGUI <- true;
 	}
 }
 

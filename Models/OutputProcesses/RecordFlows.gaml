@@ -9,6 +9,8 @@ model RecordFlows
 
 global {
 	
+	bool enableDebug <- false;
+	
 	//// Initiate data gathering tools ////
 	
 	// Modular maps to structure matrixes (could just be matrixes, but clearer with maps)
@@ -141,10 +143,12 @@ global {
 	
 	// Used by agents in ask world statement to save emitted flows in the flows maps
 	action saveFlowInMap (string flowType, string emittingPool, string flowDestination, float flowValue) {
-		// Tests for typo
-		assert flowType in ["C", "N"];
-		assert (emittingPool in NFlowsMap.keys) or (emittingPool in map(flowsMapTemplate.pairs where (each.key contains "IF-")).keys);
-		assert flowDestination in flowsMapTemplate.keys;
+		if enableDebug {
+			// Tests for typo
+			assert flowType in ["C", "N"];
+			assert (emittingPool in NFlowsMap.keys) or (emittingPool in map(flowsMapTemplate.pairs where (each.key contains "IF-")).keys);
+			assert flowDestination in flowsMapTemplate.keys;
+		}
 		
 		// Assign to flows map
 		// (Switch more robust and allows addition of a flow type)

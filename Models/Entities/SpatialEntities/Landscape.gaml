@@ -54,6 +54,7 @@ global {
 	action initGrazableCells {
 		ask landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland") {
 			biomassProducer <- true;
+			grazableLandscape <+ self;
 			
 			biomassContent <- cellLU = "Cropland" ? gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1) : gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1);
 			
@@ -73,11 +74,11 @@ global {
 				myself.mySoilNProcesses <- self;
 				location <- myself.location;
 			}
-			
-			do updateColour;
+			if enabledGUI {
+				do updateColour;
+			}
 		}
-		grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
-		targetableCellsForChangingSite <- landscape where (each.cellLU = "Rangeland");
+		targetableCellsForChangingSite <- grazableLandscape where (each.cellLU = "Rangeland");
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
@@ -119,8 +120,7 @@ global {
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
 //		write "Updating available targets";
-		targetableCellsForChangingSite <- landscape where (
-			(each.cellLU = "Rangeland" or each.cellLU = "Cropland") and
+		targetableCellsForChangingSite <- grazableLandscape where (
 			(each.biomassContent > meanBiomassContent + biomassContentSD)
 		);
 	}
