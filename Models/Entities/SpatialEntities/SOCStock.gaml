@@ -98,6 +98,7 @@ species SOCStock parallel: true schedules: [] {
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactor * float(dungDeposit[1]); // kgCH4
 			CH4ToBeEmittedInRainySeason <- CH4ToBeEmittedInRainySeason + futureCH4Emission;
 			soilCarbonInput <- soilCarbonInput + float(dungDeposit[2]) - CH4ToBeEmittedInRainySeason * coefCH4ToC;
+			write "SCI " + soilCarbonInput + ", DD " + float(dungDeposit[2]) + ", CH4 " + CH4ToBeEmittedInRainySeason * coefCH4ToC;
 		}
 		
 		carbonInputsList <- [];

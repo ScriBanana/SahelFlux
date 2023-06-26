@@ -242,7 +242,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		float mobileHerdIncorporatedUrineN <-
 			float(excretaOutputs["urineNitrogen"]) - (mobileHerdNDirectUrineN2OEmissions + mobileHerdUrineNGasLoss)
 		;
-		 
+		
 		// Save N and C in cell
 		float currentVSE <- float(excretaOutputs["volatileSolidExcreted"]);
 		float currentCFlow <- float(excretaOutputs["excretedCarbon"]);

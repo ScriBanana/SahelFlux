@@ -79,4 +79,12 @@ global {
 	float fractionGasLossOrganicFerti <- 0.21; // IPCC t11.3
 	float fractionGasLossORPHeap <- 0.45; // IPCC t10.22
 	
+	// Fire emissions
+	float milletCombustionFactor <- 0.85; // IPCC tab2.6
+	float fireCO2EmissionFactor <- 1.51500;  // IPCC tab2.4
+	float fireCOEmissionFactor <- 0.09200;  // IPCC tab2.4
+	float fireCH4EmissionFactor <- 0.00270;  // IPCC tab2.4
+	float fireN2OEmissionFactor <- 0.00007;  // IPCC tab2.4
+	float fireNOxEmissionFactor <- 0.00250;  // IPCC tab2.4
+	
 }

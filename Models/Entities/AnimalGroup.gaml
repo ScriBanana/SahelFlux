@@ -142,6 +142,10 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		 // In soil carbon model
 		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested; // kgC
 		
+		write "excre " + excretedCarbon;
+		write "VSEC " + volatileSolidExcreted * ingestedCContent;
+		assert excretedCarbon > volatileSolidExcreted * ingestedCContent;
+		
 		// Return outputs
 		map<string, float> digestatCharacteristics<- [
 			"volatileSolidExcreted"::volatileSolidExcreted,
