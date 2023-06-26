@@ -99,34 +99,34 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		
 		switch chymeNature {
 			match "Cropland" {
-				ingestedNContent <- milletResiduesNContent;
-				ingestedCContent <- milletResiduesCContent;
-				faecesAshContent <- milletResiduesAshContent;
-				ingestedDigestibility <- milletResiduesDigestibility;
+				ingestedNContent <- milletResiduesNContent * 0.01;
+				ingestedCContent <- milletResiduesCContent * 0.01;
+				faecesAshContent <- milletResiduesAshContent * 0.01;
+				ingestedDigestibility <- milletResiduesDigestibility * 0.01;
 				ingestedEnergyContent <- milletResiduesEnergyContent;
 			}
 
 			match "Rangeland" {
 				if !drySeason {
-					ingestedNContent <- forageRSNContent;
-					ingestedCContent <- forageRSCContent;
-					faecesAshContent <- forageRSAshContent;
-					ingestedDigestibility <- forageRSDigestibility;
+					ingestedNContent <- forageRSNContent * 0.01;
+					ingestedCContent <- forageRSCContent * 0.01;
+					faecesAshContent <- forageRSAshContent * 0.01;
+					ingestedDigestibility <- forageRSDigestibility * 0.01;
 					ingestedEnergyContent <- forageRSEnergyContent;
 				} else {
-					ingestedNContent <- forageDSNContent;
-					ingestedCContent <- forageDSCContent;
-					faecesAshContent <- forageDSAshContent;
-					ingestedDigestibility <- forageDSDigestibility;
+					ingestedNContent <- forageDSNContent * 0.01;
+					ingestedCContent <- forageDSCContent * 0.01;
+					faecesAshContent <- forageDSAshContent * 0.01;
+					ingestedDigestibility <- forageDSDigestibility * 0.01;
 					ingestedEnergyContent <- forageDSEnergyContent;
 				}
 			}
 
 			match "FattenedRation" {
-				ingestedNContent <- fattenedRationNContent;
-				ingestedCContent <- fattenedRationCContent;
-				faecesAshContent <- fattenedRationAshContent;
-				ingestedDigestibility <- fattenedRationDigestibility;
+				ingestedNContent <- fattenedRationNContent * 0.01;
+				ingestedCContent <- fattenedRationCContent * 0.01;
+				faecesAshContent <- fattenedRationAshContent * 0.01;
+				ingestedDigestibility <- fattenedRationDigestibility * 0.01;
 				ingestedEnergyContent <- fattenedRationEnergyContent;
 			}
 
@@ -142,9 +142,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		 // In soil carbon model
 		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested; // kgC
 		
-		write "excre " + excretedCarbon;
-		write "VSEC " + volatileSolidExcreted * ingestedCContent;
-		assert excretedCarbon > volatileSolidExcreted * ingestedCContent;
+		assert excretedCarbon >= volatileSolidExcreted * ingestedCContent * ratioCExcretedOnIngested;
 		
 		// Return outputs
 		map<string, float> digestatCharacteristics<- [
