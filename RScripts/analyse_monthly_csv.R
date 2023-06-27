@@ -46,17 +46,23 @@ df_grouped <- data.df %>%
 df_grouped$date <- as.Date(paste(df_grouped$current_date.year, sprintf("%02d", df_grouped$current_date.month), "01", sep = "-"), format = "%Y-%m-%d")
 df_grouped <- df_grouped[,-c(1:2)]
 
+df_grouped_diff <- data.frame(diff(df_grouped$totalNflow), diff(df_grouped$totalCflow), diff(df_grouped$TT), diff(df_grouped$CThroughflow))
+df_grouped_diff$date <- df_grouped$date[-1]
+
 write.csv(df_grouped, file="../OutputFiles/OutputsRScripts/Monthly_grouped50.csv")
 
 # Conversion du data frame en format long avec la fonction melt()
-df_long <- melt(df_grouped, id.vars = "date")
+df_long <- melt(df_grouped_diff, id.vars = "date")
+levels(df_long$variable) <- c("totalNflow", "totalCflow", "TT", "CThroughflow")
 
 # Création du graphique en utilisant ggplot2 et facet_grid()
 ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
+  geom_smooth(span = 0.25)+
   facet_grid(. ~ variable, scales = "free_y") +
-  labs(title = "Moyenne de 104 réplications de 2020 à 2070")+
+  labs(title = "Moyenne de 50 réplications de 2020 à 2070")+
   theme_bw()+
+  ylim(c(0,1234483))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
