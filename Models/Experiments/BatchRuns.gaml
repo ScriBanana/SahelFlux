@@ -67,7 +67,7 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 		levels: 4
 		outputs: ["totalCFlows", "CThroughflow", "totalNFlows", "TT"]
 		sample: 6
-		report: "outputDirectory/Morris/morris.txt"
-		results: "outputDirectory/Morris/morris_raw.csv"
+		report: outputDirectory + "/Morris/morris.txt"
+		results: outputDirectory + "/Morris/morris_raw.csv"
 	;
 }

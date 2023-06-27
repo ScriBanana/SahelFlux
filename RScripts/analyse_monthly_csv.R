@@ -13,7 +13,7 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "../OutputFiles/Monthly/"
+path <- "../OutputFilesForR/Monthly50yBatchComplete/"
 file.names <- list.files(paste0(path))
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
