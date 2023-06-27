@@ -86,5 +86,10 @@ global {
 	float fireCH4EmissionFactor <- 0.00270;  // IPCC tab2.4
 	float fireN2OEmissionFactor <- 0.00007;  // IPCC tab2.4
 	float fireNOxEmissionFactor <- 0.00250;  // IPCC tab2.4
+	float CO2FromBurning <- milletCombustionFactor * fireCO2EmissionFactor;
+	float COFromBurning <- milletCombustionFactor * fireCOEmissionFactor;
+	float CH4FromBurning <- milletCombustionFactor * fireCH4EmissionFactor;
+	float N2OFromBurning <- milletCombustionFactor * fireN2OEmissionFactor;
+	float NOxFromBurning <- milletCombustionFactor * fireNOxEmissionFactor;
 	
 }

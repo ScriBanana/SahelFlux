@@ -131,7 +131,7 @@ global {
 				ask ORPHeap {
 					do emitRSHeapsCH4;
 				}
-				do burnMilletRemainingResidues;
+				do burnAndIncorporateRemainingResidues;
 				
 				write "	Computing plant biomass production for the upcoming rainy season.";
 				ask landscape where each.biomassProducer {
