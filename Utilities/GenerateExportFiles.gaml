@@ -12,12 +12,27 @@ import "ImportZoning.gaml"
 
 global {
 	string outputDirectory <- "../../OutputFiles/";
-	string universalPrefix <- "" + machine_time + "-SahFl-";
+	string universalPrefix <- "" + floor(machine_time / 1000) + "-SahFl-";
 	bool generateMonthlySaves <- false;
 	
 	action exportParameterData {
-		//TODO build and call
-		
+		string pathParameters <-  outputDirectory + "Single/" + universalPrefix + "Param.csv";
+		save [
+			machine_time,
+			starting_date,
+			endDate,
+			fallowEnabled,
+			homeFieldsRadius,
+			nbHousehold,
+			nbTranshumantHh,
+			meanHerdSize,
+			meanFattenedGroupSize,
+			nbBushFieldsPerHh,
+			nbHomeFieldsPerHh,
+			maxNbNightsPerCellInPaddock,
+			meteoUpdateType,
+			digestionLengthParamAsInt
+		] to: pathParameters format: csv rewrite: false header: true;
 	}
 	
 	action exportStockFlowsOutputData {
@@ -32,6 +47,7 @@ global {
 		outputCSVheader <<+ flowsMapTemplate.keys where (each contains "IF-");
 		outputCSVheader <<+ NFlowsMap.keys;
 		
+		do exportParameterData;
 		do saveSFMatrixDivided (outputCSVheader, "Out-", 1.0);
 		do saveSFMatrixDivided (outputCSVheader, "Out-y_", durationSimu);
 		do saveSFMatrixDivided (outputCSVheader, "Out-ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
