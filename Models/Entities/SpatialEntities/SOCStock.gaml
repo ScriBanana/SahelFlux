@@ -97,7 +97,7 @@ species SOCStock parallel: true schedules: [] {
 			float methaneConversionFactor <- dungDeposit[0] = "HerdDung" ? methaneConversionFactorHerd : methaneConversionFactorORPSpread;
 			float futureCH4Emission <- methaneProdFromManure * methaneConversionFactor * float(dungDeposit[1]); // kgCH4
 			CH4ToBeEmittedInRainySeason <- CH4ToBeEmittedInRainySeason + futureCH4Emission;
-			soilCarbonInput <- soilCarbonInput + float(dungDeposit[2]) - CH4ToBeEmittedInRainySeason * coefCH4ToC;
+			soilCarbonInput <- soilCarbonInput + float(dungDeposit[2]) - futureCH4Emission * coefCH4ToC;
 		}
 		
 		carbonInputsList <- [];
