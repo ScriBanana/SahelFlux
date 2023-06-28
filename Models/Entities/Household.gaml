@@ -24,8 +24,8 @@ global {
 	float propFatteningHh <- 0.114 min: 0.0 max: 1.0; // Audouin 2014 Diohine
 	int nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
 	int nbFatteningHh <- round(propFatteningHh * nbHousehold);
-	int nbBushFieldsPerHh <- 10; // TODO Dummy 
-	int nbHomeFieldsPerHh <- 2; // TODO Dummy
+	int nbBushFieldsPerHh <- 10 min: 0; // TODO Dummy 
+	int nbHomeFieldsPerHh <- 2 min: 0; // TODO Dummy
 	
 	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary
 	
@@ -36,7 +36,8 @@ global {
 	action instantiateHouseholds {
 		write "Populating the village.";
 		if nbHomeFieldsPerHh != 0 {
-			assert length (parcel where (each.homeField)) > nbHomeFieldsPerHh * nbHousehold; // Tests if enough home parcels are available
+			assert length (listAllHomeParcels) > nbHomeFieldsPerHh * nbHousehold warning: true;
+			// Tests if enough home parcels are available
 		}
 		create household number: nbHousehold {
 			myForagePileBiomassContent <- gauss(meanForagePileBiomassContent, meanForagePileBiomassContent * 0.1);

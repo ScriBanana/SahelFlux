@@ -36,7 +36,7 @@ global {
 		list<landscape> availableCroplandCells <- landscape where (each.cellLU = "Cropland");
 		int nbAvailableCells <- nil;
 	
-		//TODO : needs revamp for full coverage and better shapes		
+		//TODO : needs revamp for full coverage and better shapes => Voronoi?
 		loop while: nbAvailableCells != length(availableCroplandCells) {
 			nbAvailableCells <- length(availableCroplandCells);
 			
@@ -56,7 +56,10 @@ global {
 					}
 					
 					// Checking if neighbouring cells can be integrated into the parcel.
-					if parcelSize / 2 < min(cellHeight, cellWidth) / 2 or empty(cell neighbors_at (parcelSize / 2) where (each.myParcel != nil or each.cellLU != "Cropland")) {
+					if
+						parcelSize / 2 < min(cellHeight, cellWidth) / 2 or
+						empty(cell neighbors_at (parcelSize / 2) where (each.myParcel != nil or each.cellLU != "Cropland"))
+					{
 					// If all is green, create the parcel and assign its cells to it.
 						create parcel {
 							self.parcelColour <- #olive;

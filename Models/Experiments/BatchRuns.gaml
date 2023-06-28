@@ -59,24 +59,25 @@ experiment BatchLongRuns autorun: true type: batch repeat: 48 until: endSimu {
 
 experiment MorrisBatch type: batch autorun: true until: endSimu {
 	
-	parameter "Number households and mobile herds" var: nbHousehold min: 20 max: 150 step: 10;
-	parameter "Number transhuming households" var: propTranshumantHh min: 0.0 max: 1.0;
-	parameter "Number fattening households" var: propFatteningHh min: 0.0 max: 1.0;
-	parameter "Fallow on" var: fallowEnabled <- false among: [true, false];
-	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 10.0;
-	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
-	parameter "maxNbNightsPerCellInPaddock" var: maxNbNightsPerCellInPaddock min: 1 max: 10;
+	parameter "Number households and mobile herds" var: nbHousehold min: 20 max: 150;
+//	parameter "Number transhuming households" var: propTranshumantHh min: 0.0 max: 1.0;
+//	parameter "Number fattening households" var: propFatteningHh min: 0.0 max: 1.0;
+//	parameter "Fallow on" var: fallowEnabled <- false among: [true, false];
+//	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 10.0;
+//	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
+//	parameter "maxNbNightsPerCellInPaddock" var: maxNbNightsPerCellInPaddock min: 1 max: 10;
 	
 	init {
 		nbBushFieldsPerHh <- 8;
 		nbHomeFieldsPerHh <- 1;
+		lengthSimu <- 0.1;
 	}
 	
 	method morris
 		levels: 4
-		outputs: ["totalCFlows", "CThroughflow", "totalNFlows", "TT"]
-		sample: 12
-		report: outputDirectory + "/Morris/morris.txt"
-		results: outputDirectory + "/Morris/morris_raw.csv"
+		outputs: ["totalCFlows"]
+		sample: 24
+		report: "Morris/morris.txt"
+		results: "Morris/morris_raw.csv"
 	;
 }
