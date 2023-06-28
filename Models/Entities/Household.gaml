@@ -20,8 +20,10 @@ global {
 	//// Global households parameters
 	
 	int nbHousehold <- 84; // Grillot 2018
-	int nbTranshumantHh <- round(0.4 * nbHousehold); // TODO DUMMY
-	int nbFatteningHh <- round(0.114 * nbHousehold); // Audouin 2014 Diohine
+	float propTranshumantHh <- 0.4 min: 0.0 max: 1.0; // TODO DUMMY
+	float propFatteningHh <- 0.114 min: 0.0 max: 1.0; // Audouin 2014 Diohine
+	int nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
+	int nbFatteningHh <- round(propFatteningHh * nbHousehold);
 	int nbBushFieldsPerHh <- 10; // TODO Dummy 
 	int nbHomeFieldsPerHh <- 2; // TODO Dummy
 	

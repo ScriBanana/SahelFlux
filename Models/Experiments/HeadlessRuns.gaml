@@ -18,9 +18,10 @@ global {
 
 experiment FastAutoRun autorun: true {
 	// 3 month short auto run 
-	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0 updates: [nbTranshumantHh, nbFatteningHh];
-	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 5 min: 0 max: nbHousehold;
-	parameter "Number fattening households" category: "Scenario - Population structure" var: nbFatteningHh <- 5 min: 0 max: nbHousehold;
+	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0;
+	parameter "Number transhuming households" category: "Scenario - Population structure" var: propTranshumantHh <- 0.5 min: 0.0 max: 1.0;
+	parameter "Number fattening households" category: "Scenario - Population structure" var: propFatteningHh <- 0.5 min: 0.0 max: 1.0;
+	
 	parameter "Short run start date" var: starting_date <- date([2020, 4, 10, eveningTime + 1, 0, 0]);
 	parameter "Short run end date" var: endDate <- date([2020, 7, 1, eveningTime + 1, 0, 0]);
 }
