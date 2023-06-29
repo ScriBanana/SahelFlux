@@ -41,6 +41,29 @@ global {
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
+	float meanHomefieldsSOCS;
+	float meanBushfieldsSOCS;
+	float meanRangelandSOCS;
+	action getMeanSOCS {
+		list<float> rangelandCellsSOCS;
+		list<float> homefieldsCellsSOCS;
+		list<float> bushfieldsCellsSOCS;
+		ask SOCStock {
+			if myCell.cellLU = "Rangeland" {
+				rangelandCellsSOCS <+ stableCPool;
+			} else {
+				if myCell.myParcel.homeField {
+					homefieldsCellsSOCS <+ stableCPool;
+				} else {
+					bushfieldsCellsSOCS <+ stableCPool;
+				}
+			}
+		}
+		meanHomefieldsSOCS <- mean(homefieldsCellsSOCS);
+		meanBushfieldsSOCS <- mean(bushfieldsCellsSOCS);
+		meanRangelandSOCS <- mean(rangelandCellsSOCS);
+	}
+	
 }
 
 species SOCStock parallel: true schedules: [] {
