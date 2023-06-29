@@ -86,13 +86,9 @@ global {
 		do updateGlobalBiomassMeanAndSD;
 		ask landscape where each.biomassProducer {
 			
-			if enabledGUI {
-				do updateColour;
-			}
-			
-			if !drySeason {// TODO faire gaffe au scheduling, notamment en début de saison
-				do growBiomass;
-			}
+			if enabledGUI { do updateColour;}
+			// TODO faire gaffe au scheduling, notamment en début de saison
+			if !drySeason { do growBiomass;}
 		}
 		
 		if drySeason {
@@ -109,7 +105,6 @@ global {
 			
 			match 1 {
 			// New year processes
-//				write string(current_date, "'	Y'y");
 				do updateMeteo;
 			}
 			
@@ -125,18 +120,15 @@ global {
 					do transitionToFallows;
 				}
 				
-				ask SOCStock {
-					do emitRSSoilCH4;
-				}
-				ask ORPHeap {
-					do emitRSHeapsCH4;
-				}
-				do burnAndIncorporateRemainingResidues;
-				
+				ask SOCStock { do emitRSSoilCH4;}
+				ask ORPHeap { do emitRSHeapsCH4;}
+				write "	Incorporating and burning (millet) remaining biomass.";
 				write "	Computing plant biomass production for the upcoming rainy season.";
 				ask landscape where each.biomassProducer {
+					do burnAndIncorporateBiomass;
 					do computeYearlyBiomassProduction;
 				}
+				
 			}
 			
 			match drySeasonFirstMonth {
@@ -146,23 +138,15 @@ global {
 				dayInDS <- 0;
 				daysSinceSpread <- 0;
 				
-				ask landscape where (each.myParcel != nil) {
-					do getHarvested;
-				}
+				ask landscape where (each.myParcel != nil) { do getHarvested;}
 				if enabledGUI {
-					ask landscape where each.biomassProducer {
-						do updateColour;
-					}
+					ask landscape where each.biomassProducer { do updateColour;}
 				}
 				do updateParcelsCovers; // Crop rotation
 				
 				// Retrieving herds
-				ask transhumance {
-					do returnHerdsToLandscape;
-				}
-				if fallowEnabled {
-					do transitionFromFallows;
-				}
+				ask transhumance {	do returnHerdsToLandscape;}
+				if fallowEnabled { do transitionFromFallows;}
 			}
 			
 			match rainySeasonFirstMonth - ORPSpreadingPeriodLength {
@@ -183,16 +167,10 @@ global {
 		write string(date(time), "M'/'y");
 		// TODO do some of these come before what's above?
 		do addWastesToHeaps;
-		ask SOCStock {
-			do updateCarbonPools;
-		}
-		ask ORPHeap where (each.myHousehold.myFattenedAnimals != nil) {
-			do accumulateFattenedInputs;
-		}
+		ask SOCStock { do updateCarbonPools;}
+		ask ORPHeap where (each.myHousehold.myFattenedAnimals != nil) { do accumulateFattenedInputs;}
 		
-		if generateMonthlySaves {
-			do saveOutputsDuringSim;
-		}
+		if generateMonthlySaves { do saveOutputsDuringSim;}
 		
 	}
 	
