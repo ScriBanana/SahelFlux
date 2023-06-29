@@ -90,37 +90,6 @@ global {
 		biomassContentSD <- standard_deviation(allCellsBiomass);
 	}
 	
-	action burnAndIncorporateRemainingResidues {
-		write "	Incorporating and burning (millet) remaining biomass.";
-		ask landscape where each.biomassProducer {
-			if (self.cellLU = "Cropland" and self.myParcel != nil) {
-				switch myParcel.lastRSCover {
-					match "Millet" {
-						string emittingPool <- myParcel.homeField ? "HomeFields" : "BushFields";
-						ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG",
-							CO2FromBurning * coefCO2ToC + COFromBurning * coefCOToC + CH4FromBurning * coefCH4ToC
-						);}
-						ask world {	do saveFlowInMap("N", emittingPool, "OF-GHG", N2OFromBurning * coefN2OToN);}
-						ask world {	do saveFlowInMap("N", emittingPool, "OF-AtmoLosses", NOxFromBurning * coefNOxToN);}
-						
-						biomassContent <- 0.0;
-					}
-					match "Groundnut" {
-						mySOCstock.carbonInputsList <+ ["Groundnut", 0.0, biomassContent * groundnutAerialPartCContent];
-						biomassContent <- 0.0;
-					}
-					match "Fallow" {
-						mySOCstock.carbonInputsList <+ ["Fallow", 0.0, biomassContent * fallowVegCContent];
-						biomassContent <- 0.0;
-					}
-				}
-			} else { // Rangelands + interstitial vegetation
-				mySOCstock.carbonInputsList <+ ["Rangeland", 0.0, biomassContent * forageDSCContent];
-				biomassContent <- 0.0;
-			}
-		}
-	}
-	
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
 //		write "Updating available targets";
@@ -288,6 +257,34 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHouseholds", exportedCropsCFlow);}
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToStrawPiles", exportedStrawNFlow);}
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToStrawPiles", exportedStrawCFlow);}
+	}
+	
+	action burnAndIncorporateBiomass {
+		if (self.cellLU = "Cropland" and self.myParcel != nil) {
+			switch myParcel.lastRSCover {
+				match "Millet" {
+					string emittingPool <- myParcel.homeField ? "HomeFields" : "BushFields";
+					ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG",
+						CO2FromBurning * coefCO2ToC + COFromBurning * coefCOToC + CH4FromBurning * coefCH4ToC
+					);}
+					ask world {	do saveFlowInMap("N", emittingPool, "OF-GHG", N2OFromBurning * coefN2OToN);}
+					ask world {	do saveFlowInMap("N", emittingPool, "OF-AtmoLosses", NOxFromBurning * coefNOxToN);}
+					
+					biomassContent <- 0.0;
+				}
+				match "Groundnut" {
+					mySOCstock.carbonInputsList <+ ["Groundnut", 0.0, biomassContent * groundnutAerialPartCContent];
+					biomassContent <- 0.0;
+				}
+				match "Fallow" {
+					mySOCstock.carbonInputsList <+ ["Fallow", 0.0, biomassContent * fallowVegCContent];
+					biomassContent <- 0.0;
+				}
+			}
+		} else { // Rangelands + interstitial vegetation
+			mySOCstock.carbonInputsList <+ ["Rangeland", 0.0, biomassContent * forageDSCContent];
+			biomassContent <- 0.0;
+		}
 	}
 	
 	// Colouring (Resource heavy; only call when running GUI experiments, by enabling enabledGUI bool)
