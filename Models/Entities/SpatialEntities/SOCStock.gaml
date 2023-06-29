@@ -41,27 +41,22 @@ global {
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
-	float meanHomefieldsSOCS;
-	float meanBushfieldsSOCS;
-	float meanRangelandSOCS;
-	action getMeanSOCS {
-		list<float> rangelandCellsSOCS;
-		list<float> homefieldsCellsSOCS;
-		list<float> bushfieldsCellsSOCS;
-		ask SOCStock {
-			if myCell.cellLU = "Rangeland" {
-				rangelandCellsSOCS <+ stableCPool;
-			} else {
-				if myCell.myParcel.homeField {
-					homefieldsCellsSOCS <+ stableCPool;
-				} else {
-					bushfieldsCellsSOCS <+ stableCPool;
-				}
-			}
-		}
-		meanHomefieldsSOCS <- mean(homefieldsCellsSOCS);
-		meanBushfieldsSOCS <- mean(bushfieldsCellsSOCS);
-		meanRangelandSOCS <- mean(rangelandCellsSOCS);
+	list<float> getMeanSOCS {
+		float meanHomefieldsSOCS;
+		float meanBushfieldsSOCS;
+		float meanRangelandSOCS;
+		
+		meanHomefieldsSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
+		) mean_of each.stableCPool;
+		meanBushfieldsSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
+		) mean_of each.stableCPool;
+		meanRangelandSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Rangeland")
+		) mean_of each.stableCPool;
+		
+		return [meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS];
 	}
 	
 }

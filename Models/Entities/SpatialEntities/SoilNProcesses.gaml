@@ -22,6 +22,30 @@ global {
 		"MineralFerti"::[1.0, 0.0, 0.0]
 	];
 	
+	// SOC on available N model parameters
+	bool SOCxSONOn <- false;
+	float SOCxSONAlpha;
+	float SOCxSONBeta;
+	
+	// Gather NFrom soils for SOCxSON calibration
+	list<float> gatherNFromSoils {
+		float meanHomefieldsLastNFromSoil;
+		float meanBushfieldsLastNFromSoil;
+		float meanRangelandLastNFromSoil;
+		
+		meanHomefieldsLastNFromSoil <- (
+			soilNProcesses where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
+		) mean_of each.lastNFromSoil;
+		meanBushfieldsLastNFromSoil <- (
+			soilNProcesses where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
+		) mean_of each.lastNFromSoil;
+		meanRangelandLastNFromSoil <- (
+			soilNProcesses where (each.myCell.cellLU = "Rangeland")
+		) mean_of each.lastNFromSoil;
+		
+		return [meanHomefieldsLastNFromSoil, meanBushfieldsLastNFromSoil, meanRangelandLastNFromSoil];
+	}
+	
 }
 
 species soilNProcesses parallel: true schedules: [] {
@@ -34,6 +58,7 @@ species soilNProcesses parallel: true schedules: [] {
 	// Memory variables
 	map<string, float> thisYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
 	map<string, float> nextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
+	float lastNFromSoil;
 	
 	float soilGasLossNToEmitInRS; // kgN TODO emit at some point (register in matrix?)
 	
@@ -41,23 +66,28 @@ species soilNProcesses parallel: true schedules: [] {
 	
 	float computeNAvailable { // Yearly
 		
-		float NFromSoil <- computeNFromSoil();
+		float computedNFromSoil <- computeNFromSoil();
+		lastNFromSoil <- computedNFromSoil;
 		list<float> NAtmo <- computeNAtmo();
 		map<string, float> NFromDepositsAndAfterEffect<- computeNDepositsAndAfterEffect();
 		
-		float NAvailable <- NFromSoil + sum(NAtmo) + sum(NFromDepositsAndAfterEffect);
+		float NAvailable <- computedNFromSoil + sum(NAtmo) + sum(NFromDepositsAndAfterEffect);
 		assert NAvailable >=0;
 		return NAvailable;
 	}
 	
 	float computeNFromSoil {
-		float NFromSoil <- (myCell.myParcel != nil and myCell.myParcel.homeField) ?
-			baseNFromSoilHomefields :
-			baseNFromSoilBushfields;
-		// Will return the value for bushfields in cropland not part of a parcel and rangeland.
-		// TODO Value for rangeland? Nothing in Grillot.
+		float NFromSoil;
 		
-		// Version + should account for SOC.
+		if !SOCxSONOn {
+			NFromSoil <- (myCell.myParcel != nil and myCell.myParcel.homeField) ?
+				baseNFromSoilHomefields :
+				baseNFromSoilBushfields;
+			// Will return the value for bushfields in cropland not part of a parcel and rangeland.
+			// TODO Value for rangeland? Nothing in Grillot.
+		} else {
+			NFromSoil <- SOCxSONAlpha * myCell.mySOCstock.stableCPool + SOCxSONBeta;
+		}
 		
 		return NFromSoil;
 	}
