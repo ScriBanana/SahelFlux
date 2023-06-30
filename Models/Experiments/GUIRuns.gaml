@@ -19,6 +19,8 @@ global {
 
 experiment Run type: gui {
 	
+	init { experimentType <- "GUIRun";}
+	
 	// Parameters - Tests in UnitTests.gaml
 	parameter "Start date" category: "Scenario - Time" var: starting_date;
 	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;
@@ -58,6 +60,9 @@ experiment Run type: gui {
 }
 
 experiment FallowtoRun parent: Run autorun: true {
+	
+	init { experimentType <- "FallowtoRun";}
+	
 	// Auto run for the fallow period only
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 20 min: 0;
 	parameter "Number transhuming households" category: "Scenario - Population structure" var: propTranshumantHh <- 0.5 min: 0.0 max: 1.0;
@@ -68,6 +73,9 @@ experiment FallowtoRun parent: Run autorun: true {
 }
 
 experiment SOCDispRun parent: Run {
+	
+	init { experimentType <- "SOCDispRun";}
+	
 	output {
 		display carbonDisplay type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
 			grid landscape;

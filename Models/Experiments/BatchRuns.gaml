@@ -22,9 +22,11 @@ global {
 	}
 }
 
-experiment BatchRun autorun: true type: batch repeat: 1014 until: endSimu {
+experiment BatchRun autorun: true type: batch repeat: 12 until: endSimu {
 	
-	parameter "Simulation length (years)" var: lengthSimu <- 2.0;
+	init{ experimentType <- "SimpleBatch";}
+		
+	parameter "Simulation length (years)" var: lengthSimu <- 0.1;
 	
 //	reflex saveResults { // Redundant with saveBatchRunOutput, but backuping is good
 //		write "End of batch, backing up outputs.";
@@ -54,6 +56,7 @@ experiment BatchLongRuns autorun: true type: batch repeat: 52 until: endSimu {
 	init {
 		generateMonthlySaves <- true;
 		fallowEnabled <- true;
+		experimentType <- "BatchLongRuns";
 	}
 }
 
@@ -62,6 +65,7 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 	init {
 		SOCxSONOn <- false;
 		lengthSimu <- 20.0;
+		experimentType <- "SOCxSON";
 	}
 	
 	reflex saveResults {
@@ -126,24 +130,25 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 experiment MorrisBatch type: batch autorun: true until: endSimu {
 	
 	parameter "Number households and mobile herds" var: nbHousehold min: 20 max: 150;
-//	parameter "Number transhuming households" var: propTranshumantHh min: 0.0 max: 1.0;
-//	parameter "Number fattening households" var: propFatteningHh min: 0.0 max: 1.0;
-//	parameter "Fallow on" var: fallowEnabled <- false among: [true, false];
+	parameter "Number transhuming households" var: propTranshumantHh min: 0.0 max: 1.0;
+	parameter "Number fattening households" var: propFatteningHh min: 0.0 max: 1.0;
+	parameter "Fallow on" var: fallowEnabled <- false among: [true, false];
 	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 10.0;
-//	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
-//	parameter "maxNbNightsPerCellInPaddock" var: maxNbNightsPerCellInPaddock min: 1 max: 10;
+	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
+	parameter "maxNbNightsPerCellInPaddock" var: maxNbNightsPerCellInPaddock min: 1 max: 10;
 	
 	init {
 		nbBushFieldsPerHh <- 8;
 		nbHomeFieldsPerHh <- 1;
-		lengthSimu <- 0.15;
+		lengthSimu <- 1.0;
+		experimentType <- "Morris";
 	}
 	
 	method morris
 		levels: 4
-		outputs: ["totalNFlows"]
-		sample: 12
-		report: "morris.txt"
-		results: "morris_raw.csv"
+		outputs: ["totalNFlows", "TT", "totalCFlows", "CThroughflow"]
+		sample: 52
+		report: outputDirectory + "Morris/"+ universalPrefix + "morris.txt"
+		results: outputDirectory + "Morris/"+ universalPrefix + "morris_raw.csv"
 	;
 }

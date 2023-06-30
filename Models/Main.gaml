@@ -237,12 +237,12 @@ global {
 		
 		do gatherFlows;
 		do computeOutputs;
+		do saveLogOutput;
 		
 		runTime <- (machine_time - startTimeReal) / 1000;
 		write "Simulation ended. Runtime : " + runTime + " s";
 		
 		if batchOn {
-			do saveBatchRunOutput;
 			endSimu <- true;
 		} else {
 			write "N flows :";

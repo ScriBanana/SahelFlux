@@ -17,6 +17,9 @@ global {
 }
 
 experiment FastAutoRun autorun: true {
+	
+	init { experimentType <- "FastAutoRun";}
+	
 	// 3 month short auto run 
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0;
 	parameter "Number transhuming households" category: "Scenario - Population structure" var: propTranshumantHh <- 0.5 min: 0.0 max: 1.0;
@@ -38,6 +41,7 @@ experiment LongRun {
 	
 	init {
 		generateMonthlySaves <- true;
+		experimentType <- "BenchmarkRun";
 	}
 	
 }
@@ -48,6 +52,7 @@ experiment BenchmarkRun benchmark: true autorun: true {
 		parallelHerds <- false;
 		enableDebug <- false;
 		endDate <- date([2021, 4, 1, eveningTime + 1, 0, 0]);
+		experimentType <- "BenchmarkRun";
 	}
 }
 

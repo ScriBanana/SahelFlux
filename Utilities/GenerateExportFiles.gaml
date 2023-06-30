@@ -14,25 +14,29 @@ global {
 	string outputDirectory <- "../../OutputFiles/";
 	string universalPrefix <- "" + floor(machine_time / 1000) + "-SahFl-";
 	bool generateMonthlySaves <- false;
+	string experimentType;
 	
-	action exportParameterData {
-		string pathParameters <-  outputDirectory + "Single/" + universalPrefix + "Param.csv";
+	init {
+		assert experimentType != nil;
+	}
+	
+	action saveLogOutput {
+		write "Saving output for simulation " + int(self);
 		save [
-			machine_time,
-			starting_date,
-			endDate,
-			fallowEnabled,
-			homeFieldsRadius,
-			nbHousehold,
-			nbTranshumantHh,
-			meanHerdSize,
-			meanFattenedGroupSize,
-			nbBushFieldsPerHh,
-			nbHomeFieldsPerHh,
-			maxNbNightsPerCellInPaddock,
-			meteoUpdateType,
-			digestionLengthParamAsInt
-		] to: pathParameters format: csv rewrite: false header: true;
+			machine_time, int(self), experimentType,
+			starting_date, endDate, cycle, runTime,
+			fallowEnabled, meteoUpdateType,
+			nbHousehold, nbTranshumantHh, nbFatteningHh,
+			meanHerdSize, meanFattenedGroupSize,
+			homeFieldsRadius, nbBushFieldsPerHh, nbHomeFieldsPerHh,
+			maxNbNightsPerCellInPaddock, digestionLengthParamAsInt,
+			totalNFlows, totalCFlows, TT, CThroughflow
+		]
+			to: outputDirectory + "SahFl-Log.csv"
+			format: "csv"
+			rewrite: false
+			header: true
+		;
 	}
 	
 	action exportStockFlowsOutputData {
@@ -87,18 +91,24 @@ global {
 		}
 	}
 	
-	action saveBatchRunOutput {
-		write "Saving output for simulation " + int(self);
+	action exportParameterData { // Redundant with log.
+		string pathParameters <-  outputDirectory + "Single/" + universalPrefix + "Param.csv";
 		save [
-			int(self), self.nbHousehold, self.nbTranshumantHh, self.nbFatteningHh, self.fallowEnabled,
-			self.cycle, self.machine_time, runTime,
-			self.totalNFlows, self.totalCFlows, self.TT, self.CThroughflow
-		]
-			to: outputDirectory + "Batches/" + universalPrefix + "Out-BatchSamples.csv"
-			format: "csv"
-			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
-			header: true
-		;
+			machine_time,
+			starting_date,
+			endDate,
+			fallowEnabled,
+			homeFieldsRadius,
+			nbHousehold,
+			nbTranshumantHh,
+			meanHerdSize,
+			meanFattenedGroupSize,
+			nbBushFieldsPerHh,
+			nbHomeFieldsPerHh,
+			maxNbNightsPerCellInPaddock,
+			meteoUpdateType,
+			digestionLengthParamAsInt
+		] to: pathParameters format: csv rewrite: false header: true;
 	}
 	
 	action saveOutputsDuringSim {
