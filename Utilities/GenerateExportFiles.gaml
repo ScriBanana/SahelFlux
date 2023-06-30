@@ -16,10 +16,6 @@ global {
 	bool generateMonthlySaves <- false;
 	string experimentType;
 	
-	init {
-		assert experimentType != nil;
-	}
-	
 	action saveLogOutput {
 		write "Saving output for simulation " + int(self);
 		save [
@@ -115,9 +111,15 @@ global {
 		do gatherFlows;
 		do computeOutputs;
 		
+		list<float> meanSOCS <- getMeanSOCS();
+		float meanHomefieldsSOCS <- meanSOCS[0];
+		float meanBushfieldsSOCS <- meanSOCS[1];
+		float meanRangelandSOCS <- meanSOCS[2];
+		
 		save [
 			current_date.year, current_date.month,
 			cycle, machine_time, runTime,
+			meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS,
 			totalNFlows, totalCFlows, TT, CThroughflow
 		]
 			to: outputDirectory + "Monthly/" + universalPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"

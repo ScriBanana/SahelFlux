@@ -103,15 +103,15 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 		float meanMeanBushfieldsLastNFromSoil <- mean(listMeanBushfieldsNFromSoils);
 		float meanMeanRangelandLastNFromSoil <- mean(listMeanRangelandNFromSoils);
 		
-		meanMeanBushfieldsSOCS <- mean([meanMeanBushfieldsSOCS, meanMeanRangelandSOCS]);
-		meanMeanBushfieldsLastNFromSoil <- mean([meanMeanBushfieldsLastNFromSoil, meanMeanRangelandLastNFromSoil]);
+//		meanMeanBushfieldsSOCS <- mean([meanMeanBushfieldsSOCS, meanMeanRangelandSOCS]);
+//		meanMeanBushfieldsLastNFromSoil <- mean([meanMeanBushfieldsLastNFromSoil, meanMeanRangelandLastNFromSoil]);
 		// TODO Remove if an Nsoil value for rangeland is found
 		
 		float SOCxSONAlphaOutput <- (
 			meanMeanBushfieldsLastNFromSoil - meanMeanHomefieldsLastNFromSoil
 		) / (meanMeanBushfieldsSOCS - meanMeanHomefieldsSOCS);
 		float SOCxSONBetaOutput <- (
-			meanMeanBushfieldsSOCS * meanMeanBushfieldsLastNFromSoil - meanMeanHomefieldsSOCS * meanMeanHomefieldsLastNFromSoil
+			meanMeanBushfieldsSOCS * meanMeanHomefieldsLastNFromSoil - meanMeanHomefieldsSOCS * meanMeanBushfieldsLastNFromSoil
 		) / (meanMeanBushfieldsSOCS - meanMeanHomefieldsSOCS);
 		
 		write "Alpha : " + SOCxSONAlphaOutput;

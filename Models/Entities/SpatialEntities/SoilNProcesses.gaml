@@ -24,8 +24,8 @@ global {
 	
 	// SOC on available N model parameters
 	bool SOCxSONOn <- false;
-	float SOCxSONAlpha;
-	float SOCxSONBeta;
+	float SOCxSONAlpha <- 7.55607226546866; //TODO Base alpha. Recompute twice
+	float SOCxSONBeta <- -15.7224306428423;
 	
 	// Gather NFrom soils for SOCxSON calibration
 	list<float> gatherNFromSoils {
