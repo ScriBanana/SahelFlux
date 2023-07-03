@@ -22,7 +22,7 @@ global {
 	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of forage biomass consumed daily. (Rivière, 1991)
 	
 	// Digestion parameters
-	int digestionLengthParamAsInt; // More readable
+	int digestionLengthParamAsInt <- 20; // More readable
 	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals
 	float ratioNExcretedOnIngested <- 0.43; // Lecomte 2002
 	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
