@@ -26,8 +26,8 @@ global {
 	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
 	
 	// Weeds biomass production parameters
-	float weedProdRangelandHa <- 475.0; // kgDM/ha Grillot 2018
-	float weedProdCroplandHa <- 100.0; // kgDM/ha Grillot 2018
+	float weedProdRangelandHa <- 0.0; //475.0; // kgDM/ha Grillot 2018
+	float weedProdCroplandHa <- 0.0; //100.0; // kgDM/ha Grillot 2018
 	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
 	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	

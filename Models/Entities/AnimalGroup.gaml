@@ -22,7 +22,7 @@ global {
 	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of forage biomass consumed daily. (Rivière, 1991)
 	
 	// Digestion parameters
-	int digestionLengthParamAsInt <- 20; // More readable
+	int digestionLengthParamAsInt <- 20; // Hours
 	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals
 	float ratioNExcretedOnIngested <- 0.43; // Lecomte 2002
 	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
@@ -48,6 +48,8 @@ global {
 	// Carboned gases parameters
 	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
 	float methaneEnergyContent <- 55.65; // MJ/kgCH4
+	float CH4ToCO2Slope <- 0.02859; // Adapted from Aubry et al
+	float CH4ToCO2Offset <- 0.01141; // Adapted from Aubry et al
 }
 
 species animalGroup virtual: true schedules: [] { // Not sure if schedules is not already empty if virtual is true.
@@ -78,7 +80,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		}
 		
 		float entericCH4 <- eatenEnergy * Fm / methaneEnergyContent; // kgCH4/herd/timestep
-		float metaboCO2 <- max((entericCH4 - 0.01141) / 0.2859, 0.0); // kgCO2/herd/timestep
+		float metaboCO2 <- max((entericCH4 - CH4ToCO2Offset) / CH4ToCO2Slope, 0.0); // kgCO2/herd/timestep
 		
 		string emittingPool <- eatenBiomassType = "FattenedRation" ? "FattenedAn" : "MobileHerds";
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
