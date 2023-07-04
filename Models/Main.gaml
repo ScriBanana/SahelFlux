@@ -28,16 +28,16 @@ global {
 	bool batchOn <- false;
 	bool enabledGUI <- false;
 	
+	// Time step parameters
+	float step <- 30.0 #minutes;
+	int biophysicalProcessesUpdateFreq <- 15; // In days
+	
 	// Simulation calendar
 	int startHour <- wakeUpTime - 1;
 	date starting_date <- date([2020, 11, 1, startHour, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
 	date endDate <- date([2026, 11, 1, eveningTime + 1, 0, 0]);
 	int drySeasonFirstMonth <- 11; // Tweaks have to be made to run with new year during the rainy season
 	int rainySeasonFirstMonth <- 7;
-	
-	// Time step parameters
-	float step <- 30.0 #minutes;
-	int biophysicalProcessesUpdateFreq <- 15; // In days
 	int lengthRainySeason <- int(milliseconds_between(
 		date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])
 	) / 86400000.0); // days. Weird, but hard to find better

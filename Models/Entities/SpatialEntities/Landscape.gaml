@@ -121,7 +121,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	string thisYearNFlowReceivingPool;
 	string thisYearCFlowReceivingPool;
 	float yearlyBiomassToBeProduced;
-	float yearlyWeedsBiomassToBeProduced;
+	float yearlyWeedsBiomassToBeProduced <- 0.0; // As of now, no weed in the simulation
 	float weedProportionInBiomass <- 0.0; // As of now, no weed in the simulation
 	
 	//// Functions
@@ -133,14 +133,14 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		
 		// Registering N and C flows
 		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
-		float weedsNFlowToSaveEachCall <- weedProportionInBiomass * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+//		float weedsNFlowToSaveEachCall <- weedProportionInBiomass * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
 		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
-		float weedsCFlowToSaveEachCall <- yearlyWeedsBiomassToBeProduced * weedsCContent / nbBiophUpdatesDuringRainySeason;
+//		float weedsCFlowToSaveEachCall <- yearlyWeedsBiomassToBeProduced * weedsCContent / nbBiophUpdatesDuringRainySeason;
 		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
-		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
+//		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
 		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}
-		ask world {	do saveFlowInMap("C", "Weeds",  "IF-FromAtmo", weedsCFlowToSaveEachCall);}
+//		ask world {	do saveFlowInMap("C", "Weeds",  "IF-FromAtmo", weedsCFlowToSaveEachCall);}
 		
 		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
 	}
@@ -202,8 +202,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		// Producing biomass
 		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
 		assert yearlyBiomassToBeProduced >= 0;
-		yearlyWeedsBiomassToBeProduced <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
-		weedProportionInBiomass <- yearlyWeedsBiomassToBeProduced / (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced);
+//		yearlyWeedsBiomassToBeProduced <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
+//		weedProportionInBiomass <- yearlyWeedsBiomassToBeProduced / (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced);
 		
 	}
 	
