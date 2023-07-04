@@ -9,6 +9,7 @@
 model GenerateExportFiles
 
 import "ImportZoning.gaml"
+import "../Utilities/ParamAndOutCentraliser.gaml"
 
 global {
 	string outputDirectory <- "../../OutputFiles/";
@@ -89,27 +90,14 @@ global {
 	
 	action exportParameterData { // Redundant with log.
 		string pathParameters <-  outputDirectory + "Single/" + universalPrefix + "Param.csv";
-		save [
-			machine_time,
-			starting_date,
-			endDate,
-			fallowEnabled,
-			homeFieldsRadius,
-			nbHousehold,
-			nbTranshumantHh,
-			meanHerdSize,
-			meanFattenedGroupSize,
-			nbBushFieldsPerHh,
-			nbHomeFieldsPerHh,
-			maxNbNightsPerCellInPaddock,
-			meteoUpdateType,
-			digestionLengthParamAsInt
-		] to: pathParameters format: csv rewrite: false header: true;
+		save parametersStringList to: pathParameters format: csv rewrite: false header: false;
+		save parametersList to: pathParameters format: csv rewrite: false header: false;
 	}
 	
 	action saveOutputsDuringSim {
 		do gatherFlows;
 		do computeOutputs;
+		do gatherOutputsAndParameters;
 		
 		list<float> meanSOCS <- getMeanSOCS();
 		float meanHomefieldsSOCS <- meanSOCS[0];
@@ -119,8 +107,7 @@ global {
 		save [
 			current_date.year, current_date.month,
 			cycle, machine_time, runTime,
-			meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS,
-			totalNFlows, totalCFlows, TT, CThroughflow
+			outputsList
 		]
 			to: outputDirectory + "Monthly/" + universalPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
 			format: "csv"

@@ -58,10 +58,11 @@ global {
 				location <- myself.location;
 				
 				labileCPool <- myself.cellLU = "Cropland" ?
-					gauss(croplandSOCInit * labileCPoolProportionInit, croplandSOCInit * labileCPoolProportionInit * 0.1) : 
+					gauss(homefieldsSOChaInit * labileCPoolProportionInit, homefieldsSOChaInit * labileCPoolProportionInit * 0.1) : 
 					gauss(rangelandSOCInit * labileCPoolProportionInit, rangelandSOCInit * labileCPoolProportionInit * 0.1); // TODO DUMMY
+					// TODO ADD BUSHFIELDS
 				stableCPool <- myself.cellLU = "Cropland" ?
-					gauss(croplandSOCInit * stableCPoolProportionInit, croplandSOCInit * stableCPoolProportionInit * 0.1) : 
+					gauss(homefieldsSOChaInit * stableCPoolProportionInit, homefieldsSOChaInit * stableCPoolProportionInit * 0.1) : 
 					gauss(rangelandSOCInit * stableCPoolProportionInit, rangelandSOCInit * stableCPoolProportionInit * 0.1); // TODO DUMMY
 				totalSOC <- labileCPool + stableCPool;
 			}

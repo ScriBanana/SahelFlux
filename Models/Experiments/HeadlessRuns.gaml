@@ -12,13 +12,15 @@ import "../Main.gaml"
 global {
 	init {
 		parallelHerds <- true;
-		enableDebug <- true;
 	}
 }
 
 experiment FastAutoRun autorun: true {
 	
-	init { experimentType <- "FastAutoRun";}
+	init {
+		experimentType <- "FastAutoRun";
+		enableDebug <- true;
+	}
 	
 	// 3 month short auto run 
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 10 min: 0;

@@ -16,9 +16,11 @@ global {
 	//// Global SOC parameters
 	
 	// Initial stocks parameters
-	float croplandSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020
+	float homefieldsSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020
+	float bushfieldsSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020
 	float rangelandSOChaInit <- 11100.0; // kgC/ha; Loum selon Ndour 2020
-	float croplandSOCInit <- croplandSOChaInit * hectareToCell; // kgC/cell
+	float homefieldsSOCInit <- homefieldsSOChaInit * hectareToCell; // kgC/cell
+	float bushfieldsSOCInit <- bushfieldsSOChaInit * hectareToCell; // kgC/cell
 	float rangelandSOCInit <- rangelandSOChaInit * hectareToCell; // kgC/cell
 	
 	// SOC model (ICBM) parameters

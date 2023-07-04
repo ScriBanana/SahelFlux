@@ -13,7 +13,7 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "../OutputFilesForR/Monthly50yBatchComplete/"
+path <- "../OutputFilesForR/"
 file.names <- list.files(paste0(path))
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
@@ -49,7 +49,7 @@ df_grouped <- df_grouped[,-c(1:2)]
 df_grouped_diff <- data.frame(diff(df_grouped$totalNflow), diff(df_grouped$totalCflow), diff(df_grouped$TT), diff(df_grouped$CThroughflow))
 df_grouped_diff$date <- df_grouped$date[-1]
 
-write.csv(df_grouped, file="../OutputFiles/OutputsRScripts/Monthly_grouped50.csv")
+write.csv(df_grouped, file="../OutputFiles/OutputsRScripts/230407-monthly_Long.csv")
 
 # Conversion du data frame en format long avec la fonction melt()
 df_long <- melt(df_grouped_diff, id.vars = "date")
@@ -66,4 +66,4 @@ ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
-ggsave("../OutputFiles/img/monthly_grouped50.png", height = 7, width = 9)
+ggsave("../OutputFiles/img/230407-monthly_Long.png", height = 7, width = 18)

@@ -17,7 +17,7 @@ global {
 	}
 }
 
-experiment Run type: gui {
+experiment Run type: gui parent: ParamGatherer {
 	
 	init { experimentType <- "GUIRun";}
 	
@@ -45,7 +45,8 @@ experiment Run type: gui {
 	parameter "Yearly meteorological quality (groundnut) and rainfall (millet and spontaneous vegetation) variarion means" category: "Scenario - ExternalFactors" var: meteoUpdateType;
 	
 	parameter "Digestion length (h)" category: "Calibration" var: digestionLengthParamAsInt min: 0;
-	parameter "Initial soil carbon stock in croplands (kgC/ha)" category: "Calibration" var: croplandSOChaInit min: 0.0;
+	parameter "Initial soil carbon stock in homefields (kgC/ha)" category: "Calibration" var: homefieldsSOChaInit min: 0.0;
+	parameter "Initial soil carbon stock in bushfields (kgC/ha)" category: "Calibration" var: bushfieldsSOChaInit min: 0.0;
 	parameter "Initial soil carbon stock in rangelands (kgC/ha)" category: "Calibration" var: rangelandSOChaInit min: 0.0;
 	
 	parameter "Parcels borders as" category: "Display options" var: parcelsAspect <- "Owner" among: ["Owner", "Cover"];

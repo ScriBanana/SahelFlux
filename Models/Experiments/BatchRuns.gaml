@@ -1,7 +1,7 @@
 /**
 * In: SahelFlux
 * Name: BatchRuns
-* Plain batches (replications only)
+* Plain batches
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
@@ -22,9 +22,12 @@ global {
 	}
 }
 
-experiment BatchRun autorun: true type: batch repeat: 12 until: endSimu {
+experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 	
-	init{ experimentType <- "SimpleBatch";}
+	init{
+		experimentType <- "SimpleBatch";
+		fallowEnabled <- true;
+	}
 		
 	parameter "Simulation length (years)" var: lengthSimu <- 0.1;
 	

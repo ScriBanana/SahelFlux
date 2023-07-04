@@ -18,6 +18,10 @@ global {
 	float TST;
 	float ICR;
 	float CThroughflow;
+	float ecosystemCBalance;
+	float totalGHG;
+	float SCS;
+	float CFootprint;
 	
 	action computeOutputs {
 		
@@ -25,12 +29,18 @@ global {
 		loop subMap over: NFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
 			loop flowPair over: subMap.pairs {
 				totalNFlows <- totalNFlows + float(flowPair.value);
-			}
-			loop flowPair over: subMap.pairs where (each.key contains "TF-") {
-				TT <- TT + float(flowPair.value);
+				
+				if flowPair.key contains "TF-" {
+					TT <- TT + float(flowPair.value);
+					TST <- TST + float(flowPair.value);
+				} else if flowPair.key contains "IF-" {
+					TST <- TST + float(flowPair.value);
+				} else if flowPair.key contains "OF-" {
+					
+				}
 			}
 		}
-
+		
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;
 //		float rangeNVarIfNeg <- rangelandNFluxMatrix["periodVarCellNstock"] < 0 ? rangelandNFluxMatrix["periodVarCellNstock"] : 0.0;
@@ -38,19 +48,19 @@ global {
 //		TST <- TT + croplandNFluxMatrix["periodAtmoNFix"] + rangelandNFluxMatrix["periodAtmoNFix"] - cropNVarIfNeg - rangeNVarIfNeg - herdsNVarIfNeg;
 
 		// ICR
-//		ICR <- TT / TST;
-
-		// Prompt
-//		write "		TST : " + TST / hectareToCell + " kgN/ha";
-//		write "		ICR : " + ICR;
+		ICR <- TT / TST;
 		
 		// Carbon balance
 		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
 			loop flowPair over: subMap.pairs {
 				totalCFlows <- totalCFlows + float(flowPair.value);
-			}
-			loop flowPair over: subMap.pairs where (each.key contains "TF-") {
-				CThroughflow <- CThroughflow + float(flowPair.value);
+				if flowPair.key contains "TF-" {
+					CThroughflow <- CThroughflow + float(flowPair.value);
+				} else if flowPair.key contains "IF-" {
+					ecosystemCBalance <- ecosystemCBalance + float(flowPair.value);
+				} else if flowPair.key contains "OF-" {
+					ecosystemCBalance <- ecosystemCBalance - float(flowPair.value);
+				}
 			}
 		}
 	}
