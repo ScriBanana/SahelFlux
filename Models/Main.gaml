@@ -233,14 +233,15 @@ global {
 	bool endSimu <- false;
 	float runTime; // seconds
 	reflex endSim when: current_date = endDate {
+		runTime <- (machine_time - startTimeReal) / 60000;
+		
 		write "=== END OF SIMULATION ===";
 		
 		do gatherFlows;
 		do computeOutputs;
 		do saveLogOutput;
 		
-		runTime <- (machine_time - startTimeReal) / 1000;
-		write "Simulation ended. Runtime : " + runTime + " s";
+		write "Simulation ended. Runtime : " + floor(runTime) + " min " + round((runTime - floor(runTime)) * 60 ) + " s";
 		
 		if batchOn {
 			endSimu <- true;
