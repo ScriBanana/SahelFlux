@@ -72,6 +72,11 @@ global {
 		do initiateRotations;
 		write "Initialising meteorological conditions for year 1";
 		do updateMeteo;
+		do getMeanSOCS;
+		meanHomefieldsSOCSInit <- meanHomefieldsSOCS;
+		meanBushfieldsSOCSInit <- meanBushfieldsSOCS;
+		meanRangelandSOCSInit <- meanRangelandSOCS;
+		totalMeanSOCSInit <- totalMeanSOCS;
 		
 		write "Start date : " + starting_date + ", end date : " + endDate;
 		write "=== MODEL INITIALISED ===";

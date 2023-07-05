@@ -17,14 +17,14 @@ global {
 	//// Output variables ////
 	
 	// Global flows
-	float totalNFlows;
-	float totalNInflows;
-	float totalNThroughflows;
-	float totalNOutflows;
-	float totalCFlows;
-	float totalCInflows;
-	float totalCThroughflows;
-	float totalCOutflows;
+	float totalNFlows; // kgN
+	float totalNInflows; // kgN
+	float totalNThroughflows; // kgN
+	float totalNOutflows; // kgN
+	float totalCFlows; // kgC
+	float totalCInflows; // kgC
+	float totalCThroughflows; // kgC
+	float totalCOutflows; // kgC
 	
 	// Circularity (ENA framework)
 	float TSTN;
@@ -42,16 +42,16 @@ global {
 	
 	// Carbon balance
 	float ecosystemCBalance;
-	float ecosystemCO2Balance; // kgCO2; used for validation
-	float ecosystemGHGBalance; // kgCO2eq
+	float ecosystemCO2Balance; // kgCO2; atmo fix - CO2 emissions; used for validation
+	float ecosystemGHGBalance; // kgCO2eq; SOCS accumulation - GHG emissions
 	float SCS;
 	float CFootprint;
 	
 	// SOC
-	float meanHomefieldsSOCS;
-	float meanBushfieldsSOCS;
-	float meanRangelandSOCS;
-	float totalMeanSOCS;
+	float meanHomefieldsSOCSVariation; // kgC
+	float meanBushfieldsSOCSVariation; // kgC
+	float meanRangelandSOCSVariation; // kgC
+	float totalMeanSOCSVariation; // kgC
 	
 	
 	//// Output computer ////
@@ -122,19 +122,17 @@ global {
 		}
 		
 		// SOC		
-		meanHomefieldsSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
-		) mean_of each.stableCPool;
-		meanBushfieldsSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
-		) mean_of each.stableCPool;
-		meanRangelandSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Rangeland")
-		) mean_of each.stableCPool;
-		// TODO Unoptimised triple loop
-		totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
-	
+		do getMeanSOCS;
+		meanHomefieldsSOCSVariation <- meanHomefieldsSOCS - meanHomefieldsSOCSInit; // kgC
+		meanBushfieldsSOCSVariation <- meanBushfieldsSOCS - meanBushfieldsSOCSInit; // kgC
+		meanRangelandSOCSVariation <- meanRangelandSOCS - meanRangelandSOCSInit; // kgC
+		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
+		
+		
 		//// Compute derivated outputs
+		
+		// Carbon balance
+		ecosystemGHGBalance <-  - totalGHG;
 		
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;

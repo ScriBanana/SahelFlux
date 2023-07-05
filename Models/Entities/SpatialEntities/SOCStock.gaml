@@ -43,6 +43,32 @@ global {
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
+	//// Global SOC functions
+	
+	// Mean SOCS computation
+	float meanHomefieldsSOCS; // kgC
+	float meanBushfieldsSOCS; // kgC
+	float meanRangelandSOCS; // kgC
+	float totalMeanSOCS; // kgC
+	float meanHomefieldsSOCSInit; // kgC
+	float meanBushfieldsSOCSInit; // kgC
+	float meanRangelandSOCSInit; // kgC
+	float totalMeanSOCSInit; // kgC
+	
+	action getMeanSOCS {
+		meanHomefieldsSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
+		) mean_of each.stableCPool;
+		meanBushfieldsSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
+		) mean_of each.stableCPool;
+		meanRangelandSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Rangeland")
+		) mean_of each.stableCPool;
+		// TODO Unoptimised triple loop
+		totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
+	}
+	
 }
 
 species SOCStock parallel: true schedules: [] {
