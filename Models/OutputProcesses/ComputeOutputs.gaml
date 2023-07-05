@@ -10,28 +10,35 @@ model ComputeOutputs
 
 import "RecordFlows.gaml"
 import "RecordGHG.gaml"
+import "../../Utilities/CnNFlowsParameters.gaml"
 
 global {
 	
+	//// Output variables ////
+	
 	// Global flows
 	float totalNFlows;
+	float totalNInflows;
+	float totalNThroughflows;
+	float totalNOutflows;
 	float totalCFlows;
+	float totalCInflows;
+	float totalCThroughflows;
+	float totalCOutflows;
 	
 	// Circularity (ENA framework)
-	float TTN;
 	float TSTN;
 	float ICRN;
 	float FinnN;
-	float TTC;
 	float TSTC;
 	float ICRC;
 	float FinnC;
 	
 	// GHG
-	float totalCO2;
-	float totalCH4;
-	float totalN2O;
-	float totalGHG;
+	float totalCO2; // kgCO2
+	float totalCH4; // kgCH4
+	float totalN2O; // kgN2O
+	float totalGHG; // kgCO2eq
 	
 	// Carbon balance
 	float ecosystemCBalance;
@@ -40,23 +47,59 @@ global {
 	float SCS;
 	float CFootprint;
 	
+	
+	//// Output computer ////
+	
 	action computeOutputs {
 		
-		// TT
+		// Nitrogen
 		loop subMap over: NFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
 			loop flowPair over: subMap.pairs {
 				totalNFlows <- totalNFlows + float(flowPair.value);
-				
 				if flowPair.key contains "TF-" {
-					TTN <- TTN + float(flowPair.value);
+					totalNThroughflows <- totalNThroughflows + float(flowPair.value);
 					TSTN <- TSTN + float(flowPair.value);
 				} else if flowPair.key contains "IF-" {
+					totalNInflows <- totalNInflows + float(flowPair.value);
 					TSTN <- TSTN + float(flowPair.value);
 				} else if flowPair.key contains "OF-" {
-					
+					totalNOutflows <- totalNOutflows + float(flowPair.value);
 				}
 			}
 		}
+		
+		// Carbon
+		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
+			loop flowPair over: subMap.pairs {
+				totalCFlows <- totalCFlows + float(flowPair.value);
+				if flowPair.key contains "TF-" {
+					totalCThroughflows <- totalCThroughflows + float(flowPair.value);
+				} else if flowPair.key contains "IF-" {
+					totalCInflows <- totalCInflows + float(flowPair.value);
+					ecosystemCBalance <- ecosystemCBalance + float(flowPair.value);
+				} else if flowPair.key contains "OF-" {
+					totalCOutflows <- totalCOutflows + float(flowPair.value);
+					ecosystemCBalance <- ecosystemCBalance - float(flowPair.value);
+				}
+			}
+		}
+		
+		// GHG
+		loop subMap over: GHGFlowsMap {
+			loop flowPair over: subMap.pairs {
+				if flowPair.key = "CO2" {
+					totalCO2 <- totalCO2 + float(flowPair.value);
+					totalGHG <- totalGHG + float(flowPair.value);
+				} else if flowPair.key = "CH4" {
+					totalCH4 <- totalCH4 + float(flowPair.value);
+					totalGHG <- totalGHG + float(flowPair.value) * PRGCH4;
+				} else if flowPair.key = "N2O" {
+					totalN2O <- totalN2O + float(flowPair.value);
+					totalGHG <- totalGHG + float(flowPair.value) * PRGN2O;
+				}
+			}
+		}
+		
 		
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;
@@ -65,20 +108,8 @@ global {
 //		TST <- TT + croplandNFluxMatrix["periodAtmoNFix"] + rangelandNFluxMatrix["periodAtmoNFix"] - cropNVarIfNeg - rangeNVarIfNeg - herdsNVarIfNeg;
 
 		// ICR
-		ICRN <- TTN / TSTN;
+		ICRN <- totalNThroughflows / TSTN;
+		ICRC <- totalCThroughflows / TSTC;
 		
-		// Carbon balance
-		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
-			loop flowPair over: subMap.pairs {
-				totalCFlows <- totalCFlows + float(flowPair.value);
-				if flowPair.key contains "TF-" {
-					TTC <- TTC + float(flowPair.value);
-				} else if flowPair.key contains "IF-" {
-					ecosystemCBalance <- ecosystemCBalance + float(flowPair.value);
-				} else if flowPair.key contains "OF-" {
-					ecosystemCBalance <- ecosystemCBalance - float(flowPair.value);
-				}
-			}
-		}
 	}
 }

@@ -88,7 +88,7 @@ global {
 			// SOC
 			meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS, totalMeanSOCS,
 			// Ecosystem carbon balance
-			TTN, TTC,
+			totalNThroughflows, totalCThroughflows,
 			// Carbon footprint
 			
 			// C and N fluxes analysis

@@ -92,4 +92,8 @@ global {
 	float N2OFromBurning <- milletCombustionFactor * fireN2OEmissionFactor;
 	float NOxFromBurning <- milletCombustionFactor * fireNOxEmissionFactor;
 	
+	// PRG
+	float PRGCH4 <- 25.0; // Over 100 years, as recommended by IPCC
+	float PRGN2O <- 298.0;
+	
 }

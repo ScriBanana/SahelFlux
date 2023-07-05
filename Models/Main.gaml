@@ -252,8 +252,8 @@ global {
 			write NFlowsMatrix;
 			write "C flows :";
 			write CFlowsMatrix;
-			write "		N throughflow : " + int(floor(TTN)) + " kgN";
-			write "		C throughflow : " + int(floor(TTC)) + " kgC";
+			write "		N throughflow : " + int(floor(totalNThroughflows)) + " kgN";
+			write "		C throughflow : " + int(floor(totalCThroughflows)) + " kgC";
 			
 			do exportStockFlowsOutputData;
 			do pause;
