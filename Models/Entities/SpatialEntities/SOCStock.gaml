@@ -43,24 +43,6 @@ global {
 	// Display parameter
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
-	list<float> getMeanSOCS {
-		float meanHomefieldsSOCS;
-		float meanBushfieldsSOCS;
-		float meanRangelandSOCS;
-		
-		meanHomefieldsSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
-		) mean_of each.stableCPool;
-		meanBushfieldsSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
-		) mean_of each.stableCPool;
-		meanRangelandSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Rangeland")
-		) mean_of each.stableCPool;
-		
-		return [meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS];
-	}
-	
 }
 
 species SOCStock parallel: true schedules: [] {

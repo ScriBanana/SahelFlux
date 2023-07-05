@@ -99,11 +99,6 @@ global {
 		do computeOutputs;
 		do gatherOutputsAndParameters;
 		
-		list<float> meanSOCS <- getMeanSOCS();
-		float meanHomefieldsSOCS <- meanSOCS[0];
-		float meanBushfieldsSOCS <- meanSOCS[1];
-		float meanRangelandSOCS <- meanSOCS[2];
-		
 		save [
 			current_date.year, current_date.month,
 			cycle, machine_time, runTime,

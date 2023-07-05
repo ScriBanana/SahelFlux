@@ -47,39 +47,56 @@ global {
 	float SCS;
 	float CFootprint;
 	
+	// SOC
+	float meanHomefieldsSOCS;
+	float meanBushfieldsSOCS;
+	float meanRangelandSOCS;
+	float totalMeanSOCS;
+	
 	
 	//// Output computer ////
 	
 	action computeOutputs {
 		
+		//// Gather flows
+		
 		// Nitrogen
 		loop subMap over: NFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
 			loop flowPair over: subMap.pairs {
-				totalNFlows <- totalNFlows + float(flowPair.value);
-				if flowPair.key contains "TF-" {
-					totalNThroughflows <- totalNThroughflows + float(flowPair.value);
-					TSTN <- TSTN + float(flowPair.value);
-				} else if flowPair.key contains "IF-" {
-					totalNInflows <- totalNInflows + float(flowPair.value);
-					TSTN <- TSTN + float(flowPair.value);
-				} else if flowPair.key contains "OF-" {
-					totalNOutflows <- totalNOutflows + float(flowPair.value);
+				string flowKey <- flowPair.key;
+				float flowValue <- float(flowPair.value);
+				
+				totalNFlows <- totalNFlows + flowValue;
+				if flowKey contains "TF-" {
+					totalNThroughflows <- totalNThroughflows + flowValue;
+					TSTN <- TSTN + flowValue;
+				} else if flowKey contains "IF-" {
+					totalNInflows <- totalNInflows + flowValue;
+					TSTN <- TSTN + flowValue;
+				} else if flowKey contains "OF-" {
+					totalNOutflows <- totalNOutflows + flowValue;
 				}
 			}
 		}
 		
 		// Carbon
-		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
+		loop subMap over: CFlowsMap {
 			loop flowPair over: subMap.pairs {
-				totalCFlows <- totalCFlows + float(flowPair.value);
-				if flowPair.key contains "TF-" {
-					totalCThroughflows <- totalCThroughflows + float(flowPair.value);
-				} else if flowPair.key contains "IF-" {
-					totalCInflows <- totalCInflows + float(flowPair.value);
-					ecosystemCBalance <- ecosystemCBalance + float(flowPair.value);
-				} else if flowPair.key contains "OF-" {
-					totalCOutflows <- totalCOutflows + float(flowPair.value);
-					ecosystemCBalance <- ecosystemCBalance - float(flowPair.value);
+				string flowKey <- flowPair.key;
+				float flowValue <- float(flowPair.value);
+				
+				totalCFlows <- totalCFlows + flowValue;
+				if flowKey contains "TF-" {
+					totalCThroughflows <- totalCThroughflows + flowValue;
+				} else if flowKey contains "IF-" {
+					totalCInflows <- totalCInflows + flowValue;
+					ecosystemCBalance <- ecosystemCBalance + flowValue;
+					if flowKey = "IF-FromAtmo" {
+						ecosystemCO2Balance <- ecosystemCO2Balance + flowValue / coefCO2ToC;
+					}
+				} else if flowKey contains "OF-" {
+					totalCOutflows <- totalCOutflows + flowValue;
+					ecosystemCBalance <- ecosystemCBalance - flowValue;
 				}
 			}
 		}
@@ -87,19 +104,37 @@ global {
 		// GHG
 		loop subMap over: GHGFlowsMap {
 			loop flowPair over: subMap.pairs {
-				if flowPair.key = "CO2" {
-					totalCO2 <- totalCO2 + float(flowPair.value);
-					totalGHG <- totalGHG + float(flowPair.value);
-				} else if flowPair.key = "CH4" {
-					totalCH4 <- totalCH4 + float(flowPair.value);
-					totalGHG <- totalGHG + float(flowPair.value) * PRGCH4;
-				} else if flowPair.key = "N2O" {
-					totalN2O <- totalN2O + float(flowPair.value);
-					totalGHG <- totalGHG + float(flowPair.value) * PRGN2O;
+				string flowKey <- flowPair.key;
+				float flowValue <- float(flowPair.value);
+				
+				if flowKey = "CO2" {
+					totalCO2 <- totalCO2 + flowValue;
+					totalGHG <- totalGHG + flowValue;
+					ecosystemCO2Balance <- ecosystemCO2Balance - flowValue;
+				} else if flowKey = "CH4" {
+					totalCH4 <- totalCH4 + flowValue;
+					totalGHG <- totalGHG + flowValue * PRGCH4;
+				} else if flowKey = "N2O" {
+					totalN2O <- totalN2O + flowValue;
+					totalGHG <- totalGHG + flowValue * PRGN2O;
 				}
 			}
 		}
 		
+		// SOC		
+		meanHomefieldsSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
+		) mean_of each.stableCPool;
+		meanBushfieldsSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
+		) mean_of each.stableCPool;
+		meanRangelandSOCS <- (
+			SOCStock where (each.myCell.cellLU = "Rangeland")
+		) mean_of each.stableCPool;
+		// TODO Unoptimised triple loop
+		totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
+	
+		//// Compute derivated outputs
 		
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;
