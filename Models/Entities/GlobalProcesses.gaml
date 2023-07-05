@@ -17,7 +17,7 @@ global {
 	int SDRainfall <- 170; // mm/year Thibaudeau et al 2015
 	
 	// Variables
-	int yearRainfall min: 0; // mm
+	int yearRainfall min: 1; // mm; min 1 to apease the ln
 	float yearMeteoQuality min: 0.0 max: 1.0; // adimensionnal, used for groundnut growth
 	
 	//// Global external processes functions
