@@ -267,6 +267,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		ask world {	do saveFlowInMap("N", emissionsEmittingPool, "OF-GHG" ,
 			mobileHerdNDirectFaecesN2OEmissions + mobileHerdNDirectUrineN2OEmissions
 		);}
+		ask world { do saveGHGFlow(emissionsEmittingPool, "N2O",
+			(mobileHerdNDirectFaecesN2OEmissions + mobileHerdNDirectUrineN2OEmissions) / coefN2OToN
+		);}
 		ask world {	do saveFlowInMap("N", emissionsEmittingPool, "OF-AtmoLosses" ,
 			mobileHerdFaecesNGasLoss + mobileHerdUrineNGasLoss
 		);}

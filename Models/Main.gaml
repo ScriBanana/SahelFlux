@@ -246,12 +246,14 @@ global {
 		if batchOn {
 			endSimu <- true;
 		} else {
+			write "GHG emissions :";
+			write GHGFlowsMap;
 			write "N flows :";
 			write NFlowsMatrix;
 			write "C flows :";
 			write CFlowsMatrix;
-			write "		TT : " + int(floor(TT)) + " kgN";
-			write "		C throughflow : " + int(floor(CThroughflow)) + " kgC";
+			write "		N throughflow : " + int(floor(TTN)) + " kgN";
+			write "		C throughflow : " + int(floor(TTC)) + " kgC";
 			
 			do exportStockFlowsOutputData;
 			do pause;

@@ -70,7 +70,8 @@ species ORPHeap schedules: [] {
 		
 		ask world {	do saveFlowInMap("N", "Households", "TF-ToORPHeaps" , wastesNAddition);}
 		ask world {	do saveFlowInMap("C", "Households", "TF-ToORPHeaps" , wastesCAddition);}
-		ask world {	do saveFlowInMap("N", "HomeFields", "OF-GHG" , emittedN2OFromWastesAddition);}
+		ask world {	do saveFlowInMap("N", "ORPHeaps", "OF-GHG" , emittedN2OFromWastesAddition);}
+		ask world { do saveGHGFlow("ORPHeaps", "N2O", emittedN2OFromWastesAddition / coefN2OToN);}
 		
 		heapQuantity <- heapQuantity + (kitchenWasteInputRate + otherWastesInputRate) * ORPAccumulationPeriodLength;
 		heapNContent <- heapNContent + wastesNAddition;
@@ -87,6 +88,7 @@ species ORPHeap schedules: [] {
 			// Compute N2O emissions
 			float emittedN2OFromFattenedInput <- (float(dungDeposit[2]) + float(dungDeposit[3])) * emissionFactorN2OInHeap; // kgN
 			ask world {	do saveFlowInMap("N", "ORPHeaps", "OF-GHG" , emittedN2OFromFattenedInput);}
+			ask world { do saveGHGFlow("ORPHeaps", "N2O", emittedN2OFromFattenedInput / coefN2OToN);}
 			
 			// Compute NOx gas losses
 			float lostNGasFromFattenedInput <- (float(dungDeposit[2]) + float(dungDeposit[3])) * fractionGasLossORPHeap; // kgN
@@ -115,6 +117,7 @@ species ORPHeap schedules: [] {
 	
 	action emitRSHeapsCH4 {
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "OF-GHG" , myself.heapCH4ToBeEmittedInRainySeason * coefCH4ToC);}
+		ask world { do saveGHGFlow("ORPHeaps", "CH4", myself.heapCH4ToBeEmittedInRainySeason / coefCH4ToC);}
 		heapCH4ToBeEmittedInRainySeason <- 0.0;
 	}
 	
@@ -137,6 +140,7 @@ species ORPHeap schedules: [] {
 		// N2O direct
 		float spreadORPNDirectN2OEmissions <- spreadNQuantity * emissionFactorN2ODeposits; // kgN
 		ask world {	do saveFlowInMap("N", "HomeFields", "OF-GHG" , spreadORPNDirectN2OEmissions);}
+		ask world { do saveGHGFlow("HomeFields", "N2O", spreadORPNDirectN2OEmissions / coefN2OToN);}
 		
 		// Indirect RS
 		float spreadORPNGasLoss <- spreadNQuantity * fractionGasLossOrganicFerti; // kgN

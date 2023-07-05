@@ -107,6 +107,7 @@ species SOCStock parallel: true schedules: [] {
 		// TODO scinder pertes et GHG
 		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
+		ask world { do saveGHGFlow(emittingPool, "CO2", (emissionsFromStable + emissionsFromLabile) / coefCO2ToC);}
 	}
 	
 	float aggregateRSDungCH4Emissions {
@@ -127,6 +128,7 @@ species SOCStock parallel: true schedules: [] {
 	action emitRSSoilCH4 {
 		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , myself.CH4ToBeEmittedInRainySeason * coefCH4ToC);}
+		ask world { do saveGHGFlow(emittingPool, "CH4", myself.CH4ToBeEmittedInRainySeason);}
 		CH4ToBeEmittedInRainySeason <- 0.0;
 	}
 	

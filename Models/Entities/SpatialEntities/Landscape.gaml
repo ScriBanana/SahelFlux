@@ -266,10 +266,13 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				match "Millet" {
 					string emittingPool <- myParcel.homeField ? "HomeFields" : "BushFields";
 					ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG",
-						CO2FromBurning * coefCO2ToC + COFromBurning * coefCOToC + CH4FromBurning * coefCH4ToC
+						CO2FromBurning * coefCO2ToC + COFromBurning * coefCOToC + CH4FromBurning * coefCH4ToC // TODO CO as GHG?
 					);}
 					ask world {	do saveFlowInMap("N", emittingPool, "OF-GHG", N2OFromBurning * coefN2OToN);}
 					ask world {	do saveFlowInMap("N", emittingPool, "OF-AtmoLosses", NOxFromBurning * coefNOxToN);}
+					ask world { do saveGHGFlow(emittingPool, "CO2", CO2FromBurning);}
+					ask world { do saveGHGFlow(emittingPool, "CH4", CH4FromBurning);}
+					ask world { do saveGHGFlow(emittingPool, "N2O", N2OFromBurning);}
 					
 					biomassContent <- 0.0;
 				}

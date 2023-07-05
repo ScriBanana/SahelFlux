@@ -9,17 +9,34 @@
 model ComputeOutputs
 
 import "RecordFlows.gaml"
+import "RecordGHG.gaml"
 
 global {
 	
+	// Global flows
 	float totalNFlows;
 	float totalCFlows;
-	float TT;
-	float TST;
-	float ICR;
-	float CThroughflow;
-	float ecosystemCBalance;
+	
+	// Circularity (ENA framework)
+	float TTN;
+	float TSTN;
+	float ICRN;
+	float FinnN;
+	float TTC;
+	float TSTC;
+	float ICRC;
+	float FinnC;
+	
+	// GHG
+	float totalCO2;
+	float totalCH4;
+	float totalN2O;
 	float totalGHG;
+	
+	// Carbon balance
+	float ecosystemCBalance;
+	float ecosystemCO2Balance; // kgCO2; used for validation
+	float ecosystemGHGBalance; // kgCO2eq
 	float SCS;
 	float CFootprint;
 	
@@ -31,10 +48,10 @@ global {
 				totalNFlows <- totalNFlows + float(flowPair.value);
 				
 				if flowPair.key contains "TF-" {
-					TT <- TT + float(flowPair.value);
-					TST <- TST + float(flowPair.value);
+					TTN <- TTN + float(flowPair.value);
+					TSTN <- TSTN + float(flowPair.value);
 				} else if flowPair.key contains "IF-" {
-					TST <- TST + float(flowPair.value);
+					TSTN <- TSTN + float(flowPair.value);
 				} else if flowPair.key contains "OF-" {
 					
 				}
@@ -48,14 +65,14 @@ global {
 //		TST <- TT + croplandNFluxMatrix["periodAtmoNFix"] + rangelandNFluxMatrix["periodAtmoNFix"] - cropNVarIfNeg - rangeNVarIfNeg - herdsNVarIfNeg;
 
 		// ICR
-		ICR <- TT / TST;
+		ICRN <- TTN / TSTN;
 		
 		// Carbon balance
 		loop subMap over: CFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
 			loop flowPair over: subMap.pairs {
 				totalCFlows <- totalCFlows + float(flowPair.value);
 				if flowPair.key contains "TF-" {
-					CThroughflow <- CThroughflow + float(flowPair.value);
+					TTC <- TTC + float(flowPair.value);
 				} else if flowPair.key contains "IF-" {
 					ecosystemCBalance <- ecosystemCBalance + float(flowPair.value);
 				} else if flowPair.key contains "OF-" {

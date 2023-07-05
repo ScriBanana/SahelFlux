@@ -84,6 +84,8 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		
 		string emittingPool <- eatenBiomassType = "FattenedRation" ? "FattenedAn" : "MobileHerds";
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
+		ask world { do saveGHGFlow(emittingPool, "CH4", entericCH4);}
+		ask world { do saveGHGFlow(emittingPool, "CO2", metaboCO2);}
 		// TODO une fonction pour vérifier que l'émis n'est pas supérieur au digéré?
 	}
 	

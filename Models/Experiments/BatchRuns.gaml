@@ -138,12 +138,9 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 	parameter "Fallow on" var: fallowEnabled <- false among: [true, false];
 	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 10.0;
 	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
-	parameter "maxNbNightsPerCellInPaddock" var: maxNbNightsPerCellInPaddock min: 1 max: 10;
 	
 	init {
-		nbBushFieldsPerHh <- 8;
-		nbHomeFieldsPerHh <- 1;
-		lengthSimu <- 1.0;
+		lengthSimu <- 10.0;
 		experimentType <- "Morris";
 	}
 	

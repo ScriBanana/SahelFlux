@@ -27,7 +27,7 @@ global {
 			meanHerdSize, meanFattenedGroupSize,
 			homeFieldsRadius, nbBushFieldsPerHh, nbHomeFieldsPerHh,
 			maxNbNightsPerCellInPaddock, digestionLengthParamAsInt,
-			totalNFlows, totalCFlows, TT, CThroughflow
+			totalNFlows, totalCFlows, TTN, TTC
 		]
 			to: outputDirectory + "SahFl-Log.csv"
 			format: "csv"

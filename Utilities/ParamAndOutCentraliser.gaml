@@ -82,12 +82,13 @@ global {
 		float meanHomefieldsSOCS <- meanSOCS[0];
 		float meanBushfieldsSOCS <- meanSOCS[1];
 		float meanRangelandSOCS <- meanSOCS[2];
+		float totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
 		
 		outputsList <- [
 			// SOC
-			meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS,
+			meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS, totalMeanSOCS,
 			// Ecosystem carbon balance
-			TT, CThroughflow,
+			TTN, TTC,
 			// Carbon footprint
 			
 			// C and N fluxes analysis
