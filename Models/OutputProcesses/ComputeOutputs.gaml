@@ -128,11 +128,38 @@ global {
 		meanRangelandSOCSVariation <- meanRangelandSOCS - meanRangelandSOCSInit; // kgC
 		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
 		
+		// Pool flows
+		map<string, list> poolFlowsMap <- [
+				"Households"::copy(flowsMapTemplate),
+				"MobileHerds"::copy(flowsMapTemplate),
+				"FattenedAn"::copy(flowsMapTemplate),
+				"ORPHeaps"::copy(flowsMapTemplate),
+				"StrawPiles"::copy(flowsMapTemplate),
+				"HomeFields"::copy(flowsMapTemplate),
+				"BushFields"::copy(flowsMapTemplate),
+				"Rangelands"::copy(flowsMapTemplate),
+				"Millet"::copy(flowsMapTemplate),
+				"Groundnut"::copy(flowsMapTemplate),
+				"FallowVeg"::copy(flowsMapTemplate),
+				"SpontVeg"::copy(flowsMapTemplate),
+				"Weeds"::copy(flowsMapTemplate),
+				"Trees"::copy(flowsMapTemplate),
+			"Households"::[0.0, 0.0, 0.0],
+			"MobileHerds"::[0.0, 0.0, 0.0],
+			"FattenedAn"::[0.0, 0.0, 0.0],
+			"ORPHeaps"::[0.0, 0.0, 0.0],
+			"StrawPiles"::[0.0, 0.0, 0.0],
+			"HomeFields"::[0.0, 0.0, 0.0],
+			"BushFields"::[0.0, 0.0, 0.0],
+			"Market"::[0.0, 0.0, 0.0],
+			"Market"::[0.0, 0.0, 0.0],
+			"Market"::[0.0, 0.0, 0.0]
+		];
 		
 		//// Compute derivated outputs
 		
 		// Carbon balance
-		ecosystemGHGBalance <-  - totalGHG;
+		ecosystemGHGBalance <- totalMeanSOCSVariation - totalGHG;
 		
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;

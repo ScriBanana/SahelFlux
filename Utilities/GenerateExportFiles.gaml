@@ -13,9 +13,9 @@ import "../Utilities/ParamAndOutCentraliser.gaml"
 
 global {
 	string outputDirectory <- "../../OutputFiles/";
-	string universalPrefix <- "" + floor(machine_time / 1000) + "-SahFl-";
 	bool generateMonthlySaves <- false;
 	string experimentType;
+	string universalPrefix <- "" + floor(machine_time / 1000) + "-SahFl-" + experimentType;
 	
 	action saveLogOutput {
 		write "Saving output for simulation " + int(self);

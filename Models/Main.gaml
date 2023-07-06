@@ -245,6 +245,7 @@ global {
 		do gatherFlows;
 		do computeOutputs;
 		do gatherOutputsAndParameters;
+		do saveLogOutput;
 		
 		write "Simulation ended. Runtime : " + floor(runTime) + " min " + round((runTime - floor(runTime)) * 60 ) + " s";
 		
