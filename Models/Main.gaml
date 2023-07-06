@@ -246,6 +246,7 @@ global {
 		do computeOutputs;
 		do gatherOutputsAndParameters;
 		do saveLogOutput;
+		do exportStockFlowsOutputData;
 		
 		write "Simulation ended. Runtime : " + floor(runTime) + " min " + round((runTime - floor(runTime)) * 60 ) + " s";
 		
@@ -258,10 +259,11 @@ global {
 			write NFlowsMatrix;
 			write "C flows :";
 			write CFlowsMatrix;
+			write "Flows balance and total GHG per pool :";
+			write poolFlowsMap;
 			write "		N throughflow : " + int(floor(totalNThroughflows)) + " kgN";
 			write "		C throughflow : " + int(floor(totalCThroughflows)) + " kgC";
 			
-			do exportStockFlowsOutputData;
 			do pause;
 		}
 	}

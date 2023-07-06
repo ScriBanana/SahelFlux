@@ -226,8 +226,12 @@ global {
 //		TST <- TT + croplandNFluxMatrix["periodAtmoNFix"] + rangelandNFluxMatrix["periodAtmoNFix"] - cropNVarIfNeg - rangeNVarIfNeg - herdsNVarIfNeg;
 
 		// ICR
-		ICRN <- totalNThroughflows / TSTN;
-		ICRC <- totalCThroughflows / TSTC;
+		if TSTN != 0 {
+			ICRN <- totalNThroughflows / TSTN;
+		}
+		if TSTC != 0 {
+			ICRC <- totalCThroughflows / TSTC;
+		}
 		
 	}
 	

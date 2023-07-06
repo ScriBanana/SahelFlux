@@ -95,7 +95,7 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 				int(self),
 				meanSOCS[0], meanSOCS[1], meanSOCS[2],
 				meanLastNFromSoils[0], meanLastNFromSoils[1], meanLastNFromSoils[2]
-			] to: outputDirectory + "SOCxSON/"+ universalPrefix + "SOCxSON_raw.csv" format:"csv" rewrite: (int(self) = 0) ? true : false header: true;
+			] to: outputDirectory + "SOCxSON/"+ runPrefix + "SOCxSON_raw.csv" format:"csv" rewrite: (int(self) = 0) ? true : false header: true;
 			
 		}
 		
@@ -124,7 +124,7 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 			meanMeanHomefieldsSOCS, meanMeanBushfieldsSOCS,
 			meanMeanHomefieldsLastNFromSoil, meanMeanBushfieldsLastNFromSoil,
 			SOCxSONAlphaOutput, SOCxSONBetaOutput
-		] to: outputDirectory + "SOCxSON/"+ universalPrefix + "SOCxSON_AlphaBeta.csv" format:"csv" rewrite: true header: true;
+		] to: outputDirectory + "SOCxSON/"+ runPrefix + "SOCxSON_AlphaBeta.csv" format:"csv" rewrite: true header: true;
 		
 	}
 	
@@ -148,7 +148,7 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 		levels: 4
 		outputs: ["totalNFlows", "TT", "totalCFlows", "CThroughflow"]
 		sample: 52
-		report: outputDirectory + "Morris/"+ universalPrefix + "morris.txt"
-		results: outputDirectory + "Morris/"+ universalPrefix + "morris_raw.csv"
+		report: outputDirectory + "Morris/"+ runPrefix + "morris.txt"
+		results: outputDirectory + "Morris/"+ runPrefix + "morris_raw.csv"
 	;
 }

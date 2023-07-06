@@ -15,7 +15,7 @@ global {
 	string outputDirectory <- "../../OutputFiles/";
 	bool generateMonthlySaves <- false;
 	string experimentType;
-	string universalPrefix <- "" + floor(machine_time / 1000) + "-SahFl-" + experimentType;
+	string runPrefix;
 	
 	action saveLogOutput {
 		write "Saving output for simulation " + int(self);
@@ -40,6 +40,8 @@ global {
 		write "Saving data in " + outputDirectory;
 		// Saving a matrix to a csv doesn't work. Issue raised on github. Fix coming up in Gama 1.9.0 (commit a4d2a56)
 		
+		runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "-";
+		
 		// Variables
 		float durationSimu <- (current_date - starting_date)/#year;
 		
@@ -49,20 +51,22 @@ global {
 		outputCSVheader <<+ NFlowsMap.keys;
 		
 		do exportParameterData;
-		do saveSFMatrixDivided (outputCSVheader, "Out-", 1.0);
-		do saveSFMatrixDivided (outputCSVheader, "Out-y_", durationSimu);
-		do saveSFMatrixDivided (outputCSVheader, "Out-ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "Flow-", 1.0);
+		do saveSFMatrixDivided (outputCSVheader, "Flow-y_", durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "Flow-ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
-		do saveSFMatrixDivided (outputCSVheader, "Out-TLU_y_", (nbTLUHerds) * durationSimu);
+		do saveSFMatrixDivided (outputCSVheader, "Flow-TLU_y_", (nbTLUHerds) * durationSimu);
+		do exportGHGMat;
+		do exportBalanceMat;
 		
 		write "... Done";
 	}
 	
 	action saveSFMatrixDivided (list<string> outputCSVheader, string fileCoreName, float divisionOperand) {
 		
-		string pathN <-  outputDirectory + "Single/" + universalPrefix + fileCoreName + "Nmat.csv";
-		string pathC <-  outputDirectory + "Single/" + universalPrefix + fileCoreName + "Cmat.csv";
+		string pathN <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Nmat.csv";
+		string pathC <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Cmat.csv";
 		
 		save outputCSVheader to: pathN format: csv rewrite: true header: false;
 		save outputCSVheader to: pathC format: csv rewrite: true header: false;
@@ -88,9 +92,35 @@ global {
 		}
 	}
 	
+	action exportGHGMat {
+		string pathGHG <-  outputDirectory + "Single/" + runPrefix + "GHGmat.csv";
+		list<string> outputCSVheader <- ["", "kgCO2", "kgCH4", "kgN2O"];
+		save outputCSVheader to: pathGHG format: csv rewrite: true header: false;
+		
+		loop subMap over: GHGFlowsMap.pairs {
+			list lineToSave <- [subMap.key];
+			loop flowPair over: subMap.value.pairs {
+				lineToSave <+ string(flowPair.value);
+			}
+			save lineToSave to: pathGHG format: csv rewrite: false header: false;
+		}
+	}
+	
+	action exportBalanceMat {
+		string pathBalance <-  outputDirectory + "Single/" + runPrefix + "Balancemat.csv";
+		list<string> outputCSVheader <- ["", "ΔkgC", "ΔkgN", "GHG(kgCO2eq)"];
+		save outputCSVheader to: pathBalance format: csv rewrite: true header: false;
+		
+		loop subMap over: poolFlowsMap.pairs {
+			list lineToSave <- [subMap.key];
+			lineToSave <<+ subMap.value;
+			save lineToSave to: pathBalance format: csv rewrite: false header: false;
+		}
+	}
+	
 	action exportParameterData { // Redundant with log.
-		string pathParameters <-  outputDirectory + "Single/" + universalPrefix + "Param.csv";
-		save parametersStringList to: pathParameters format: csv rewrite: false header: false;
+		string pathParameters <-  outputDirectory + "Single/" + runPrefix + "Param.csv";
+		save parametersStringList to: pathParameters format: csv rewrite: true header: false;
 		save parametersList to: pathParameters format: csv rewrite: false header: false;
 	}
 	
@@ -104,7 +134,7 @@ global {
 			cycle, machine_time, runTime,
 			outputsList
 		]
-			to: outputDirectory + "Monthly/" + universalPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
+			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true
