@@ -53,6 +53,26 @@ global {
 	float meanRangelandSOCSVariation; // kgC
 	float totalMeanSOCSVariation; // kgC
 	
+	// Flow balance gatherer
+	map<string, list> poolFlowsMap <- [ // [string::pool :: [float::Cbalance(kgC), float::Nbalance(kgN), float::GHG(kgCO2eq)]]
+		"Households"::[0.0, 0.0, 0.0],
+		"MobileHerds"::[0.0, 0.0, 0.0],
+		"FattenedAn"::[0.0, 0.0, 0.0],
+		"ORPHeaps"::[0.0, 0.0, 0.0],
+		"StrawPiles"::[0.0, 0.0, 0.0],
+		"HomeFields"::[0.0, 0.0, 0.0],
+		"BushFields"::[0.0, 0.0, 0.0],
+		"Rangelands"::[0.0, 0.0, 0.0],
+		"Millet"::[0.0, 0.0, 0.0],
+		"Groundnut"::[0.0, 0.0, 0.0],
+		"FallowVeg"::[0.0, 0.0, 0.0],
+		"SpontVeg"::[0.0, 0.0, 0.0],
+		"Weeds"::[0.0, 0.0, 0.0],
+		"Trees"::[0.0, 0.0, 0.0],
+		"Market"::[0.0, 0.0, 0.0],
+		"Transhumance"::[0.0, 0.0, 0.0],
+		"Atmosphere"::[0.0, 0.0, 0.0]
+	];
 	
 	//// Output computer ////
 	
@@ -61,62 +81,128 @@ global {
 		//// Gather flows
 		
 		// Nitrogen
-		loop subMap over: NFlowsMap { // TODO ne marchera pas si gatherflows est call plusieurs fois
-			loop flowPair over: subMap.pairs {
+		loop poolPair over: NFlowsMap.pairs { // TODO ne marchera pas si gatherflows est call plusieurs fois
+			string poolKey <- poolPair.key;
+			map poolMap <- poolPair.value;
+			loop flowPair over: poolMap.pairs {
 				string flowKey <- flowPair.key;
+				string flowPool <- replace (flowKey, "TF-To", "");
 				float flowValue <- float(flowPair.value);
 				
 				totalNFlows <- totalNFlows + flowValue;
-				if flowKey contains "TF-" {
-					totalNThroughflows <- totalNThroughflows + flowValue;
-					TSTN <- TSTN + flowValue;
-				} else if flowKey contains "IF-" {
+				if flowKey contains "IF-" {
+					
 					totalNInflows <- totalNInflows + flowValue;
 					TSTN <- TSTN + flowValue;
+					
+					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) + flowValue;
+					switch flowKey {
+						match "IF-FromMarket" {
+							poolFlowsMap["Market"][1] <- float(poolFlowsMap["Market"][1]) - flowValue;
+						} match "IF-FromTranshu" {
+							poolFlowsMap["Transhumance"][1] <- float(poolFlowsMap["Transhumance"][1]) - flowValue;
+						} match "IF-FromAtmo" {
+							poolFlowsMap["Atmosphere"][1] <- float(poolFlowsMap["Atmosphere"][1]) - flowValue;
+						}
+					}
 				} else if flowKey contains "OF-" {
+					
 					totalNOutflows <- totalNOutflows + flowValue;
+					
+					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) - flowValue;
+					switch flowKey {
+						match "OF-SoldOnMarket" {
+							poolFlowsMap["Market"][1] <- float(poolFlowsMap["Market"][1]) + flowValue;
+						} match "OF-ToTranshu" {
+							poolFlowsMap["Transhumance"][1] <- float(poolFlowsMap["Transhumance"][1]) + flowValue;
+						} match_one ["OF-GHG", "OF-AtmoLosses"] {
+							poolFlowsMap["Atmosphere"][1] <- float(poolFlowsMap["Atmosphere"][1]) + flowValue;
+						}
+					}
+				} else if flowKey contains "TF-" {
+					
+					totalNThroughflows <- totalNThroughflows + flowValue;
+					TSTN <- TSTN + flowValue;
+					
+					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) - flowValue;
+					poolFlowsMap[flowPool][1] <- float(poolFlowsMap[flowPool][1]) + flowValue;
 				}
 			}
 		}
 		
+		
 		// Carbon
-		loop subMap over: CFlowsMap {
-			loop flowPair over: subMap.pairs {
+		loop poolPair over: CFlowsMap.pairs {
+			string poolKey <- poolPair.key;
+			map poolMap <- poolPair.value;
+			loop flowPair over: poolMap.pairs {
 				string flowKey <- flowPair.key;
+				string flowPool <- replace (flowKey, "TF-To", "");
 				float flowValue <- float(flowPair.value);
 				
 				totalCFlows <- totalCFlows + flowValue;
-				if flowKey contains "TF-" {
-					totalCThroughflows <- totalCThroughflows + flowValue;
-				} else if flowKey contains "IF-" {
+				if flowKey contains "IF-" {
+					
 					totalCInflows <- totalCInflows + flowValue;
 					ecosystemCBalance <- ecosystemCBalance + flowValue;
-					if flowKey = "IF-FromAtmo" {
-						ecosystemCO2Balance <- ecosystemCO2Balance + flowValue / coefCO2ToC;
+					
+					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) + flowValue;
+					switch flowKey {
+						match "IF-FromMarket" {
+							poolFlowsMap["Market"][0] <- float(poolFlowsMap["Market"][0]) - flowValue;
+						} match "IF-FromTranshu" {
+							poolFlowsMap["Transhumance"][0] <- float(poolFlowsMap["Transhumance"][0]) - flowValue;
+						} match "IF-FromAtmo" {
+							ecosystemCO2Balance <- ecosystemCO2Balance + flowValue / coefCO2ToC;
+							poolFlowsMap["Atmosphere"][0] <- float(poolFlowsMap["Atmosphere"][0]) - flowValue;
+						}
 					}
 				} else if flowKey contains "OF-" {
+					
 					totalCOutflows <- totalCOutflows + flowValue;
 					ecosystemCBalance <- ecosystemCBalance - flowValue;
+					
+					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) - flowValue;
+					switch flowKey {
+						match "OF-SoldOnMarket" {
+							poolFlowsMap["Market"][0] <- float(poolFlowsMap["Market"][0]) + flowValue;
+						} match "OF-ToTranshu" {
+							poolFlowsMap["Transhumance"][0] <- float(poolFlowsMap["Transhumance"][0]) + flowValue;
+						} match_one ["OF-GHG", "OF-AtmoLosses"] {
+							poolFlowsMap["Atmosphere"][0] <- float(poolFlowsMap["Atmosphere"][0]) + flowValue;
+						}
+					}
+				} else if flowKey contains "TF-" {
+					
+					totalCThroughflows <- totalCThroughflows + flowValue;
+					
+					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) - flowValue;
+					poolFlowsMap[flowPool][0] <- float(poolFlowsMap[flowPool][0]) + flowValue;
 				}
 			}
 		}
 		
 		// GHG
-		loop subMap over: GHGFlowsMap {
-			loop flowPair over: subMap.pairs {
-				string flowKey <- flowPair.key;
+		loop subMap over: GHGFlowsMap.pairs {
+			string poolKey <- subMap.key;
+			map GHGMap <- subMap.value;
+			loop flowPair over: GHGMap.pairs {
+				string GHGKey <- flowPair.key;
 				float flowValue <- float(flowPair.value);
 				
-				if flowKey = "CO2" {
+				if GHGKey = "CO2" {
 					totalCO2 <- totalCO2 + flowValue;
 					totalGHG <- totalGHG + flowValue;
 					ecosystemCO2Balance <- ecosystemCO2Balance - flowValue;
-				} else if flowKey = "CH4" {
+					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue;
+				} else if GHGKey = "CH4" {
 					totalCH4 <- totalCH4 + flowValue;
 					totalGHG <- totalGHG + flowValue * PRGCH4;
-				} else if flowKey = "N2O" {
+					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue * PRGCH4;
+				} else if GHGKey = "N2O" {
 					totalN2O <- totalN2O + flowValue;
 					totalGHG <- totalGHG + flowValue * PRGN2O;
+					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue * PRGN2O;
 				}
 			}
 		}
@@ -127,34 +213,6 @@ global {
 		meanBushfieldsSOCSVariation <- meanBushfieldsSOCS - meanBushfieldsSOCSInit; // kgC
 		meanRangelandSOCSVariation <- meanRangelandSOCS - meanRangelandSOCSInit; // kgC
 		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
-		
-		// Pool flows
-		map<string, list> poolFlowsMap <- [
-				"Households"::copy(flowsMapTemplate),
-				"MobileHerds"::copy(flowsMapTemplate),
-				"FattenedAn"::copy(flowsMapTemplate),
-				"ORPHeaps"::copy(flowsMapTemplate),
-				"StrawPiles"::copy(flowsMapTemplate),
-				"HomeFields"::copy(flowsMapTemplate),
-				"BushFields"::copy(flowsMapTemplate),
-				"Rangelands"::copy(flowsMapTemplate),
-				"Millet"::copy(flowsMapTemplate),
-				"Groundnut"::copy(flowsMapTemplate),
-				"FallowVeg"::copy(flowsMapTemplate),
-				"SpontVeg"::copy(flowsMapTemplate),
-				"Weeds"::copy(flowsMapTemplate),
-				"Trees"::copy(flowsMapTemplate),
-			"Households"::[0.0, 0.0, 0.0],
-			"MobileHerds"::[0.0, 0.0, 0.0],
-			"FattenedAn"::[0.0, 0.0, 0.0],
-			"ORPHeaps"::[0.0, 0.0, 0.0],
-			"StrawPiles"::[0.0, 0.0, 0.0],
-			"HomeFields"::[0.0, 0.0, 0.0],
-			"BushFields"::[0.0, 0.0, 0.0],
-			"Market"::[0.0, 0.0, 0.0],
-			"Market"::[0.0, 0.0, 0.0],
-			"Market"::[0.0, 0.0, 0.0]
-		];
 		
 		//// Compute derivated outputs
 		
@@ -172,4 +230,5 @@ global {
 		ICRC <- totalCThroughflows / TSTC;
 		
 	}
+	
 }

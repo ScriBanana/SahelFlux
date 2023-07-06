@@ -31,8 +31,8 @@ global {
 		"TF-ToRangelands"::0.0,
 		"TF-ToMillet"::0.0,
 		"TF-ToGroundnut"::0.0,
-		"TF-ToFallowVeget"::0.0,
-		"TF-ToSpontVeget"::0.0,
+		"TF-ToFallowVeg"::0.0,
+		"TF-ToSpontVeg"::0.0,
 		"TF-ToWeeds"::0.0,
 		"TF-ToTrees"::0.0,
 		// Outflows

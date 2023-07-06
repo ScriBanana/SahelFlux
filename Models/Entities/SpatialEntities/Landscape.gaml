@@ -157,7 +157,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		float nitrogenReductionFactor;
 		
 		if cellLU = "Rangeland" {
-			thisYearNFlowReceivingPool <- "TF-ToSpontVeget";
+			thisYearNFlowReceivingPool <- "TF-ToSpontVeg";
 			thisYearCFlowReceivingPool <- "SpontVeg";
 			thisYearBiomassCContent <- rangelandVegCContent;
 			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
@@ -181,7 +181,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
 					
 				} match "Fallow" {
-					thisYearNFlowReceivingPool <- "TF-ToFallowVeget";
+					thisYearNFlowReceivingPool <- "TF-ToFallowVeg";
 					thisYearCFlowReceivingPool <- "FallowVeg";
 					// Same as rangeland veg
 					thisYearBiomassCContent <- fallowVegCContent;
