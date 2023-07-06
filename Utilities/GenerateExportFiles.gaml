@@ -18,22 +18,12 @@ global {
 	string runPrefix;
 	
 	action saveLogOutput {
-		write "Saving output for simulation " + int(self);
-		save [
-			machine_time, int(self), experimentType,
-			starting_date, endDate, cycle, runTime,
-			fallowEnabled, meteoUpdateType,
-			nbHousehold, nbTranshumantHh, nbFatteningHh,
-			meanHerdSize, meanFattenedGroupSize,
-			homeFieldsRadius, nbBushFieldsPerHh, nbHomeFieldsPerHh,
-			maxNbNightsPerCellInPaddock, digestionLengthParamAsInt,
-			totalNFlows, totalCFlows, totalNThroughflows, totalCThroughflows
-		]
-			to: outputDirectory + "SahFl-Log.csv"
-			format: "csv"
-			rewrite: false
-			header: true
+		save parametersStringList + outputsStringList
+			to: outputDirectory + "SahFl-Log.csv" format: "csv"
+			rewrite: !file_exists(outputDirectory + "SahFl-Log.csv") header: false
 		;
+		write "Saving output for simulation " + int(self);
+		save parametersList + outputsList to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
 	}
 	
 	action exportStockFlowsOutputData {

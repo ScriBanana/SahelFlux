@@ -27,9 +27,8 @@ global {
 		float rangelandSurface <- (landscape count (each.cellLU = "Rangeland")) / hectareToCell; // ha
 		float bushfieldsSurface <- (landscape count (each.cellLU = "Cropland" and (each.myParcel = nil or !each.myParcel.homeField ))) / hectareToCell; // ha
 		float homefieldsSurface <- (landscape count (each.cellLU = "Cropland" and (each.myParcel != nil and each.myParcel.homeField ))) / hectareToCell; // ha
-		
-		float bushfieldsSurfacePerHh;
-		float homefieldsSurfacePerHh;
+		float bushfieldsSurfacePerHh <- household mean_of (each.myHomeParcelsList sum_of each.parcelSurface);
+		float homefieldsSurfacePerHh <- household mean_of (each.myBushParcelsList sum_of each.parcelSurface);
 		
 		parametersList <- [
 			// Simulation
