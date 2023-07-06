@@ -13,11 +13,91 @@ import "GenerateExportFiles.gaml"
 global {
 	list parametersList;
 	list parametersStringList <- [
+		// Simulation
+		"machine_time",
+		"int(self)",
+		"experimentType",
+		// Time
+		"starting_date",
+		"endDate",
+		"cycle",
+		"(current_date - starting_date)/#year",
+		"runTime",
+		// Landscape structure
+		"meteoUpdateType",
+		"fallowEnabled",
+		"totalAreaHa",
+		"biomassProducingSurface",
+		"rangelandSurface",
+		"bushfieldsSurface",
+		"homefieldsSurface",
+		"maxNbCroplandParcels",
+		"parcelRadiusDistri",
+		"homeFieldsRadius",
+		// Population
+		"nbHousehold",
+		"meanHerdSize",
+		"nbTLUHerds",
+		"nbBushFieldsPerHh",
+		"nbHomeFieldsPerHh",
+		"bushfieldsSurfacePerHh",
+		"homefieldsSurfacePerHh",
+		// Practices
+		"maxNbNightsPerCellInPaddock",
+		"maxNbFallowPaddock",
+		"propTranshumantHh",
+		"nbTranshumantHh",
+		"propFatteningHh",
+		"nbFatteningHh",
+		"meanFattenedGroupSize",
+		// Biophysical
+		"SOCxSONOn",
+		"SOCxSONAlpha",
+		"SOCxSONBeta",
+		"homefieldsSOChaInit",
+		"bushfieldsSOChaInit",
+		"rangelandSOChaInit"
 	];
 		
 	list outputsList;
 	list outputsStringList <- [
 		
+		// Global flows
+		"totalNFlows (kgN)",
+		"totalNInflows (kgN)",
+		"totalNThroughflows (kgN)",
+		"totalNOutflows (kgN)",
+		"totalCFlows (kgC)",
+		"totalCInflows (kgC)",
+		"totalCThroughflows (kgC)",
+		"totalCOutflows (kgC)",
+		
+		// Circularity (ENA framework)
+		"TSTN",
+		"ICRN",
+		"FinnN",
+		"TSTC",
+		"ICRC",
+		"FinnC",
+		
+		// GHG
+		"totalCO2 (kgCO2)",
+		"totalCH4 (kgCH4)",
+		"totalN2O (kgN2O)",
+		"totalGHG (kgCO2eq)",
+		
+		// Carbon balance
+		"ecosystemCBalance",
+		"ecosystemCO2Balance (kgCO2)",
+		"ecosystemGHGBalance (kgCO2eq)",
+		"SCS",
+		"CFootprint",
+		
+		// SOC
+		"meanHomefieldsSOCSVariation (kgC)",
+		"meanBushfieldsSOCSVariation (kgC)",
+		"meanRangelandSOCSVariation (kgC)",
+		"totalMeanSOCSVariation (kgC)"
 	];
 	
 	action gatherOutputsAndParameters {
@@ -78,14 +158,43 @@ global {
 		];
 		
 		outputsList <- [
-			// SOC
-			meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS, totalMeanSOCS,
-			// Ecosystem carbon balance
-			totalNThroughflows, totalCThroughflows,
-			// Carbon footprint
 			
-			// C and N fluxes analysis
-			totalNFlows, totalCFlows
+			// Global flows
+			totalNFlows, // kgN
+			totalNInflows, // kgN
+			totalNThroughflows, // kgN
+			totalNOutflows, // kgN
+			totalCFlows, // kgC
+			totalCInflows, // kgC
+			totalCThroughflows, // kgC
+			totalCOutflows, // kgC
+			
+			// Circularity (ENA framework)
+			TSTN,
+			ICRN,
+			FinnN,
+			TSTC,
+			ICRC,
+			FinnC,
+			
+			// GHG
+			totalCO2, // kgCO2
+			totalCH4, // kgCH4
+			totalN2O, // kgN2O
+			totalGHG, // kgCO2eq
+			
+			// Carbon balance
+			ecosystemCBalance,
+			ecosystemCO2Balance, // kgCO2, atmo fix - CO2 emissions, used for validation
+			ecosystemGHGBalance, // kgCO2eq, SOCS accumulation - GHG emissions
+			SCS,
+			CFootprint,
+			
+			// SOC
+			meanHomefieldsSOCSVariation, // kgC
+			meanBushfieldsSOCSVariation, // kgC
+			meanRangelandSOCSVariation, // kgC
+			totalMeanSOCSVariation // kgC
 		];
 	}
 }
