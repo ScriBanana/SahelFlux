@@ -54,7 +54,7 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 
 experiment BatchLongRuns autorun: true type: batch repeat: 52 until: endSimu {
 	
-	parameter "Simulation length (years)" var: lengthSimu <- 50.0;
+	parameter "Simulation length (years)" var: lengthSimu <- 20.0;
 	
 	init {
 		generateMonthlySaves <- true;

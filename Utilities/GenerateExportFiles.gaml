@@ -15,13 +15,15 @@ global {
 	string outputDirectory <- "../../OutputFiles/";
 	bool generateMonthlySaves <- false;
 	string experimentType;
-	string runPrefix;
+	string runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "-";
 	
 	action saveLogOutput {
-		save parametersStringList + outputsStringList
-			to: outputDirectory + "SahFl-Log.csv" format: "csv"
-			rewrite: !file_exists(outputDirectory + "SahFl-Log.csv") header: false
-		;
+		if !file_exists(outputDirectory + "SahFl-Log.csv") {
+			save parametersStringList + outputsStringList
+				to: outputDirectory + "SahFl-Log.csv" format: "csv"
+				rewrite: true header: false
+			;
+		}
 		write "Saving log entry for simulation " + int(self);
 		save parametersList + outputsList to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
 	}
@@ -160,7 +162,7 @@ global {
 			cycle, machine_time, runTime,
 			outputsList
 		]
-			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + "-" + nbHousehold + "Hh" + nbTranshumantHh + "Tr" + nbFatteningHh + "FtF" + fallowEnabled + ".csv"
+			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true
