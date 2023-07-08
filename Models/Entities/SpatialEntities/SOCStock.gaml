@@ -16,8 +16,8 @@ global {
 	//// Global SOC parameters
 	
 	// Initial stocks parameters
-	float homefieldsSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020
-	float bushfieldsSOChaInit <- 8800.0; // kgC/ha; Moyenne chez Ndour 2020
+	float homefieldsSOChaInit <- 21822.0; // kgC/ha; Malou 2020; default Diohine
+	float bushfieldsSOChaInit <- 11706.0; // kgC/ha; Malou 2020; default Diohine
 	float rangelandSOChaInit <- 11100.0; // kgC/ha; Loum selon Ndour 2020
 	float homefieldsSOCInit <- homefieldsSOChaInit * hectareToCell; // kgC/cell
 	float bushfieldsSOCInit <- bushfieldsSOChaInit * hectareToCell; // kgC/cell

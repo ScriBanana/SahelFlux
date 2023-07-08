@@ -22,7 +22,7 @@ global {
 			to: outputDirectory + "SahFl-Log.csv" format: "csv"
 			rewrite: !file_exists(outputDirectory + "SahFl-Log.csv") header: false
 		;
-		write "Saving output for simulation " + int(self);
+		write "Saving log entry for simulation " + int(self);
 		save parametersList + outputsList to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
 	}
 	
@@ -41,19 +41,38 @@ global {
 		outputCSVheader <<+ NFlowsMap.keys;
 		
 		do exportParameterData;
-		do saveSFMatrixDivided (outputCSVheader, "Flow-", 1.0);
-		do saveSFMatrixDivided (outputCSVheader, "Flow-y_", durationSimu);
-		do saveSFMatrixDivided (outputCSVheader, "Flow-ha_y_", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu);
-		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
-		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
-		do saveSFMatrixDivided (outputCSVheader, "Flow-TLU_y_", (nbTLUHerds) * durationSimu);
 		do exportGHGMat;
 		do exportBalanceMat;
+		
+		do saveSFMatrix (outputCSVheader, "Flow-", 1.0, false);
+		do saveSFMatrix (outputCSVheader, "FlowYear-", durationSimu, false);
+		do saveSFMatrix (outputCSVheader, "FlowHaYear-", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu, false);
+		do saveSFMatrix (outputCSVheader, "FlowDiv-", 1.0, true);
+		do saveSFMatrix (outputCSVheader, "FlowDivYear-", durationSimu, true);
 		
 		write "... Done";
 	}
 	
-	action saveSFMatrixDivided (list<string> outputCSVheader, string fileCoreName, float divisionOperand) {
+	action saveSFMatrix (list<string> outputCSVheader, string fileCoreName, float divisionOperand, bool perFlowDivision) {
+		
+		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
+		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
+		map<string, float> dividingFactors <- [
+			"Households"::length(household),
+			"MobileHerds"::nbTLUHerds,
+			"FattenedAn"::nbFatteningHh,
+			"ORPHeaps"::length(ORPHeap),
+			"StrawPiles"::length(household),
+			"HomeFields"::(listAllHomeParcels sum_of each.parcelSurface),
+			"BushFields"::((landscape count (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.homeField))) / hectareToCell),
+			"Rangelands"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
+			"Millet"::((listAllHomeParcels + listAllBushParcels) sum_of each.parcelSurface),
+			"Groundnut"::(listAllBushParcels sum_of each.parcelSurface),
+			"FallowVeg"::(listAllBushParcels sum_of each.parcelSurface),
+			"SpontVeg"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
+			"Weeds"::((landscape count (each.biomassProducer)) / hectareToCell),
+			"Trees"::(landscape sum_of each.nbTrees)
+		];
 		
 		string pathN <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Nmat.csv";
 		string pathC <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Cmat.csv";
@@ -64,18 +83,35 @@ global {
 		//Again, could have been a loop over N and C, but Gama doesn't like looping on nested containers.
 		int outputId <- 0;
 		loop matLine over: rows_list (NFlowsMatrix) {
-			list<string> lineToSave <- [flowsMapTemplate.keys[outputId + nbInflows]];
+			string flowDestination <- flowsMapTemplate.keys[outputId + nbInflows];
+			list<string> lineToSave <- [flowDestination];
+			int inputId <- 0;
 			loop valueToSave over: matLine {
-				lineToSave <+ string(valueToSave / divisionOperand); // TODO ne marche pas pour les fattened
+				string flowOrigin <- (outputCSVheader - "")[inputId];
+				float divisionFactor <- perFlowDivision and (flowOrigin in dividingFactors.keys) ?
+					dividingFactors[flowOrigin] * divisionOperand :
+					divisionOperand
+				;
+				lineToSave <+ string(valueToSave / divisionFactor);
+				inputId <- inputId + 1;
 			}
 			save lineToSave to: pathN format: csv rewrite: false;
 			outputId <- outputId +1;
 		}
+		
 		outputId <- 0;
 		loop matLine over: rows_list (CFlowsMatrix) {
-			list<string> lineToSave <- [flowsMapTemplate.keys[outputId + nbInflows]];
+			string flowDestination <- flowsMapTemplate.keys[outputId + nbInflows];
+			list<string> lineToSave <- [flowDestination];
+			int inputId <- 0;
 			loop valueToSave over: matLine {
-				lineToSave <+ string(valueToSave / divisionOperand);
+				string flowOrigin <- (outputCSVheader - "")[inputId];
+				float divisionFactor <- perFlowDivision and (flowOrigin in dividingFactors.keys) ?
+					dividingFactors[flowOrigin] * divisionOperand :
+					divisionOperand
+				;
+				lineToSave <+ string(valueToSave / divisionFactor);
+				inputId <- inputId + 1;
 			}
 			save lineToSave to: pathC format: csv rewrite: false;
 			outputId <- outputId +1;
