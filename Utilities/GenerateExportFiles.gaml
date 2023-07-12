@@ -68,7 +68,7 @@ global {
 			"HomeFields"::(listAllHomeParcels sum_of each.parcelSurface),
 			"BushFields"::((landscape count (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.homeField))) / hectareToCell),
 			"Rangelands"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
-			"Millet"::((listAllHomeParcels + listAllBushParcels) sum_of each.parcelSurface),
+			"Millet"::(parcel sum_of each.parcelSurface),
 			"Groundnut"::(listAllBushParcels sum_of each.parcelSurface),
 			"FallowVeg"::(listAllBushParcels sum_of each.parcelSurface),
 			"SpontVeg"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
@@ -157,12 +157,10 @@ global {
 		do computeOutputs;
 		do gatherOutputsAndParameters;
 		
-		save [
-			current_date.year, current_date.month,
-			cycle, machine_time, runTime,
-			outputsList
-		]
-			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-B" + batchOn + "Sim" + int(self) + ".csv"
+		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
+		lineToSave <<+ list<float>(outputsList);
+		save lineToSave
+			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-Sim" + int(self) + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: true

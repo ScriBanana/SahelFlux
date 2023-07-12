@@ -41,10 +41,10 @@ global {
 	float totalGHG; // kgCO2eq
 	
 	// Carbon balance
-	float ecosystemCBalance;
+	float ecosystemCBalance; // Tout système  entrées - sorties
 	float ecosystemCO2Balance; // kgCO2; atmo fix - CO2 emissions; used for validation
 	float ecosystemGHGBalance; // kgCO2eq; SOCS accumulation - GHG emissions
-	float SCS;
+	float SCS; // Meme que GHG, en fait, redondant.
 	float CFootprint;
 	
 	// SOC
