@@ -137,7 +137,7 @@ global {
 				write "	Incorporating and burning (millet) remaining biomass.";
 				write "	Computing plant biomass production for the upcoming rainy season.";
 				ask landscape where each.biomassProducer {
-					do burnAndIncorporateBiomass;
+					do burnAndIncorporateResidualBiomass;
 					do computeYearlyBiomassProduction;
 				}
 				

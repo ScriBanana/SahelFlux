@@ -84,13 +84,13 @@ species SOCStock parallel: true schedules: [] {
 	
 	//// Functions
 	
-	action updateCarbonPools {
+	action updateCarbonPools { // Monthly default
 		
 		// Aggregate input
 		float periodCInput; // kgC
 		
 		// Mobile herds and ORP
-		periodCInput <- periodCInput + aggregateRSDungCH4Emissions();
+		periodCInput <- periodCInput + aggregateCIntputsComputeRSCH4();
 		// Could have been yearly, but eases memory load if monthly.
 		
 		// Flows to and from the two pools
@@ -118,7 +118,7 @@ species SOCStock parallel: true schedules: [] {
 		ask world { do saveGHGFlow(emittingPool, "CO2", (emissionsFromStable + emissionsFromLabile) / coefCO2ToC);}
 	}
 	
-	float aggregateRSDungCH4Emissions {
+	float aggregateCIntputsComputeRSCH4 {
 		
 		float soilCarbonInput; // kgC
 		loop dungDeposit over: carbonInputsList {

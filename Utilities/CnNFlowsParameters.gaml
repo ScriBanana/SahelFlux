@@ -30,10 +30,13 @@ global {
 	float milletStrawNContent <- 0.010; // kgN/kgDM Feedipedia
 	float milletStrawCContent <- 0.444; // kgC/kgDM Feedipedia
 	float wholeMilletCContent <- 0.355; // kgC/kgDM Manlay 2000
-	float groundnutAerialPartNContent <- 0.0193; // Manlay, 2000
-	float groundnutAerialPartCContent <- 0.375; // Manlay, 2000
+	float milletRootPartCContent <- 0.351; // kgC/kgDM Manlay, 2000
+	float groundnutAerialPartNContent <- 0.0193; // kgN/kgDM Manlay, 2000
+	float groundnutAerialPartCContent <- 0.375; // kgC/kgDM Manlay, 2000
+	float groundnutRootPartCContent <- 0.36; // kgC/kgDM Manlay, 2000
 	float fallowVegNContent <- forageRSNContent; // kgN/kgDM
 	float fallowVegCContent <- forageRSCContent; // kgC/kgDM
+	float fallowRootPartCContent <- 0.3545; // kgC/kgDM Manlay, 2000
 	float weedsCContent <- 0.0; // Weeds out
 	
 	// Feed

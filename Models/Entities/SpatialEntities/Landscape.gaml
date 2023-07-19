@@ -31,6 +31,12 @@ global {
 	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
 	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	
+	// Roots production
+	float milletRootProportion <- 0.11; // From Manlay 2000 tab 3.1 p.103
+	float groundnutRootProportion <- 0.62; // From Manlay 2000 tab 3.1 p.103
+	float spontVegRootProportion <- 0.57; // From Manlay 2000 tab 1.3 p.47
+	float weedsRootProportion <- 0.57; // From Manlay 2000 tab 1.3 p.47
+	
 	// Harvest parameters
 	float milletExportedAgriProductRatio <- 0.3; // Grillot et al, 2018
 	float milletExportedStrawRatio <- 0.38; // Ratio of produced straw that gets exported. Grillot et al, 2018
@@ -116,7 +122,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	soilNProcesses mySoilNProcesses;
 	
 	// Grazable biomass
-	float biomassContent min: 0.0; // kgDM
+	float biomassContent min: 0.0; // kgDM aerial biomass (total in RS, crop residues in DS)
 	float thisYearNAvailable;
 	float thisYearBiomassCContent;
 	string thisYearNFlowReceivingPool;
@@ -126,25 +132,6 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	float weedProportionInBiomass <- 0.0; // As of now, no weed in the simulation
 	
 	//// Functions
-	
-	action growBiomass { // To be called nbBiophUpdatesDuringRainySeason times during the rainy season
-		
-		// Grow biomass
-		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
-		
-		// Registering N and C flows
-		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
-//		float weedsNFlowToSaveEachCall <- weedProportionInBiomass * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
-		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
-//		float weedsCFlowToSaveEachCall <- yearlyWeedsBiomassToBeProduced * weedsCContent / nbBiophUpdatesDuringRainySeason;
-		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
-		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
-//		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
-		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}
-//		ask world {	do saveFlowInMap("C", "Weeds",  "IF-FromAtmo", weedsCFlowToSaveEachCall);}
-		
-		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
-	}
 	
 	action computeYearlyBiomassProduction {
 		// Computes plant biomass production at the start of the rainy season
@@ -193,11 +180,10 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		} else {
 			// TODO Manque un truc ici, du coup
 			
-			// TODO Gros bullshit
 			// Tout à 0 car hors rotation
 			thisYearNFlowReceivingPool <- "TF-ToWeeds";
 			thisYearCFlowReceivingPool <- "Weeds";
-			thisYearBiomassCContent <- fallowVegCContent;
+			thisYearBiomassCContent <- weedsCContent;
 		}
 		
 		// Producing biomass
@@ -208,13 +194,34 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		
 	}
 	
+	action growBiomass { // To be called nbBiophUpdatesDuringRainySeason times during the rainy season
+		
+		// Grow biomass
+		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
+		
+		// Registering N and C flows
+		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+//		float weedsNFlowToSaveEachCall <- weedProportionInBiomass * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
+//		float weedsCFlowToSaveEachCall <- yearlyWeedsBiomassToBeProduced * weedsCContent / nbBiophUpdatesDuringRainySeason;
+		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
+		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
+//		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToWeeds", weedsNFlowToSaveEachCall);}
+		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}
+//		ask world {	do saveFlowInMap("C", "Weeds",  "IF-FromAtmo", weedsCFlowToSaveEachCall);}
+		
+		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
+	}
+	
 	action getHarvested {
 		float exportedCropsBiomass; // kgDM
 		float exportedStrawBiomass; // kgDM
+		float incorporatedRootBiomass; // kgDM
 		float exportedCropsNFlow; // kgN
 		float exportedCropsCFlow; // kgC
 		float exportedStrawNFlow; // kgN
 		float exportedStrawCFlow; // kgC
+		float incorporatedRootCFlow; // kgC
 		string emittingPool;
 		
 		// Compute exported flows
@@ -223,29 +230,35 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				emittingPool <- "Millet";
 				exportedCropsBiomass <- milletExportedAgriProductRatio * (1 - weedProportionInBiomass) * self.biomassContent;
 				exportedStrawBiomass <- milletExportedStrawRatio * (self.biomassContent - exportedCropsBiomass);
+				incorporatedRootBiomass <- self.biomassContent * milletRootProportion / (1 - milletRootProportion);
 				
 				exportedCropsNFlow <- exportedCropsBiomass * milletEarNContent; // kgN
 				exportedCropsCFlow <- exportedCropsBiomass * milletEarCContent; // kgC
 				exportedStrawNFlow <- exportedStrawBiomass * milletStrawNContent; // kgN
 				exportedStrawCFlow <- exportedStrawBiomass * milletStrawCContent; // kgC
+				incorporatedRootCFlow <- incorporatedRootBiomass * milletRootPartCContent; // kgC
 			}
 			match "Groundnut" {
 				emittingPool <- "Groundnut";
 				exportedCropsBiomass <- groundnutExportedBiomassRatio * (1 - weedProportionInBiomass) * self.biomassContent;
+				incorporatedRootBiomass <- self.biomassContent * groundnutRootProportion / (1 - groundnutRootProportion);
 				
 				exportedCropsNFlow <- exportedCropsBiomass * groundnutAerialPartNContent; // kgN
 				exportedCropsCFlow <- exportedCropsBiomass * groundnutAerialPartCContent; // kgC
+				incorporatedRootCFlow <- incorporatedRootBiomass * groundnutRootPartCContent; // kgC
 			}
 			match "Fallow" {
 				emittingPool <- "FallowVeg";
 				exportedStrawBiomass <- fallowExportedBiomass * (1 - weedProportionInBiomass) * self.biomassContent;
+				incorporatedRootBiomass <- self.biomassContent * spontVegRootProportion / (1 - spontVegRootProportion);
 				
 				exportedStrawNFlow <- exportedStrawBiomass * fallowVegNContent; // kgN
 				exportedStrawCFlow <- exportedStrawBiomass * fallowVegCContent; // kgC
+				incorporatedRootCFlow <- incorporatedRootBiomass * fallowRootPartCContent; // kgC
 			}
 		}
 		
-		// Remove harvested biomass from self
+		// Remove harvested biomass from self (root were not computed in biomass)
 		self.biomassContent <- self.biomassContent - exportedCropsBiomass - exportedStrawBiomass;
 		
 		// Credit straw pile with harvested straw
@@ -253,14 +266,22 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 			myParcel.myOwner.myForagePileBiomassContent <- myParcel.myOwner.myForagePileBiomassContent + exportedStrawBiomass;
 		}
 		
+		// Incorporate root to SOC model
+		mySOCstock.carbonInputsList <+ [emittingPool, 0.0, incorporatedRootCFlow];
+		
 		// Save flows
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHouseholds", exportedCropsNFlow);}
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHouseholds", exportedCropsCFlow);}
 		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToStrawPiles", exportedStrawNFlow);}
 		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToStrawPiles", exportedStrawCFlow);}
+		string rootCReciever <- cellLU = "Rangeland" ?
+			"TF-ToRangelands" :
+			(myParcel != nil and myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields")
+		;
+		ask world {	do saveFlowInMap("C", emittingPool, rootCReciever, incorporatedRootCFlow);}
 	}
 	
-	action burnAndIncorporateBiomass {
+	action burnAndIncorporateResidualBiomass {
 		if (self.cellLU = "Cropland" and self.myParcel != nil) {
 			switch myParcel.lastRSCover {
 				match "Millet" {

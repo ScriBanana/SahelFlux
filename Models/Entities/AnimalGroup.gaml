@@ -74,10 +74,11 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 			match "Rangeland" {
 				eatenEnergy <- drySeason ? forageDSEnergyContent * eatenQuantity : forageRSEnergyContent * eatenQuantity;
 			}
-			match_one ["HomeFields", "BushFields"] {
+			match_one ["Cropland", "HomeFields", "BushFields"] {
 				eatenEnergy <- milletResiduesEnergyContent * eatenQuantity;
 			}
 			default {
+				write eatenBiomassType;
 				assert false; // Error in eatenBiomassType
 			}
 		}
