@@ -28,29 +28,28 @@ global {
 	bool batchOn <- false;
 	bool enabledGUI <- false;
 	
-	// Time step parameters
+	// Time and calendar parameters
 	float step <- 30.0 #minutes;
 	int biophysicalProcessesUpdateFreq <- 15; // In days
-	
-	// Simulation calendar
+	int drySeasonFirstMonth <- 11; // Tweaks have to be made to run with new year during the rainy season
+	int rainySeasonFirstMonth <- 7;
+	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
+	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields; Surveys
+	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period TODO DUMMY
 	int startHour <- wakeUpTime - 1;
 	date starting_date <- date([2020, 11, 1, startHour, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
 	date endDate <- date([2026, 11, 1, eveningTime + 1, 0, 0]);
-	int drySeasonFirstMonth <- 11; // Tweaks have to be made to run with new year during the rainy season
-	int rainySeasonFirstMonth <- 7;
 	int lengthRainySeason <- int(milliseconds_between(
 		date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])
 	) / 86400000.0); // days. Weird, but hard to find better
 	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
-	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0
-		update: current_date.hour = startHour + 1 and current_date.minute = 0;
-	int lengthFatteningSeason <- 80; // Days. field survey. TODO Ndiaye says 120
-	int ORPSpreadingPeriodLength <- 3; // Months Period of time before the start of the rainy season during which ORP is spread on homefields; Surveys
-	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period TODO DUMMY
 	
 	// Time related variables
+	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0
+		update: current_date.hour = startHour + 1 and current_date.minute = 0;
 	bool drySeason;
 	int dayInDS <- 0;
+	bool spreadingSeason;
 	int daysSinceSpread <- 0;
 	
 	////	--------------------------	////
@@ -60,7 +59,14 @@ global {
 		do inputUnitTests;
 		
 		write "=== RUN " + int(self) + " INITIALISATION ===";
-		drySeason <- !(starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth);
+		drySeason <- !(
+			starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth
+		);
+		spreadingSeason <- (
+			starting_date.month >= rainySeasonFirstMonth - ORPSpreadingPeriodLength and
+			starting_date.month < rainySeasonFirstMonth
+		);
+		
 		// All init actions defined in related species files.
 		do resetFlowsMaps;
 		do assignLUFromRaster;
@@ -81,7 +87,7 @@ global {
 		write "Start date : " + starting_date + ", end date : " + endDate;
 		write "=== MODEL INITIALISED ===";
 	}
-
+	
 	////	--------------------------		////
 	////	Global scheduler		////
 	////	--------------------------		////
@@ -117,6 +123,7 @@ global {
 				// Rainy season processes
 				write "RAINY SEASON STARTS.";
 				drySeason <- false;
+				spreadingSeason <- false;
 				
 				do captureRemainingTranshumants;
 				
@@ -156,6 +163,8 @@ global {
 			
 			match rainySeasonFirstMonth - ORPSpreadingPeriodLength {
 				write "	ORP spreading starts.";
+				spreadingSeason <- true;
+				daysSinceSpread <- 0;
 			}
 		}
 		
@@ -185,33 +194,28 @@ global {
 		ask mobileHerd {
 			loop biomassType over: dailyIntakes.keys {
 				do emitMetaboIntake(biomassType, dailyIntakes[biomassType]);
-				dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
 			}
+			dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
 		}
 		
 		// ORP spreading mechanisms
-		if 
-			current_date.month < rainySeasonFirstMonth and
-			current_date.month >= rainySeasonFirstMonth - ORPSpreadingPeriodLength
-			// Probably an ABS function would be more elegant, but I'm tired
-		{
-			daysSinceSpread <- daysSinceSpread + 1;
+		if spreadingSeason {
 			if daysSinceSpread >= 3 {
 				ask ORPHeap where (each.heapQuantity > 0.0) {
 					do spreadORPOnParcels;
 				}
-				
 				daysSinceSpread <- 0;
+			} else {
+				daysSinceSpread <- daysSinceSpread + 1;
 			}
 		}
 		
 		// Fattening mechanisms
-		if mod(dayInDS, lengthFatteningSeason) = 0 and drySeason {
+		if drySeason and mod(dayInDS, lengthFatteningSeason) = 0 {
 			if dayInDS > (365 - lengthRainySeason) * 1 / 4 { // IDK what I'm doing anymore
 				ask household where each.doesFattening {
 					do sellFattenedAnimals;
 				}
-				
 			}
 			
 			if (current_date != (starting_date add_hours 1)) and (dayInDS < (365 - lengthRainySeason) * 3 / 4) {
@@ -219,7 +223,6 @@ global {
 					do renewFattenedAnimals;
 				}
 				write "	Renewed fattened animals. " +  fattenedAnimal sum_of each.groupSize + " new animals.";
-				
 			}
 		}
 		

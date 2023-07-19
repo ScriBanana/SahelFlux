@@ -36,7 +36,7 @@ global {
 	float milletExportedStrawRatio <- 0.38; // Ratio of produced straw that gets exported. Grillot et al, 2018
 	float groundnutExportedBiomassRatio <- 1.0;
 	float fallowExportedBiomass <- 0.55; // Surveys
-		
+	
 	// Variables
 	list<landscape> grazableLandscape;
 	list<landscape> targetableCellsForChangingSite;
@@ -127,8 +127,8 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	
 	//// Functions
 	
-	action growBiomass { // To be called regularly during the rainy season
-	
+	action growBiomass { // To be called nbBiophUpdatesDuringRainySeason times during the rainy season
+		
 		// Grow biomass
 		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
 		
