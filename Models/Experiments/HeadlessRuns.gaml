@@ -43,7 +43,7 @@ experiment LongRun {
 	
 	init {
 		generateMonthlySaves <- true;
-		experimentType <- "BenchmarkRun";
+		experimentType <- "LongRun";
 	}
 	
 }
