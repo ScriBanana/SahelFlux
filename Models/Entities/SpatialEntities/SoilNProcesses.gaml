@@ -105,13 +105,14 @@ species soilNProcesses parallel: true schedules: [] {
 		string inflowRecievingPool <- myCell.cellLU = "Rangeland" ?
 			"Rangelands" :
 			(myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
-		string treeFixationRecievingPool <- myCell.cellLU = "Rangeland" ?
+		string fixationRecievingPool <- myCell.cellLU = "Rangeland" ?
 			"TF-ToRangelands" :
 			(myCell.myParcel != nil and myCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");
 		ask world {	do saveFlowInMap("N", inflowRecievingPool, "IF-FromAtmo", NAtmoMicroOrga);}
-		ask world {	do saveFlowInMap("N", inflowRecievingPool, "IF-FromAtmo", NAtmoGroundnut);}
+		ask world {	do saveFlowInMap("N", "Groundnut", "IF-FromAtmo", NAtmoGroundnut);}
+		ask world {	do saveFlowInMap("N", "Groundnut", fixationRecievingPool, NAtmoGroundnut);}
 		ask world {	do saveFlowInMap("N", "Trees", "IF-FromAtmo", NAtmoFromTrees);} // TODO Ajouter la captation pas envoyée au sol?
-		ask world {	do saveFlowInMap("N", "Trees", treeFixationRecievingPool, NAtmoFromTrees);}
+		ask world {	do saveFlowInMap("N", "Trees", fixationRecievingPool, NAtmoFromTrees);}
 		
 		return [NAtmoMicroOrga, NAtmoGroundnut, NAtmoFromTrees];
 	}
