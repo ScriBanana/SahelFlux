@@ -150,7 +150,7 @@ global {
 				dayInDS <- 0;
 				daysSinceSpread <- 0;
 				
-				ask landscape where (each.myParcel != nil) { do getHarvested;}
+				ask landscape where (each.biomassProducer) { do getHarvestedAndBurrowRoots;}
 				if enabledGUI {
 					ask landscape where each.biomassProducer { do updateColour;}
 				}

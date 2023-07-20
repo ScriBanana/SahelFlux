@@ -142,6 +142,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		
 		float waterLimitedYieldHa;
 		float nitrogenReductionFactor;
+		float rootProportion;
 		
 		if cellLU = "Rangeland" {
 			thisYearNFlowReceivingPool <- "TF-ToSpontVeg";
@@ -149,6 +150,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 			thisYearBiomassCContent <- rangelandVegCContent;
 			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
+			rootProportion <- spontVegRootProportion;
 			
 		} else if myParcel != nil {
 			switch myParcel.nextRSCover {
@@ -159,6 +161,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 					thisYearBiomassCContent <- wholeMilletCContent;
 					waterLimitedYieldHa <- max(0.0, min(3775.0, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
+					rootProportion <- milletRootProportion;
 				
 				} match "Groundnut" {
 					thisYearNFlowReceivingPool <- "TF-ToGroundnut";
@@ -166,6 +169,7 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 					thisYearBiomassCContent <- groundnutAerialPartCContent;
 					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
+					rootProportion <- groundnutRootProportion;
 					
 				} match "Fallow" {
 					thisYearNFlowReceivingPool <- "TF-ToFallowVeg";
@@ -174,20 +178,26 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 					thisYearBiomassCContent <- fallowVegCContent;
 					waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
+					rootProportion <- spontVegRootProportion;
 				
 				}
 			}
 		} else {
 			// TODO Manque un truc ici, du coup
 			
-			// Tout à 0 car hors rotation
+			// All 0 as out of crop rotation; Weeds out now
 			thisYearNFlowReceivingPool <- "TF-ToWeeds";
 			thisYearCFlowReceivingPool <- "Weeds";
 			thisYearBiomassCContent <- weedsCContent;
+			rootProportion <- weedsRootProportion;
 		}
 		
 		// Producing biomass
 		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
+		
+		// Adding roots
+		yearlyBiomassToBeProduced <- yearlyBiomassToBeProduced * (1 + rootProportion);
+		
 		assert yearlyBiomassToBeProduced >= 0;
 //		yearlyWeedsBiomassToBeProduced <- cellLU = "Rangeland" ? weedProdRangeland : weedProdCropland; // kgDM/cell
 //		weedProportionInBiomass <- yearlyWeedsBiomassToBeProduced / (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced);
@@ -195,11 +205,11 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	}
 	
 	action growBiomass { // To be called nbBiophUpdatesDuringRainySeason times during the rainy season
-		
+	
 		// Grow biomass
 		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
 		
-		// Registering N and C flows
+		// Registering N (uptake from soil) and C (photosynthesis) flows
 		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
 //		float weedsNFlowToSaveEachCall <- weedProportionInBiomass * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
 		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
@@ -213,72 +223,140 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
 	}
 	
-	action getHarvested {
-		float exportedCropsBiomass; // kgDM
-		float exportedStrawBiomass; // kgDM
-		float incorporatedRootBiomass; // kgDM
-		float exportedCropsNFlow; // kgN
-		float exportedCropsCFlow; // kgC
-		float exportedStrawNFlow; // kgN
-		float exportedStrawCFlow; // kgC
-		float incorporatedRootCFlow; // kgC
+	action getHarvestedAndBurrowRoots {
+		
 		string emittingPool;
-		
-		// Compute exported flows
-		switch myParcel.nextRSCover {
-			match "Millet" {
-				emittingPool <- "Millet";
-				exportedCropsBiomass <- milletExportedAgriProductRatio * (1 - weedProportionInBiomass) * self.biomassContent;
-				exportedStrawBiomass <- milletExportedStrawRatio * (self.biomassContent - exportedCropsBiomass);
-				incorporatedRootBiomass <- self.biomassContent * milletRootProportion / (1 - milletRootProportion);
-				
-				exportedCropsNFlow <- exportedCropsBiomass * milletEarNContent; // kgN
-				exportedCropsCFlow <- exportedCropsBiomass * milletEarCContent; // kgC
-				exportedStrawNFlow <- exportedStrawBiomass * milletStrawNContent; // kgN
-				exportedStrawCFlow <- exportedStrawBiomass * milletStrawCContent; // kgC
-				incorporatedRootCFlow <- incorporatedRootBiomass * milletRootPartCContent; // kgC
-			}
-			match "Groundnut" {
-				emittingPool <- "Groundnut";
-				exportedCropsBiomass <- groundnutExportedBiomassRatio * (1 - weedProportionInBiomass) * self.biomassContent;
-				incorporatedRootBiomass <- self.biomassContent * groundnutRootProportion / (1 - groundnutRootProportion);
-				
-				exportedCropsNFlow <- exportedCropsBiomass * groundnutAerialPartNContent; // kgN
-				exportedCropsCFlow <- exportedCropsBiomass * groundnutAerialPartCContent; // kgC
-				incorporatedRootCFlow <- incorporatedRootBiomass * groundnutRootPartCContent; // kgC
-			}
-			match "Fallow" {
-				emittingPool <- "FallowVeg";
-				exportedStrawBiomass <- fallowExportedBiomass * (1 - weedProportionInBiomass) * self.biomassContent;
-				incorporatedRootBiomass <- self.biomassContent * spontVegRootProportion / (1 - spontVegRootProportion);
-				
-				exportedStrawNFlow <- exportedStrawBiomass * fallowVegNContent; // kgN
-				exportedStrawCFlow <- exportedStrawBiomass * fallowVegCContent; // kgC
-				incorporatedRootCFlow <- incorporatedRootBiomass * fallowRootPartCContent; // kgC
-			}
-		}
-		
-		// Remove harvested biomass from self (root were not computed in biomass)
-		self.biomassContent <- self.biomassContent - exportedCropsBiomass - exportedStrawBiomass;
-		
-		// Credit straw pile with harvested straw
-		if myParcel.myOwner != nil {
-			myParcel.myOwner.myForagePileBiomassContent <- myParcel.myOwner.myForagePileBiomassContent + exportedStrawBiomass;
-		}
-		
-		// Incorporate root to SOC model
-		mySOCstock.carbonInputsList <+ [emittingPool, 0.0, incorporatedRootCFlow];
-		
-		// Save flows
-		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHouseholds", exportedCropsNFlow);}
-		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHouseholds", exportedCropsCFlow);}
-		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToStrawPiles", exportedStrawNFlow);}
-		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToStrawPiles", exportedStrawCFlow);}
-		string rootCReciever <- cellLU = "Rangeland" ?
+		string soilFlowReciever <- cellLU = "Rangeland" ?
 			"TF-ToRangelands" :
 			(myParcel != nil and myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields")
 		;
-		ask world {	do saveFlowInMap("C", emittingPool, rootCReciever, incorporatedRootCFlow);}
+		
+		float incorporatedRootProportion;
+		float incorporatedRootNContent; // kgN
+		float incorporatedRootCContent; // kgC
+		
+		float exportedCropsProportion;
+		float exportedCropsNContent; // kgN
+		float exportedCropsCContent; // kgC
+		
+		float exportedStrawProportion;
+		float residuesAndStrawNContent; // kgN
+		float residuesAndStrawCContent; // kgC
+		
+		// Affect harvest ratios according to vegetation type
+		if myParcel = nil {
+			if cellLU = "Rangeland" {
+				emittingPool <- "SpontVeg";
+				
+				incorporatedRootProportion <- spontVegRootProportion;
+				incorporatedRootNContent <- fallowRootPartNContent; // kgN
+				incorporatedRootCContent <- fallowRootPartCContent; // kgC
+				
+				exportedCropsProportion <- 0.0;
+				exportedCropsNContent <- rangelandVegNContent; // kgN
+				exportedCropsCContent <- rangelandVegCContent; // kgC
+				
+				exportedStrawProportion <- 0.0;
+				residuesAndStrawNContent <- rangelandVegNContent; // kgN
+				residuesAndStrawCContent <- rangelandVegCContent; // kgC
+				
+			} else {
+				emittingPool <- "Weeds";
+				
+				incorporatedRootProportion <- weedsRootProportion;
+//				incorporatedRootNContent <- weedsRootPartNContent; // kgN
+//				incorporatedRootCContent <- weedsRootPartCContent; // kgC
+				
+				exportedCropsProportion <- 0.0;
+//				exportedCropsNContent <- weedsNContent; // kgN
+//				exportedCropsCContent <- weedsCContent; // kgC
+				
+				exportedStrawProportion <- 0.0;
+//				residuesAndStrawNContent <- weedsNContent; // kgN
+//				residuesAndStrawCContent <- weedsCContent; // kgC
+				
+			}
+		} else {
+			switch myParcel.nextRSCover {
+				match "Millet" {
+					emittingPool <- "Millet";
+					
+					incorporatedRootProportion <- milletRootProportion;
+					incorporatedRootNContent <- milletRootPartNContent; // kgN
+					incorporatedRootCContent <- milletRootPartCContent; // kgC
+					
+					exportedCropsProportion <- milletExportedAgriProductRatio;
+					exportedCropsNContent <- milletEarNContent; // kgN
+					exportedCropsCContent <- milletEarCContent; // kgC
+					
+					exportedStrawProportion <- milletExportedStrawRatio;
+					residuesAndStrawNContent <- milletStrawNContent; // kgN
+					residuesAndStrawCContent <- milletStrawCContent; // kgC
+				}
+				match "Groundnut" {
+					emittingPool <- "Groundnut";
+					
+					incorporatedRootProportion <- groundnutRootProportion;
+					incorporatedRootNContent <- groundnutRootPartNContent; // kgN
+					incorporatedRootCContent <- groundnutRootPartCContent; // kgC
+					
+					exportedCropsProportion <- groundnutExportedBiomassRatio;
+					exportedCropsNContent <- groundnutAerialPartNContent; // kgN
+					exportedCropsCContent <- groundnutAerialPartCContent; // kgC
+					
+					exportedStrawProportion <- 0.0;
+					residuesAndStrawNContent <- groundnutAerialPartNContent; // kgN
+					residuesAndStrawCContent <- groundnutAerialPartCContent; // kgC
+					
+				}
+				match "Fallow" {
+					emittingPool <- "FallowVeg";
+					
+					incorporatedRootProportion <- spontVegRootProportion;
+					incorporatedRootNContent <- fallowRootPartNContent; // kgN
+					incorporatedRootCContent <- fallowRootPartCContent; // kgC
+					
+					exportedCropsProportion <- fallowExportedBiomass;
+					exportedCropsNContent <- fallowVegNContent; // kgN
+					exportedCropsCContent <- fallowVegCContent; // kgC
+					
+					exportedStrawProportion <- 0.0;
+					residuesAndStrawNContent <- fallowVegNContent; // kgN
+					residuesAndStrawCContent <- fallowVegCContent; // kgC
+					
+				}
+			}
+		}
+		
+		// Incorporate roots to soils and SOC model
+		float incorporatedRoot <- biomassContent * incorporatedRootProportion; // kgDM
+		ask world {	do saveFlowInMap("N", emittingPool, soilFlowReciever, incorporatedRoot * incorporatedRootNContent);}
+		ask world {	do saveFlowInMap("C", emittingPool, soilFlowReciever, incorporatedRoot * incorporatedRootCContent);}
+		mySOCstock.carbonInputsList <+ [emittingPool, 0.0, incorporatedRoot * incorporatedRootCContent];
+		float aerialBiomass <- (biomassContent - incorporatedRoot) * (1 - weedProportionInBiomass);
+		
+		// Export crop products
+		float exportedCropsBiomass <- exportedCropsProportion * aerialBiomass; // kgDM
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToHouseholds", exportedCropsBiomass * exportedCropsNContent);}
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToHouseholds", exportedCropsBiomass * exportedCropsCContent);}
+		float strawBiomass <- aerialBiomass - exportedCropsBiomass; // kgDM
+		
+		// Export millet straw
+		float exportedStrawBiomass <- strawBiomass * exportedStrawProportion; // kgDM
+		ask world {	do saveFlowInMap("N", emittingPool, "TF-ToStrawPiles", exportedStrawBiomass * residuesAndStrawNContent);}
+		ask world {	do saveFlowInMap("C", emittingPool, "TF-ToStrawPiles", exportedStrawBiomass * residuesAndStrawCContent);}
+		if myParcel != nil and myParcel.myOwner != nil {
+			myParcel.myOwner.myForagePileBiomassContent <-
+				myParcel.myOwner.myForagePileBiomassContent + exportedStrawBiomass
+			;
+		}
+		
+		// Transfer residues to cell
+		float remainingResiduesBiomass <- aerialBiomass - exportedCropsBiomass - exportedStrawBiomass;
+		ask world {	do saveFlowInMap("N", emittingPool, soilFlowReciever, remainingResiduesBiomass * residuesAndStrawNContent);}
+		ask world {	do saveFlowInMap("C", emittingPool, soilFlowReciever, remainingResiduesBiomass * residuesAndStrawCContent);}
+		biomassContent <- remainingResiduesBiomass;
+		
 	}
 	
 	action burnAndIncorporateResidualBiomass {
@@ -291,9 +369,9 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 					);}
 					ask world {	do saveFlowInMap("N", emittingPool, "OF-GHG", N2OFromBurning * coefN2OToN);}
 					ask world {	do saveFlowInMap("N", emittingPool, "OF-AtmoLosses", NOxFromBurning * coefNOxToN);}
-					ask world { do saveGHGFlow(emittingPool, "CO2", CO2FromBurning);}
-					ask world { do saveGHGFlow(emittingPool, "CH4", CH4FromBurning);}
-					ask world { do saveGHGFlow(emittingPool, "N2O", N2OFromBurning);}
+					ask world {	do saveGHGFlow(emittingPool, "CO2", CO2FromBurning);}
+					ask world {	do saveGHGFlow(emittingPool, "CH4", CH4FromBurning);}
+					ask world {	do saveGHGFlow(emittingPool, "N2O", N2OFromBurning);}
 					
 					biomassContent <- 0.0;
 				}
