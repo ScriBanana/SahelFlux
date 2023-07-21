@@ -96,3 +96,56 @@ experiment SOCDispRun parent: Run {
 	}
 }
 
+experiment stateObserver parent: Run {
+	
+	init { experimentType <- "stateObserver";}
+	
+	point chartWindow;
+	
+	int nbSleepGoers;
+	int nbSleepers;
+	int nbSpotChangers;
+	int nbGrazers;
+	int nbResters;
+	int totalSleepGoers;
+	int totalSleepers;
+	int totalSpotChangers;
+	int totalGrazers;
+	int totalResters;
+	reflex {
+		nbSleepGoers <- mobileHerd count (each.state = "isGoingToSleepSpot");
+		nbSleepers <- mobileHerd count (each.state = "isSleepingInPaddock");
+		nbSpotChangers <- mobileHerd count (each.state = "isChangingSite");
+		nbGrazers <- mobileHerd count (each.state = "isGrazing");
+		nbResters <- mobileHerd count (each.state = "isResting");
+		totalSleepGoers <- totalSleepGoers + nbSleepGoers;
+		totalSleepers <- totalSleepers + nbSleepers;
+		totalSpotChangers <- totalSpotChangers + nbSpotChangers;
+		totalGrazers <- totalGrazers + nbGrazers;
+		totalResters <- totalResters + nbResters;
+		
+		chartWindow <- {cycle - 96, cycle};
+	}
+	
+	output {
+		display stateMeter type: java2D {
+			chart "State meter" type: pie {
+				data "isGoingToSleepSpot" value: totalSleepGoers color: #blue;
+				data "isSleepingInPaddock" value: totalSleepers color: #darkblue;
+				data "isChangingSite" value: totalSpotChangers color: #red;
+				data "isGrazing" value: totalGrazers color: #green;
+				data "isResting" value: totalResters color: #yellow;
+			}
+		}
+		display stateFollower type: java2D {
+			chart "State follower" type: series x_range: chartWindow {
+				data "isGoingToSleepSpot" value: nbSleepGoers color: #blue;
+				data "isSleepingInPaddock" value: nbSleepers color: #darkblue;
+				data "isChangingSite" value: nbSpotChangers color: #red;
+				data "isGrazing" value: nbGrazers color: #green;
+				data "isResting" value: nbResters color: #yellow;
+			}
+		}
+	}
+}
+

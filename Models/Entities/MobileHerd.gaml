@@ -92,7 +92,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}
-
+	
 	state isSleepingInPaddock initial: true {
 		enter {
 			satietyMeter <- 0.0;
@@ -108,7 +108,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 			}
 		}
 	}
-
+	
 	state isChangingSite {
 		enter {
 			targetCell <- one_of(targetableCellsForChangingSite);
@@ -122,7 +122,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isGrazing when: isInGoodSpot or currentCell = targetCell;
 	}
-
+	
 	state isGrazing {
 		enter {
 			landscape currentGrazingCell <- currentCell;
@@ -144,7 +144,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		transition to: isResting when: restTime or !hungry;
 		transition to: isChangingSite when: !isInGoodSpot;
 	}
-
+	
 	state isResting {
 		transition to: isGoingToSleepSpot when: sleepTime;
 		transition to: isGrazing when: !restTime and hungry;

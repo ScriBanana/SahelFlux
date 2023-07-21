@@ -20,10 +20,10 @@ global {
 	
 	//// Global landscape parameters
 	
-	float maxCropBiomassContentHa <- 351.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; weeds and crop residues
-	float maxRangelandBiomassContentHa <- 375.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; grass and shrubs
-	float maxCropBiomassContent <- maxCropBiomassContentHa * hectareToCell;
-	float maxRangelandBiomassContent <- maxRangelandBiomassContentHa * hectareToCell;
+	float cropBiomassContentInitHa <- 351.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; weeds and crop residues
+	float rangelandBiomassContentInitHa <- 375.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; grass and shrubs
+	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell;
+	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell;
 	
 	// Weeds biomass production parameters
 	float weedProdRangelandHa <- 0.0; //475.0; // kgDM/ha Grillot 2018
@@ -55,8 +55,8 @@ global {
 			grazableLandscape <+ self;
 			
 			biomassContent <- cellLU = "Cropland" ?
-				gauss(maxCropBiomassContent, maxCropBiomassContent * 0.1) :
-				gauss(maxRangelandBiomassContent, maxRangelandBiomassContent * 0.1)
+				gauss(cropBiomassContentInit, cropBiomassContentInit * 0.1) :
+				gauss(rangelandBiomassContentInit, rangelandBiomassContentInit * 0.1)
 			;
 			
 			create SOCStock with: [myCell::self] {
@@ -411,15 +411,15 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 	action updateColour {
 		if cellLU = "Cropland" { // Ternary possible, but if statement more secure and readable
 			color <- rgb(
-				255 + (216 - 255) / maxCropBiomassContent * biomassContent,
-				255 + (232 - 255) / maxCropBiomassContent * biomassContent,
+				255 + (216 - 255) / cropBiomassContentInit * biomassContent,
+				255 + (232 - 255) / cropBiomassContentInit * biomassContent,
 				180
 			);
 		} else if cellLU = "Rangeland" {
 			color <- rgb(
-				200 + (101 - 200) / maxRangelandBiomassContent * biomassContent,
-				230 + (198 - 230) / maxRangelandBiomassContent * biomassContent,
-				180 + (110 - 180) / maxRangelandBiomassContent * biomassContent
+				200 + (101 - 200) / rangelandBiomassContentInit * biomassContent,
+				230 + (198 - 230) / rangelandBiomassContentInit * biomassContent,
+				180 + (110 - 180) / rangelandBiomassContentInit * biomassContent
 			);
 		}
 		
