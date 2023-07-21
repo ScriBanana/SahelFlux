@@ -226,6 +226,10 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 //		ask world {	do saveFlowInMap("C", "Weeds",  "IF-FromAtmo", weedsCFlowToSaveEachCall);}
 		
 		// TODO du coup, N flows ne dépend pas de la pousse effective, alors que C oui...
+		
+		if enabledGUI {
+			do updateColour;
+		}
 	}
 	
 	action getHarvestedAndBurrowRoots {
@@ -362,6 +366,10 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		ask world {	do saveFlowInMap("C", emittingPool, soilFlowReciever, remainingResiduesBiomass * residuesAndStrawCContent);}
 		biomassContent <- remainingResiduesBiomass;
 		
+		
+		if enabledGUI {
+			do updateColour;
+		}
 	}
 	
 	action burnAndIncorporateResidualBiomass {
@@ -392,6 +400,10 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 		} else { // Rangelands + interstitial vegetation
 			mySOCstock.carbonInputsList <+ ["Rangeland", 0.0, biomassContent * forageDSCContent];
 			biomassContent <- 0.0;
+		}
+		
+		if enabledGUI {
+			do updateColour;
 		}
 	}
 	

@@ -120,7 +120,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		}
 		
 		transition to: isGoingToSleepSpot when: sleepTime;
-		transition to: isGrazing when: isInGoodSpot;
+		transition to: isGrazing when: isInGoodSpot or currentCell = targetCell;
 	}
 
 	state isGrazing {

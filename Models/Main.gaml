@@ -94,7 +94,6 @@ global {
 	
 	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay { // Every 15 days default
 		
-		do updateGlobalBiomassMeanAndSD;
 		ask landscape where each.biomassProducer {
 			
 			if enabledGUI { do updateColour;}
@@ -151,9 +150,6 @@ global {
 				daysSinceSpread <- 0;
 				
 				ask landscape where (each.biomassProducer) { do getHarvestedAndBurrowRoots;}
-				if enabledGUI {
-					ask landscape where each.biomassProducer { do updateColour;}
-				}
 				do updateParcelsCovers; // Crop rotation
 				
 				// Retrieving herds
@@ -165,15 +161,6 @@ global {
 				write "	ORP spreading starts.";
 				spreadingSeason <- true;
 				daysSinceSpread <- 0;
-			}
-		}
-		
-		switch current_date.month { // Monthly processes only in a specific season
-			match_between [rainySeasonFirstMonth, drySeasonFirstMonth - 1] { // Rainy season
-				// Necessary to use default.
-			}
-			default { // Dry season
-				do updateTargetableCellsForChangingSiteInDS;
 			}
 		}
 		
@@ -190,6 +177,7 @@ global {
 	
 	reflex dailyStep when: updateTimeOfDay { // Has to come after monthStep for indentation reasons
 		
+		do updateGlobalBiomassMeanAndSD;
 		// Mobile herds mechanisms
 		ask mobileHerd {
 			loop biomassType over: dailyIntakes.keys {
@@ -210,19 +198,23 @@ global {
 			}
 		}
 		
-		// Fattening mechanisms
-		if drySeason and mod(dayInDS, lengthFatteningSeason) = 0 {
-			if dayInDS > (365 - lengthRainySeason) * 1 / 4 { // IDK what I'm doing anymore
-				ask household where each.doesFattening {
-					do sellFattenedAnimals;
-				}
-			}
+		if drySeason {
+			do updateTargetableCellsForChangingSiteInDS;
 			
-			if (current_date != (starting_date add_hours 1)) and (dayInDS < (365 - lengthRainySeason) * 3 / 4) {
-				ask household where each.doesFattening {
-					do renewFattenedAnimals;
+			// Fattening mechanisms
+			if mod(dayInDS, lengthFatteningSeason) = 0 {
+				if dayInDS > (365 - lengthRainySeason) * 1 / 4 { // IDK what I'm doing anymore
+					ask household where each.doesFattening {
+						do sellFattenedAnimals;
+					}
 				}
-				write "	Renewed fattened animals. " +  fattenedAnimal sum_of each.groupSize + " new animals.";
+				
+				if (current_date != (starting_date add_hours 1)) and (dayInDS < (365 - lengthRainySeason) * 3 / 4) {
+					ask household where each.doesFattening {
+						do renewFattenedAnimals;
+					}
+					write "	Renewed fattened animals. " +  fattenedAnimal sum_of each.groupSize + " new animals.";
+				}
 			}
 		}
 		
