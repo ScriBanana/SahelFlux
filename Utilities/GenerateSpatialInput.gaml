@@ -18,18 +18,21 @@ global {
 	
 	list<string> villageNamesList <- ["Sob", "Diohine", "Barry"];
 	string villageName <- "Barry" among: villageNamesList;
+	
 	shape_file parcelsCentroids <- shape_file("../Inputs/SpatialInputs/Voro" + villageName + ".shp");
 	shape_file shapeLU <- shape_file("../Inputs/SpatialInputs/OcuSols" + villageName + ".shp");
 	shape_file villageLimits <- shape_file("../Inputs/SpatialInputs/Limi" + villageName + ".shp");
 	shape_file croplandsLimits <- shape_file("../Inputs/SpatialInputs/LimiParcelles" + villageName + ".shp");
+	
+	geometry shape <- envelope(villageLimits);
 	geometry villageArea <- villageLimits.contents[0];
 	geometry croplandArea <- croplandsLimits.contents[0];
-	geometry shape <- envelope(villageLimits);
 	
 	list<string> LUList <- [
 		"Dwelling", "Tree", "Homefield", "Bushfield", "BareGround", "Pond", "Road",
 		"Rangeland", "NonGrazable", "Fallow", "Garden", "Lowland", "River"
 	];
+	list<string> parcellableLUList <- ["Homefield", "Bushfield", "Fallow"];
 	list<rgb> LUColours <- [
 		rgb(134, 140, 134), #green, rgb(186, 202, 150), rgb(216, 232, 180), #ivory, rgb(57, 106, 178), #grey,
 		rgb(101, 198, 110), #red, rgb(57, 208, 202), rgb(0, 187, 53), rgb(100, 217, 244), #blue
@@ -61,7 +64,7 @@ global {
 			do createParcel;
 		}
 		
-		do generateGridInitFiles;
+		do generateOutputFiles;
 		
 		float runTime <- (machine_time - startTimeReal) / 60000;
 		write "Done. Runtime : " + floor(runTime) + " min " + round((runTime - floor(runTime)) * 60 ) + " s";
@@ -93,18 +96,14 @@ global {
 		}
 	}
 	
-	action generateGridInitFiles {
-		write "Exporting LU grid file";
+	action generateOutputFiles {
+		write "Exporting grid file";
 		ask cellGrid {
-			self.grid_value <- self.cellLUId;
+			assert self.cellLUId < 100;
+			self.grid_value <- float(self.myParcelId);
+			self.grid_value <- self.grid_value + (self.cellLUId + 1) / 100;
 		}
-		save cellGrid to:"../Inputs/GridInputs/LUGrid" + villageName + cellSize + ".asc";
-		
-		write "Exporting parcels grid file";
-		ask cellGrid {
-			self.grid_value <- self.myParcelId;
-		}
-		save cellGrid to:"../Inputs/GridInputs/ParcelGrid" + villageName + cellSize + ".asc";
+		save cellGrid to:"../Inputs/GridInputs/LU&ParcGrid" + villageName + cellSize + ".asc";
 	}
 }
 
@@ -113,16 +112,16 @@ grid cellGrid
 	neighbors: 8 optimizer: "JPS" schedules: [] use_regular_agents: false
 {
 	string cellLU;
-	float cellLUId;
+	int cellLUId min: 0 max: 99;
 	parcel myParcel;
-	float myParcelId;
+	int myParcelId min: 0;
 	
 	action getOverlappingPolygonsAreasAndSetLU {
 		
 		list<ocuSolShapes> overOcuSolShapes <- ocuSolShapes overlapping self;
 		list<parcelsShapes> overParcelsShapes <- parcelsShapes overlapping self;
 		
-		// Kill if out of bounds
+		// Remove cell if out of bounds
 		if empty(overOcuSolShapes) {
 			do die;
 		}
@@ -135,32 +134,11 @@ grid cellGrid
 			overLUArea[self.shpLU] <- overLUArea[self.shpLU] + (self.shape inter myself.shape).area;
 		}
 		cellLU <- first(overLUArea.pairs sort_by -each.value).key;
-		color <- LUColours[LUList index_of cellLU];
-		switch cellLU {
-			match "Homefield" {
-				cellLU <- "Homefield";
-				cellLUId <- 1.0;
-			}
-			match "Bushfield" {
-				cellLU <- "Bushfield";
-				cellLUId <- 2.0;
-			}
-			match "Fallow" {
-				cellLU <- "Fallow";
-				cellLUId <- 3.0;
-			}
-			match_one ["Tree", "Rangeland", "Lowland"] {
-				cellLU <- "Rangeland";
-				cellLUId <- 4.0;
-			}
-			default {
-				cellLU <- "NonGrazable";
-				cellLUId <- 5.0;
-			}
-		}
+		cellLUId <- LUList index_of cellLU;
+		color <- LUColours[cellLUId];
 		
 		// Assign to parcel which polygon is most present
-		if !empty(overParcelsShapes) and cellLU != "NonGrazable" and cellLU != "Rangeland" {
+		if !empty(overParcelsShapes) and cellLU in parcellableLUList {
 			parcelsShapes myParcelShape;
 			map<parcelsShapes, float> overParcelArea;
 			ask overParcelsShapes parallel: true {
@@ -196,7 +174,7 @@ species parcelsShapes parallel: true schedules: [] {
 					assert self.myParcel = nil;
 					myself.myCells <+ self;
 					self.myParcel <- myself;
-					self.myParcelId <- float(int(myself));
+					self.myParcelId <- int(myself);
 				}
 				self.shape <- union(self.myCells);
 			}
@@ -218,7 +196,10 @@ species ocuSolShapes parallel: true schedules: [] {
 	}
 }
 
-experiment Run type: gui {
+experiment GenerateOne type: gui {
+	parameter "Village" var: villageName among: villageNamesList;
+	parameter "Cell size" var: cellSize;
+	
     output {
 	    display map type: java2D{
 	        grid cellGrid border: #lightgrey;
@@ -233,7 +214,7 @@ experiment Run type: gui {
     }
 }
 
-experiment Batch autorun: true type: batch until: endSimu {
-	parameter "Cell size" var: cellSize among: [50, 40, 30, 20, 10];
+experiment GenerateAll autorun: true type: batch until: endSimu {
 	parameter "Village" var: villageName among: villageNamesList;
+	parameter "Cell size" var: cellSize among: [50, 40, 30, 20, 10];
 }
