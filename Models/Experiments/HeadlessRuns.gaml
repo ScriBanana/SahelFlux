@@ -53,7 +53,7 @@ experiment BenchmarkRun benchmark: true autorun: true {
 	init {
 		parallelHerds <- false;
 		enableDebug <- false;
-		endDate <- date([2021, 4, 1, eveningTime + 1, 0, 0]);
+		endDate <- date([2021, 11, 1, eveningTime + 1, 0, 0]);
 		experimentType <- "BenchmarkRun";
 	}
 }

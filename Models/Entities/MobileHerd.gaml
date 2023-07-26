@@ -115,7 +115,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		}
 
 		do checkSpotQuality;
-		if !isInGoodSpot {//and !sleepTime {
+		if !isInGoodSpot and !sleepTime {
 			do goto on: grazableLandscape target: targetCell speed: herdSpeed recompute_path: false;
 		}
 		
