@@ -14,7 +14,9 @@ global {
 	//// Global parcels parameters and variables
 	
 	// Parameters
+	point villageCenterPoint <- point(2100, 1700); // TODO doit être une input fonction du scenario
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
+	float homeFieldsProportion <- 0.2; // TODO Dummy
 	
 	// Variables
 	bool fallowEnabled;
@@ -58,18 +60,23 @@ global {
 	
 	action designateHomeFields {
 		write "Segregating bush and home fields.";
-		// TODO ask HH to desigantae according to distance
-		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
-			ask parcel overlapping self {
-				self.homeField <- true;
-				parcelColour <- parcelColour / 1.6; // Arbitrary esthetic factor
-				listAllHomeParcels <+ self;
-				listAllBushParcels >- self;
-				ask myCells {
-					homefieldCell <- true;
+		
+		ask household {
+			loop times: round(homeFieldsProportion * length(self.myBushParcelsList)) {
+				ask myBushParcelsList closest_to villageCenterPoint {
+					listAllBushParcels >- self;
+					myself.myBushParcelsList >- self;
+					listAllHomeParcels <+ self;
+					myself.myHomeParcelsList <+ self;
+					self.homeField <- true;
+					ask myCells {
+						homefieldCell <- true;
+					}
+					parcelColour <- parcelColour / 1.02; // Arbitrary esthetic factor
 				}
 			}
 		}
+		
 		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
 	}
 		

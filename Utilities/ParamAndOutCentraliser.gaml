@@ -36,8 +36,7 @@ global {
 		"nbHousehold",
 		"meanHerdSize",
 		"nbTLUHerds",
-		"nbBushFieldsPerHh",
-		"nbHomeFieldsPerHh",
+		"homeFieldsProportion",
 		"bushfieldsSurfacePerHh",
 		"homefieldsSurfacePerHh",
 		// Practices
@@ -132,8 +131,7 @@ global {
 			nbHousehold,
 			meanHerdSize,
 			nbTLUHerds,
-			nbBushFieldsPerHh,
-			nbHomeFieldsPerHh,
+			homeFieldsProportion,
 			bushfieldsSurfacePerHh,
 			homefieldsSurfacePerHh,
 			// Practices
@@ -202,8 +200,7 @@ experiment ExplorationParameters virtual: true {
 	parameter "Proportion of transhuming households" category: "Scenario - Population structure" var: propTranshumantHh min: 0.0 max: 1.0;
 	parameter "Proportion of fattening households" category: "Scenario - Population structure" var: propFatteningHh min: 0.0 max: 1.0;
 	parameter "Mobile herds mean sizes (TLU)" category: "Scenario - Production means repartition" var: meanHerdSize min: 0.0;
-	parameter "Bush fields parcels per household" category: "Scenario - Production means repartition" var: nbBushFieldsPerHh min: 0;
-	parameter "Home fields parcels per household" category: "Scenario - Production means repartition" var: nbHomeFieldsPerHh min: 0;
+	parameter "Proportion of Home fields among each household parcels" category: "Scenario - Production means repartition" var: homeFieldsProportion min: 0.0;
 	parameter "Mean number of fattened animals per season" category: "Scenario - Production means repartition" var: meanFattenedGroupSize min: 0.0;
 }
 	

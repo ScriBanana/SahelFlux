@@ -41,6 +41,25 @@ global {
 		sleepTime <- !(abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) < (eveningTime - wakeUpTime - 1) / 2) ? true : false;
 		restTime <- abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2 ? true : false;
 	}
+	
+	action createMobileHerds{
+		write "Creating mobile herds";
+		ask household {
+			create mobileHerd with: [
+				myHousehold::self,
+				herdSize::round(abs(gauss(meanHerdSize - 1, SDHerdSize) + 1)),
+				herdColour::self.householdColour
+			] {	
+				myHousehold.myMobileHerd <- self;
+				// Paddocking initialisation
+				myPaddockList <- copy(myHousehold.myHomeParcelsList);
+				do resetSleepSpot;
+				location <- currentSleepSpot.location;
+			}
+		}
+		if enableDebug {assert mobileHerd min_of each.herdSize > 0;}
+		write "	Done. " + length(mobileHerd) + " mobile herds. Total cheptel : " + mobileHerd sum_of each.herdSize + " TLU.";
+	}
 		
 }
 

@@ -79,8 +79,9 @@ global {
 		do readLandscapeInputData;
 		do initGrazableCells;
 		do placeParcels;
-		do designateHomeFields;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
+		do designateHomeFields;
+		do createMobileHerds;
 		create transhumance;
 		do initiateRotations;
 		write "Initialising meteorological conditions for year 1";

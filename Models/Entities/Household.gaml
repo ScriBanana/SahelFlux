@@ -24,10 +24,6 @@ global {
 	float propFatteningHh <- 0.114 min: 0.0 max: 1.0; // Audouin 2014 Diohine
 	int nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
 	int nbFatteningHh <- round(propFatteningHh * nbHousehold);
-	int nbBushFieldsPerHh <- 10 min: 0; // TODO Dummy 
-	int nbHomeFieldsPerHh <- 2 min: 0; // TODO Dummy
-	
-	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary
 	
 	float meanForagePileBiomassContent <- 300.0; // kgDM TODO DUMMY
 	
@@ -35,37 +31,19 @@ global {
 	
 	action instantiateHouseholds {
 		write "Populating the village.";
-		if nbHomeFieldsPerHh != 0 {
-			assert length (listAllHomeParcels) > nbHomeFieldsPerHh * nbHousehold warning: true;
-			// Tests if enough home parcels are available
-		}
-		create household number: nbHousehold {
-			myForagePileBiomassContent <- gauss(meanForagePileBiomassContent, meanForagePileBiomassContent * 0.1);
-			householdColour <- rnd_color(255);
+		
+		int minNbParcelPerHousehold <- floor(length(parcel) / nbHousehold);
+		
+		create household number: nbHousehold with: [householdColour::rnd_color(255)] {
+			myForagePileBiomassContent <- gauss(
+				meanForagePileBiomassContent, meanForagePileBiomassContent * 0.1
+			);
 			
 			// Associating parcels
-			ask nbHomeFieldsPerHh among (listAllHomeParcels where (each.myOwner = nil)) {
-				self.myOwner <- myself;
-				myOwner.myHomeParcelsList <+ self;
-				self.parcelColour <- myself.householdColour;
-			}
-			ask nbBushFieldsPerHh among (listAllBushParcels where (each.myOwner = nil)) {
+			ask minNbParcelPerHousehold among shuffle(listAllBushParcels where (each.myOwner = nil)) {
 				self.myOwner <- myself;
 				myOwner.myBushParcelsList <+ self;
 				self.parcelColour <- myself.householdColour;
-			}
-			
-			// Giving a mobile herd
-			create mobileHerd with: [
-				myHousehold::self,
-				herdSize::round(abs(gauss(meanHerdSize - 1, SDHerdSize) + 1)),
-				herdColour::self.householdColour
-			] {	
-				myHousehold.myMobileHerd <- self;
-				// Paddocking initialisation
-				myPaddockList <- copy(myHousehold.myHomeParcelsList);
-				do resetSleepSpot;
-				location <- currentSleepSpot.location;
 			}
 			
 			// Assiciating an ORP heap
@@ -75,19 +53,31 @@ global {
 				parcelSpreadOn <- first(nextSpreadParcelsOrder);
 			}
 		}
+		
+		// Associate the remaining parcels
+		if !empty(listAllBushParcels where (each.myOwner = nil)) {
+			ask listAllBushParcels where (each.myOwner = nil) {
+				ask one_of(household where (length(each.myBushParcelsList) = minNbParcelPerHousehold)) {
+					myself.myOwner <- self;
+					myBushParcelsList <+ myself;
+					myself.parcelColour <- self.householdColour;
+				}
+			}
+		}
+		
 		ask nbTranshumantHh among household {
 			isTranshumant <- true;
 		}
 		ask nbFatteningHh among household {
 			doesFattening <- true;
-			myMeanNbFattenedAnx <- abs(gauss(meanFattenedGroupSize, meanFattenedGroupSize * 0.2)) + 0.1; // TODO DUMMY 0.1 to avoid 0
-		}
-		ask household where each.doesFattening {
+			myMeanNbFattenedAnx <- abs(gauss(meanFattenedGroupSize, meanFattenedGroupSize * 0.2)) + 0.1;// avoids 0
 			do renewFattenedAnimals;
 		}
 		
-		assert mobileHerd min_of each.herdSize > 0;
-		write "	Done. " + length(household) + " households, " + length(mobileHerd) + " mobile herds, " +  length(household where each.isTranshumant) + " transhumants, " + length(household where each.doesFattening) + " fatteners.";
+		write "	Done. " + length(household) + " households, "
+			+  length(household where each.isTranshumant) + " transhumants, "
+			+ length(household where each.doesFattening) + " fatteners."
+		;
 	}
 }
 

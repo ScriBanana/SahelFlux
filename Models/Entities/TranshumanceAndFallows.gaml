@@ -12,6 +12,7 @@ import "../../Utilities/CnNFlowsParameters.gaml"
 import "MobileHerd.gaml"
 
 global {
+	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary
 	
 	//// Transhumance transition functions
 	action captureRemainingTranshumants {

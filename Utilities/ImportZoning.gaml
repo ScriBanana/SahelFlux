@@ -23,8 +23,6 @@ global {
 	geometry shape <- envelope(gridData);
 	float totalAreaHa <- shape.area / 10000 #m2;
 	
-	point villageCenterPoint <- point(2100, 1700); // TODO Pourrait partir du centre de l'enveloppe des croplands?
-	
 	action readLandscapeInputData {
 		write "Reading grid data from " + gridData;
 		ask landscape {

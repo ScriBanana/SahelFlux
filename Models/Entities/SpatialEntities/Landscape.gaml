@@ -88,6 +88,9 @@ global {
 				}
 			}
 		}
+		
+		write "	Done. " + length(grazableLandscape where (each.cellLU = "Cropland")) + " ha cropland, "
+			+ length(grazableLandscape where (each.cellLU = "Rangeland")) + " ha rangeland";
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
@@ -435,9 +438,6 @@ grid landscape
 				230 + (198 - 230) / rangelandBiomassContentInit * biomassContent,
 				180 + (110 - 180) / rangelandBiomassContentInit * biomassContent
 			);
-		}
-		if self.homefieldCell {
-			color <-  #red;
 		}
 		
 //		if self in targetableCellsForChangingSite {
