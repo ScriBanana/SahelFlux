@@ -9,6 +9,9 @@
 model GenerateSpatialInput
 
 global {
+	string inPath <- "../Inputs/SpatialInputs/";
+	string outPath <- "../Inputs/GridInputs/";
+	
 	float startTimeReal <- machine_time;
 	bool endSimu <- false;
 	
@@ -16,21 +19,24 @@ global {
 	float cellHeight <- cellSize #m;
 	float cellWidth <- cellSize #m;
 	
-	list<string> villageNamesList <- ["Sob", "Diohine", "Barry"];
+	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"];
 	string villageName <- "Barry" among: villageNamesList;
 	
-	shape_file parcelsCentroids <- shape_file("../Inputs/SpatialInputs/Voro" + villageName + ".shp");
-	shape_file shapeLU <- shape_file("../Inputs/SpatialInputs/OcuSols" + villageName + ".shp");
-	shape_file villageLimits <- shape_file("../Inputs/SpatialInputs/Limi" + villageName + ".shp");
-	shape_file croplandsLimits <- shape_file("../Inputs/SpatialInputs/LimiParcelles" + villageName + ".shp");
+	shape_file parcelsCentroids <- shape_file(inPath + "Voro" + villageName + ".shp");
+	shape_file shapeLU <- shape_file(inPath + "OcuSols" + villageName + ".shp");
+	shape_file villageLimits <- shape_file(inPath + "Limi" + villageName + ".shp");
+	shape_file croplandsLimits <- shape_file(inPath + "LimiParcelles" + villageName + ".shp");
 	
 	geometry shape <- envelope(villageLimits);
 	geometry villageArea <- villageLimits.contents[0];
 	geometry croplandArea <- croplandsLimits.contents[0];
 	
 	list<string> LUList <- [
-		"Dwelling", "Tree", "Homefield", "Bushfield", "BareGround", "Pond", "Road",
-		"Rangeland", "NonGrazable", "Fallow", "Garden", "Lowland", "River"
+		"Dwelling", "Tree", "Homefield", // 0, 1, 2
+		"Bushfield", "BareGround", "Pond", // 3, 4, 5
+		"Road", "Rangeland", "NonGrazable", // 6, 7, 8
+		"Fallow", "Garden", "Lowland",  // 9, 10, 11
+		"River" // 12
 	];
 	list<string> parcellableLUList <- ["Homefield", "Bushfield", "Fallow"];
 	list<rgb> LUColours <- [
@@ -72,7 +78,7 @@ global {
 	}
 	
 	action generateParcelsPolygons (shape_file inputPoints) {
-		write "Creating parcels from " + inputPoints;
+		write "Creating Voronoi parcels from " + inputPoints;
 		list<point> points;
 		loop voroPoint over: inputPoints.contents {
 			points <+ point(voroPoint);
@@ -97,13 +103,13 @@ global {
 	}
 	
 	action generateOutputFiles {
-		write "Exporting grid file";
+		write "Exporting grid file to " + outPath + "LU&ParcGrid" + villageName + cellSize + ".asc";
 		ask cellGrid {
 			assert self.cellLUId < 100;
 			self.grid_value <- float(self.myParcelId);
 			self.grid_value <- self.grid_value + (self.cellLUId + 1) / 100;
 		}
-		save cellGrid to:"../Inputs/GridInputs/LU&ParcGrid" + villageName + cellSize + ".asc";
+		save cellGrid to: outPath + "LU&ParcGrid" + villageName + cellSize + ".asc";
 	}
 }
 
@@ -115,6 +121,7 @@ grid cellGrid
 	int cellLUId min: 0 max: 99;
 	parcel myParcel;
 	int myParcelId min: 0;
+	float grid_value;
 	
 	action getOverlappingPolygonsAreasAndSetLU {
 		

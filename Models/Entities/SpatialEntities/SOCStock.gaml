@@ -35,7 +35,9 @@ global {
 	// Setting Euler discretisation solver parameter
 	float criticalNbStepLabileForDiscretisation <- 2 / (kineticLabile * edaphicClimateFactor); // Computed for Euler method.
 	float criticalNbStepStableForDiscretisation <- 2 / (kineticStable * edaphicClimateFactor);
-	float criticalNbStepForDiscretisation <- min(criticalNbStepLabileForDiscretisation, criticalNbStepStableForDiscretisation); // Stable is way higher with default parameters
+	float criticalNbStepForDiscretisation <- min(
+		criticalNbStepLabileForDiscretisation, criticalNbStepStableForDiscretisation
+	); // Stable is way higher with default parameters
 	float boundaryNbStepForDiscretisation <- 0.8 * criticalNbStepForDiscretisation; // 0.8 factor for safety
 	int solverIterations <- int(ceil(1 / boundaryNbStepForDiscretisation)); // Default 2
 	float solverDeltaT <- boundaryNbStepForDiscretisation / solverIterations; // Default 0.5
@@ -44,6 +46,20 @@ global {
 	float maxCColor <- 4000.0; // kgC/cell; Arbitrary max for color scale in displays
 	
 	//// Global SOC functions
+	
+	action initSOCStocks {
+		ask SOCStock {
+			float initSOC <- myCell.cellLU = "Rangeland" ?
+				rangelandSOCInit :
+				(myCell.homefieldCell ? homefieldsSOCInit : bushfieldsSOCInit)
+			;
+			float initSOCLabile <- initSOC * labileCPoolProportionInit;
+			labileCPool <- gauss(initSOCLabile, initSOCLabile * 0.1);
+			float initSOCStable <- initSOC * stableCPoolProportionInit;
+			stableCPool <- gauss(initSOCStable, initSOCLabile * 0.1);
+			totalSOC <- labileCPool + stableCPool;
+		}
+	}
 	
 	// Mean SOCS computation
 	float meanHomefieldsSOCS; // kgC

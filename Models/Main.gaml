@@ -28,6 +28,10 @@ global {
 	bool batchOn <- false;
 	bool enabledGUI <- false;
 	
+	// Village choice
+	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"];
+	string villageName <- "Sob" among: villageNamesList;
+	
 	// Time and calendar parameters
 	float step <- 30.0 #minutes;
 	int biophysicalProcessesUpdateFreq <- 15; // In days
@@ -59,6 +63,8 @@ global {
 		do inputUnitTests;
 		
 		write "=== RUN " + int(self) + " INITIALISATION ===";
+		
+		// Init variables
 		drySeason <- !(
 			starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth
 		);
@@ -66,18 +72,20 @@ global {
 			starting_date.month >= rainySeasonFirstMonth - ORPSpreadingPeriodLength and
 			starting_date.month < rainySeasonFirstMonth
 		);
+		nonEmptyLandscape <- list(landscape);
 		
 		// All init actions defined in related species files.
 		do resetFlowsMaps;
-		do assignLUFromRaster;
+		do readLandscapeInputData;
 		do initGrazableCells;
 		do placeParcels;
-		do segregateBushFields;
+		do designateHomeFields;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
 		create transhumance;
 		do initiateRotations;
 		write "Initialising meteorological conditions for year 1";
 		do updateMeteo;
+		do initSOCStocks;
 		do getMeanSOCS;
 		meanHomefieldsSOCSInit <- meanHomefieldsSOCS;
 		meanBushfieldsSOCSInit <- meanBushfieldsSOCS;

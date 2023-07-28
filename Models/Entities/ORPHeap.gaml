@@ -21,6 +21,7 @@ global {
 	
 	// Spreading
 	float maxManureCartWeight <- 300 / 2; // kgDM expert knowledge
+	float maxORPSpreadPerParcel <- 15500.0; // kgDM/ha ORP Spread on each home parcel each year
 	
 	//// Global manure heap functions
 	

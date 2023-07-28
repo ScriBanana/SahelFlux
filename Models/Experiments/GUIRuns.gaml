@@ -25,10 +25,8 @@ experiment Run type: gui parent: ParamGatherer {
 	parameter "Start date" category: "Scenario - Time" var: starting_date;
 	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;
 	
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: gridLayout;
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName;
 	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- false;
-	parameter "Maximum numbre of parcels to place" category: "Scenario - Spatial layout" var: maxNbCroplandParcels min: 0;
-	parameter "Parcels radius (m) : Mean :: SD" category: "Scenario - Spatial layout" var: parcelRadiusDistri;
 	parameter "Home fields area radius (m)" category: "Scenario - Spatial layout" var: homeFieldsRadius min: 0.0;
 	
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold min: 0;

@@ -10,7 +10,6 @@ model UnitTests
 
 import "../Models/Main.gaml"
 
-/* Insert your model definition here */
 global {
 	action inputUnitTests {
 		
@@ -20,9 +19,6 @@ global {
 		
 		// Households
 		assert nbHousehold >= nbTranshumantHh;
-		
-		// Parcel
-		assert parcelRadiusDistri.value > 0.0 and parcelRadiusDistri.key >= 0.0;
 		
 	}
 }

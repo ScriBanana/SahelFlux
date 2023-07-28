@@ -43,44 +43,49 @@ global {
 	float groundnutExportedBiomassRatio <- 1.0;
 	float fallowExportedBiomass <- 0.55; // Surveys
 	
-	// Variables
+	// Cells categories
+	list<landscape> nonEmptyLandscape;
+	list<landscape> walkableLandscape;
 	list<landscape> grazableLandscape;
 	list<landscape> targetableCellsForChangingSite;
 	
 	//// Global landscape functions
 	
 	action initGrazableCells {
-		ask landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland") {
-			biomassProducer <- true;
-			grazableLandscape <+ self;
-			
-			biomassContent <- cellLU = "Cropland" ?
-				gauss(cropBiomassContentInit, cropBiomassContentInit * 0.1) :
-				gauss(rangelandBiomassContentInit, rangelandBiomassContentInit * 0.1)
-			;
-			
-			create SOCStock with: [myCell::self] {
-				myself.mySOCstock <- self;
-				location <- myself.location;
+		write "Initialising landscape grid";
+		ask landscape {//nonEmptyLandscape {
+			// Check LUList in GenerateSpatialInput for cellLUId
+			if !(cellLUId in [1, 2, 3, 7, 9, 11]) {
+				cellLU <- "NonGrazable";
+				if cellLUId in [4, 6] {
+					walkableLandscape <+ self;
+				}
+			} else {
+				biomassProducer <- true;
+				grazableLandscape <+ self;
+				walkableLandscape <+ self;
 				
-				labileCPool <- myself.cellLU = "Cropland" ?
-					gauss(homefieldsSOChaInit * labileCPoolProportionInit, homefieldsSOChaInit * labileCPoolProportionInit * 0.1) : 
-					gauss(rangelandSOCInit * labileCPoolProportionInit, rangelandSOCInit * labileCPoolProportionInit * 0.1); // TODO DUMMY
-					// TODO ADD BUSHFIELDS
-				stableCPool <- myself.cellLU = "Cropland" ?
-					gauss(homefieldsSOChaInit * stableCPoolProportionInit, homefieldsSOChaInit * stableCPoolProportionInit * 0.1) : 
-					gauss(rangelandSOCInit * stableCPoolProportionInit, rangelandSOCInit * stableCPoolProportionInit * 0.1); // TODO DUMMY
-				totalSOC <- labileCPool + stableCPool;
-			}
-			create soilNProcesses with: [myCell::self] {
-				myself.mySoilNProcesses <- self;
-				location <- myself.location;
-			}
-			if enabledGUI {
-				do updateColour;
+				if cellLUId in [2, 3, 9] {
+					cellLU <- "Cropland";
+					biomassContent <- gauss(cropBiomassContentInit, cropBiomassContentInit * 0.1);
+				} else {
+					cellLU <- "Rangeland";
+					targetableCellsForChangingSite <+ self;
+					biomassContent <- gauss(rangelandBiomassContentInit, rangelandBiomassContentInit * 0.1);
+				}
+				if enabledGUI {
+					do updateColour;
+				}
+				
+				// Create companion SOCStock and soilNProcesses agents
+				create SOCStock with: [myCell::self, location::self.location] {
+					myself.mySOCstock <- self;
+				}
+				create soilNProcesses with: [myCell::self, location::self.location] {
+					myself.mySoilNProcesses <- self;
+				}
 			}
 		}
-		targetableCellsForChangingSite <- grazableLandscape where (each.cellLU = "Rangeland");
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
@@ -107,16 +112,25 @@ global {
 	
 }
 
-grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 optimizer: "JPS" schedules: [] use_regular_agents: false {
+grid landscape 
+	file: gridData parallel: true neighbors: 8
+	optimizer: "JPS" schedules: [] use_regular_agents: false
+{
 	
 	//// Parameters
 	
 	// Land unit
+	int cellLUId;
 	string cellLU;
-	bool biomassProducer <- false;
-	int nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY
+	bool biomassProducer; // TODO Useless?
+	
+	int nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY => init
+	
 	// Part of a parcel
+	int parcelID;
 	parcel myParcel;
+	bool homefieldCell;
+	
 	// Internal N and C stock and processes
 	SOCStock mySOCstock;
 	soilNProcesses mySoilNProcesses;
@@ -421,6 +435,9 @@ grid landscape width: gridWidth height: gridHeight parallel: true neighbors: 8 o
 				230 + (198 - 230) / rangelandBiomassContentInit * biomassContent,
 				180 + (110 - 180) / rangelandBiomassContentInit * biomassContent
 			);
+		}
+		if self.homefieldCell {
+			color <-  #red;
 		}
 		
 //		if self in targetableCellsForChangingSite {

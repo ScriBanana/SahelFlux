@@ -13,88 +13,49 @@ global {
 	
 	//// Global parcels parameters and variables
 	
-	int maxNbCroplandParcels <- 1000;
-	pair<float, float> parcelRadiusDistri <- (100.0 #m)::(30.0 #m);
+	// Parameters
 	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
-	bool fallowEnabled;
-	float maxORPSpreadPerParcel <- 15500.0; // kgDM/ha ORP Spread on each home parcel each year
 	
 	// Variables
+	bool fallowEnabled;
+	string parcelsAspect;
+	list<int> parcelsIDList;
 	list<parcel> listAllHomeParcels;
 	list<parcel> listAllBushParcels;
-	string parcelsAspect;
 	
 	//// Global parcels functions
 	
 	// Init functions
 	
 	action placeParcels {
-		// Instantiate parcels
-		write "Cutting the territory into a maximum of " + maxNbCroplandParcels + " parcels.";
-
-		int newParc <- 0;
-		list<landscape> availableCroplandCells <- landscape where (each.cellLU = "Cropland");
-		int nbAvailableCells <- nil;
-	
-		//TODO : needs revamp for full coverage and better shapes => Voronoi?
-		loop while: nbAvailableCells != length(availableCroplandCells) {
-			nbAvailableCells <- length(availableCroplandCells);
-			
-			list<landscape> croplandCells <- availableCroplandCells;
-			loop cell over: shuffle(croplandCells) {
-				if cell.myParcel = nil {
-					if newParc >= maxNbCroplandParcels {
-						break; // Not the most elegant
-					} else if empty(availableCroplandCells) {
-						break;
-					}
-	
-					// Attributing a random (positive) parcel size
-					float parcelSize <- -1.0;
-					loop while: parcelSize < 0.0 {
-						parcelSize <- gauss(parcelRadiusDistri.key, parcelRadiusDistri.value);
-					}
-					
-					// Checking if neighbouring cells can be integrated into the parcel.
-					if
-						parcelSize / 2 < min(cellHeight, cellWidth) / 2 or
-						empty(cell neighbors_at (parcelSize / 2) where (each.myParcel != nil or each.cellLU != "Cropland"))
-					{
-					// If all is green, create the parcel and assign its cells to it.
-						create parcel {
-							self.parcelColour <- #olive;
-							landscape myCenterCell <- cell;
-							myCenterCell.myParcel <- self;
-							self.myCells <+ myCenterCell;
-							location <- myCenterCell.location;
-							if parcelSize / 2 >= min(cellHeight, cellWidth) / 2 {
-								ask myCenterCell neighbors_at (parcelSize / 2) {
-									self.myParcel <- myself;
-									myself.myCells <+ self;
-									availableCroplandCells >- self;
-								}
-							}
-							parcelSurface <- length(myCells) / hectareToCell;
-						}
-						
-						newParc <- newParc + 1;
-					}
+		write "Placing parcels according to input data";
+		loop times: length(parcelsIDList) {
+			create parcel {
+				ask nonEmptyLandscape where (each.parcelID - 1 = int(self)) {
+					myself.myCells <+ self;
+					self.myParcel <- myself;
 				}
+				shape <- union(myCells);
+				parcelSurface <- length(myCells) / hectareToCell; // shape.area ?
+				listAllBushParcels <+ self;
+				parcelColour <- #olive;
 			}
 		}
-		listAllBushParcels <- copy(list(parcel));
 		write "	Done. " + length(parcel) + " parcels placed.";
 	}
 	
-	action segregateBushFields {
+	action designateHomeFields {
 		write "Segregating bush and home fields.";
-		
+		// TODO ask HH to desigantae according to distance
 		ask first(landscape overlapping villageCenterPoint) neighbors_at (homeFieldsRadius) {
 			ask parcel overlapping self {
 				self.homeField <- true;
 				parcelColour <- parcelColour / 1.6; // Arbitrary esthetic factor
 				listAllHomeParcels <+ self;
 				listAllBushParcels >- self;
+				ask myCells {
+					homefieldCell <- true;
+				}
 			}
 		}
 		write "	Done. " + length(listAllHomeParcels) + " home parcels.";
@@ -133,7 +94,6 @@ global {
 					}
 				}
 			}
-			rotationLength <- length(myRotation);
 		}
 	}
 	
@@ -143,7 +103,7 @@ global {
 		ask parcel {
 			int coverIdInRot <- myRotation index_of nextRSCover;
 			lastRSCover <- nextRSCover;
-			nextRSCover <- coverIdInRot >= rotationLength - 1 ? myRotation[0] : myRotation[coverIdInRot + 1];
+			nextRSCover <- coverIdInRot >= length(myRotation) - 1 ? myRotation[0] : myRotation[coverIdInRot + 1];
 		}
 	}
 	
@@ -155,18 +115,17 @@ species parcel parallel: true schedules: [] {
 	
 	list<landscape> myCells;
 	float parcelSurface; // ha
+	
 	household myOwner;
-	bool homeField <- false;
+	bool homeField;
 	
 	list<string> myRotation;
-	int rotationLength;
 	string nextRSCover;
 	string lastRSCover;
 	
 	rgb parcelColour;
 	map<string, rgb> coverColourMap <- ["Millet"::#yellow, "Groundnut"::#brown, "Fallow"::#green];
 	aspect default {
-		shape <- union(myCells);
 		switch parcelsAspect {
 			match "Owner" {
 				draw shape color: #transparent border: parcelColour;

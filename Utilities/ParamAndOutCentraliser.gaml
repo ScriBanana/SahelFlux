@@ -31,8 +31,6 @@ global {
 		"rangelandSurface",
 		"bushfieldsSurface",
 		"homefieldsSurface",
-		"maxNbCroplandParcels",
-		"parcelRadiusDistri",
 		"homeFieldsRadius",
 		// Population
 		"nbHousehold",
@@ -129,8 +127,6 @@ global {
 			rangelandSurface,
 			bushfieldsSurface,
 			homefieldsSurface,
-			maxNbCroplandParcels,
-			parcelRadiusDistri,
 			homeFieldsRadius,
 			// Population
 			nbHousehold,
