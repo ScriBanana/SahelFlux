@@ -29,25 +29,29 @@ global {
 	
 	action placeParcels {
 		write "Placing parcels according to input data";
-		int parcelCount;
-		loop times: length(parcelsIDList) {
-			
-			if mod(parcelCount, length(parcelsIDList) / 4) = 0 {
-				write "		" + int(ceil(parcelCount / length(parcelsIDList) * 100)) + " %";
-			}
-			parcelCount <- parcelCount + 1;
-			
-			create parcel {
-				ask nonEmptyLandscape where (each.parcelID - 1 = int(self)) {
-					myself.myCells <+ self;
-					self.myParcel <- myself;
+		
+		list<int> createdParcelsIDList;
+		ask (nonEmptyLandscape where (each.parcelID != 0)) sort_by each.parcelID {
+			if (parcelID - 1) in createdParcelsIDList {
+				ask parcel[parcelID - 1] {
+					self.myCells <+ myself;
+					myself.myParcel <- self;
 				}
-				if enableDebug {assert length(myCells) != 0;}
-				shape <- union(myCells);
-				parcelSurface <- length(myCells) / hectareToCell; // shape.area ?
-				listAllBushParcels <+ self;
-				parcelColour <- #olive;
+			} else {
+				create parcel {
+					self.myCells <+ myself;
+					myself.myParcel <- self;
+					createdParcelsIDList <+ int(self);
+				}
 			}
+		}
+		
+		ask parcel {
+			if enableDebug {assert length(myCells) != 0;}
+			shape <- union(myCells);
+			parcelSurface <- length(myCells) / hectareToCell; // shape.area ?
+			listAllBushParcels <+ self;
+			parcelColour <- #olive;
 		}
 		write "	Done. " + length(parcel) + " parcels placed.";
 	}

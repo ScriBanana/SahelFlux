@@ -15,12 +15,12 @@ global {
 	float startTimeReal <- machine_time;
 	bool endSimu <- false;
 	
-	int cellSize <- 50; // max LU shapefile pixelsize : 1.5 m
+	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m
 	float cellHeight <- cellSize #m;
 	float cellWidth <- cellSize #m;
 	
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"];
-	string villageName <- "Barry" among: villageNamesList;
+	string villageName <- "Sob" among: villageNamesList;
 	
 	shape_file parcelsCentroids <- shape_file(inPath + "Voro" + villageName + ".shp");
 	shape_file shapeLU <- shape_file(inPath + "OcuSols" + villageName + ".shp");

@@ -93,7 +93,8 @@ global {
 		totalMeanSOCSInit <- totalMeanSOCS;
 		
 		write "Start date : " + starting_date + ", end date : " + endDate;
-		write "=== MODEL INITIALISED ===";
+		runTime <- (machine_time - startTimeReal) / 60000;
+		write "=== MODEL INITIALISED (" + runTime * 60 + " s) ===";
 	}
 	
 	////	--------------------------		////
