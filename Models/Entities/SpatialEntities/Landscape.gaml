@@ -53,7 +53,10 @@ global {
 	
 	action initGrazableCells {
 		write "Initialising landscape grid";
-		ask landscape {//nonEmptyLandscape {
+		ask nonEmptyLandscape {
+			
+			 nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY
+			 
 			// Check LUList in GenerateSpatialInput for cellLUId
 			if !(cellLUId in [1, 2, 3, 7, 9, 11]) {
 				cellLU <- "NonGrazable";
@@ -61,7 +64,6 @@ global {
 					walkableLandscape <+ self;
 				}
 			} else {
-				biomassProducer <- true;
 				grazableLandscape <+ self;
 				walkableLandscape <+ self;
 				
@@ -94,7 +96,7 @@ global {
 	float biomassContentSD;
 	action updateGlobalBiomassMeanAndSD {
 		list<float> allCellsBiomass;
-		ask landscape where each.biomassProducer {
+		ask grazableLandscape {
 			allCellsBiomass <+ self.biomassContent;
 		}
 		sumBiomassContent <- sum(allCellsBiomass);
@@ -104,7 +106,6 @@ global {
 	
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
-//		write "Updating available targets";
 		targetableCellsForChangingSite <- grazableLandscape where (
 			(each.biomassContent > meanBiomassContent + biomassContentSD)
 		);
@@ -122,9 +123,8 @@ grid landscape
 	// Land unit
 	int cellLUId;
 	string cellLU;
-	bool biomassProducer; // TODO Useless?
 	
-	int nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY => init
+	int nbTrees;
 	
 	// Part of a parcel
 	int parcelID;
@@ -230,7 +230,7 @@ grid landscape
 			NFlowsToSaveEachCall <- 0.0;
 		}
 		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
-		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (myParcel != nil and myParcel.homeField ? "HomeFields" : "BushFields");
+		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (homefieldCell ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
 		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}
 		
@@ -251,7 +251,7 @@ grid landscape
 		string emittingPool;
 		string soilFlowReciever <- cellLU = "Rangeland" ?
 			"TF-ToRangelands" :
-			(myParcel != nil and myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields")
+			(homefieldCell ? "TF-ToHomeFields" : "TF-ToBushFields")
 		;
 		
 		float incorporatedRootProportion;

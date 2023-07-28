@@ -102,7 +102,7 @@ global {
 	
 	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay { // Every 15 days default
 		
-		ask landscape where each.biomassProducer {
+		ask grazableLandscape {
 			
 			if enabledGUI { do updateColour;}
 			// TODO faire gaffe au scheduling, notamment en début de saison
@@ -143,7 +143,7 @@ global {
 				ask ORPHeap { do emitRSHeapsCH4;}
 				write "	Incorporating and burning (millet) remaining biomass.";
 				write "	Computing plant biomass production for the upcoming rainy season.";
-				ask landscape where each.biomassProducer {
+				ask grazableLandscape {
 					do burnAndIncorporateResidualBiomass;
 					do computeYearlyBiomassProduction;
 				}
@@ -157,7 +157,7 @@ global {
 				dayInDS <- 0;
 				daysSinceSpread <- 0;
 				
-				ask landscape where (each.biomassProducer) { do getHarvestedAndBurrowRoots;}
+				ask grazableLandscape { do getHarvestedAndBurrowRoots;}
 				do updateParcelsCovers; // Crop rotation
 				
 				// Retrieving herds

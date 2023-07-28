@@ -48,7 +48,7 @@ global {
 		
 		do saveSFMatrix (outputCSVheader, "Flow-", 1.0, false);
 		do saveSFMatrix (outputCSVheader, "FlowYear-", durationSimu, false);
-		do saveSFMatrix (outputCSVheader, "FlowHaYear-", ((landscape count (each.biomassProducer)) / hectareToCell) * durationSimu, false);
+		do saveSFMatrix (outputCSVheader, "FlowHaYear-", (length(grazableLandscape) / hectareToCell) * durationSimu, false);
 		do saveSFMatrix (outputCSVheader, "FlowDiv-", 1.0, true);
 		do saveSFMatrix (outputCSVheader, "FlowDivYear-", durationSimu, true);
 		
@@ -72,7 +72,7 @@ global {
 			"Groundnut"::(listAllBushParcels sum_of each.parcelSurface),
 			"FallowVeg"::(listAllBushParcels sum_of each.parcelSurface),
 			"SpontVeg"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
-			"Weeds"::((landscape count (each.biomassProducer)) / hectareToCell),
+			"Weeds"::(length(grazableLandscape) / hectareToCell),
 			"Trees"::(landscape sum_of each.nbTrees)
 		];
 		

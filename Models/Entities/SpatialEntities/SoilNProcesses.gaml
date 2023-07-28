@@ -33,11 +33,9 @@ global {
 		float meanBushfieldsLastNFromSoil;
 		float meanRangelandLastNFromSoil;
 		
-		meanHomefieldsLastNFromSoil <- (
-			soilNProcesses where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
-		) mean_of each.lastNFromSoil;
+		meanHomefieldsLastNFromSoil <- (soilNProcesses where (each.myCell.homefieldCell)) mean_of each.lastNFromSoil;
 		meanBushfieldsLastNFromSoil <- (
-			soilNProcesses where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
+			soilNProcesses where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell)
 		) mean_of each.lastNFromSoil;
 		meanRangelandLastNFromSoil <- (
 			soilNProcesses where (each.myCell.cellLU = "Rangeland")
@@ -80,7 +78,7 @@ species soilNProcesses parallel: true schedules: [] {
 		float NFromSoil;
 		
 		if !SOCxSONOn {
-			NFromSoil <- (myCell.myParcel != nil and myCell.myParcel.homeField) ?
+			NFromSoil <- myCell.homefieldCell ?
 				baseNFromSoilHomefields :
 				baseNFromSoilBushfields;
 			// Will return the value for bushfields in cropland not part of a parcel and rangeland.
@@ -104,10 +102,10 @@ species soilNProcesses parallel: true schedules: [] {
 		
 		string inflowRecievingPool <- myCell.cellLU = "Rangeland" ?
 			"Rangelands" :
-			(myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+			(myCell.homefieldCell ? "HomeFields" : "BushFields");
 		string fixationRecievingPool <- myCell.cellLU = "Rangeland" ?
 			"TF-ToRangelands" :
-			(myCell.myParcel != nil and myCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields");
+			(myCell.homefieldCell ? "TF-ToHomeFields" : "TF-ToBushFields");
 		ask world {	do saveFlowInMap("N", inflowRecievingPool, "IF-FromAtmo", NAtmoMicroOrga);}
 		ask world {	do saveFlowInMap("N", "Groundnut", "IF-FromAtmo", NAtmoGroundnut);}
 		ask world {	do saveFlowInMap("N", "Groundnut", fixationRecievingPool, NAtmoGroundnut);}

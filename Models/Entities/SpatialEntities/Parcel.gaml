@@ -29,12 +29,20 @@ global {
 	
 	action placeParcels {
 		write "Placing parcels according to input data";
+		int parcelCount;
 		loop times: length(parcelsIDList) {
+			
+			if mod(parcelCount, length(parcelsIDList) / 4) = 0 {
+				write "		" + int(ceil(parcelCount / length(parcelsIDList) * 100)) + " %";
+			}
+			parcelCount <- parcelCount + 1;
+			
 			create parcel {
 				ask nonEmptyLandscape where (each.parcelID - 1 = int(self)) {
 					myself.myCells <+ self;
 					self.myParcel <- myself;
 				}
+				if enableDebug {assert length(myCells) != 0;}
 				shape <- union(myCells);
 				parcelSurface <- length(myCells) / hectareToCell; // shape.area ?
 				listAllBushParcels <+ self;
@@ -63,16 +71,16 @@ global {
 		
 	action initiateRotations {
 		ask parcel {
-			if !fallowEnabled {
-				myRotation <- homeField ? ["Millet"] : ["Millet", "Groundnut"];
+			if homeField {
+				myRotation <- ["Millet"];
 				nextRSCover <- one_of(myRotation);
-				lastRSCover <- homeField ? "Millet" : (nextRSCover = "Millet" ? "Groundnut" : "Millet");
+				lastRSCover <- one_of(myRotation);
+				coverColourMap[nextRSCover] <- coverColourMap[nextRSCover] / 1.05; // Arbitrary esthetic factor
 			} else {
-				if homeField {
-					myRotation <- ["Millet"];
+				if !fallowEnabled {
+					myRotation <- ["Millet", "Groundnut"];
 					nextRSCover <- one_of(myRotation);
-					lastRSCover <- one_of(myRotation);
-					coverColourMap[nextRSCover] <- coverColourMap[nextRSCover] / 1.05; // Arbitrary esthetic factor
+					lastRSCover <- nextRSCover = "Millet" ? "Groundnut" : "Millet";
 				} else {
 					myRotation <- ["Millet", "Groundnut", "Fallow"];
 					float midXaxis <- centroid(world).x;

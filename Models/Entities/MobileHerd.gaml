@@ -211,7 +211,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 				eatenBiomassCContent <- forageRSCContent;
 			}
 		} else {
-			emittingPool <- currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields";
+			emittingPool <- currentCell.homefieldCell ? "HomeFields" : "BushFields";
 			eatenBiomassNContent <- milletResiduesNContent;
 			eatenBiomassCContent <- milletResiduesCContent;
 		}
@@ -256,10 +256,10 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		
 		// Save flows to flows map
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (
-			currentCell.myParcel != nil and currentCell.myParcel.homeField ? "TF-ToHomeFields" : "TF-ToBushFields"
+			currentCell.homefieldCell ? "TF-ToHomeFields" : "TF-ToBushFields"
 		);
 		string emissionsEmittingPool <- currentCell.cellLU = "Rangeland" ? "Rangelands" : (
-			currentCell.myParcel != nil and currentCell.myParcel.homeField ? "HomeFields" : "BushFields"
+			currentCell.homefieldCell ? "HomeFields" : "BushFields"
 		);
 		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool,
 			float(excretaOutputs["excretedCarbon"])

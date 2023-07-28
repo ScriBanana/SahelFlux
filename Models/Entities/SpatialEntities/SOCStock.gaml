@@ -72,11 +72,9 @@ global {
 	float totalMeanSOCSInit; // kgC
 	
 	action getMeanSOCS {
-		meanHomefieldsSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Cropland" and each.myCell.myParcel != nil and each.myCell.myParcel.homeField)
-		) mean_of each.stableCPool;
+		meanHomefieldsSOCS <- (SOCStock where (each.myCell.homefieldCell)) mean_of each.stableCPool;
 		meanBushfieldsSOCS <- (
-			SOCStock where (each.myCell.cellLU = "Cropland" and (each.myCell.myParcel = nil or !each.myCell.myParcel.homeField))
+			SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell)
 		) mean_of each.stableCPool;
 		meanRangelandSOCS <- (
 			SOCStock where (each.myCell.cellLU = "Rangeland")
@@ -129,7 +127,7 @@ species SOCStock parallel: true schedules: [] {
 		
 		// Return flows for output indicators computation and save in flows map
 		// TODO scinder pertes et GHG
-		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.homefieldCell ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , emissionsFromStable + emissionsFromLabile);}
 		ask world { do saveGHGFlow(emittingPool, "CO2", (emissionsFromStable + emissionsFromLabile) / coefCO2ToC);}
 	}
@@ -150,7 +148,7 @@ species SOCStock parallel: true schedules: [] {
 	}
 	
 	action emitRSSoilCH4 {
-		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.myParcel != nil and myCell.myParcel.homeField ? "HomeFields" : "BushFields");
+		string emittingPool <- myCell.cellLU = "Rangeland" ? "Rangelands" : (myCell.homefieldCell ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG" , myself.CH4ToBeEmittedInRainySeason * coefCH4ToC);}
 		ask world { do saveGHGFlow(emittingPool, "CH4", myself.CH4ToBeEmittedInRainySeason);}
 		CH4ToBeEmittedInRainySeason <- 0.0;
