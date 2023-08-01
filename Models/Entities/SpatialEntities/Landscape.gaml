@@ -25,6 +25,11 @@ global {
 	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell;
 	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell;
 	
+	// Trees initialisation
+	int nbTreesInitHomefields <- 6; // Grillot, 2018
+	int nbTreesInitBushfields <- 10; // Grillot, 2018
+	int nbTreesInitRangeland <- 15; // Grillot, 2018
+		
 	// Weeds biomass production parameters
 	float weedProdRangelandHa <- 0.0; //475.0; // kgDM/ha Grillot 2018
 	float weedProdCroplandHa <- 0.0; //100.0; // kgDM/ha Grillot 2018
@@ -51,11 +56,9 @@ global {
 	
 	//// Global landscape functions
 	
-	action initGrazableCells {
+	action initGrid {
 		write "Initialising landscape grid";
 		ask nonEmptyLandscape {
-			
-			 nbTrees <- int(floor(abs(gauss(3,2)))); // TODO DUMMY
 			 
 			// Check LUList in GenerateSpatialInput for cellLUId
 			if !(cellLUId in [1, 2, 3, 7, 9, 11]) {
@@ -70,10 +73,12 @@ global {
 				if cellLUId in [2, 3, 9] {
 					cellLU <- "Cropland";
 					biomassContent <- gauss(cropBiomassContentInit, cropBiomassContentInit * 0.1);
+					nbTrees <- nbTreesInitBushfields;
 				} else {
 					cellLU <- "Rangeland";
 					targetableCellsForChangingSite <+ self;
 					biomassContent <- gauss(rangelandBiomassContentInit, rangelandBiomassContentInit * 0.1);
+					nbTrees <- nbTreesInitRangeland;
 				}
 				if enabledGUI {
 					do updateColour;
