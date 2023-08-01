@@ -17,12 +17,14 @@ global {
 		"machine_time",
 		"int(self)",
 		"experimentType",
+		
 		// Time
 		"starting_date",
 		"endDate",
 		"cycle",
 		"(current_date - starting_date)/#year",
 		"runTime",
+		
 		// Landscape structure
 		"meteoUpdateType",
 		"fallowEnabled",
@@ -31,14 +33,19 @@ global {
 		"rangelandSurface",
 		"bushfieldsSurface",
 		"homefieldsSurface",
-		"homeFieldsRadius",
+		"nbHomefieldsParcelsTotal",
+		"nbRangelandParcelsTotal",
+		
 		// Population
 		"nbHousehold",
 		"meanHerdSize",
 		"nbTLUHerds",
 		"homeFieldsProportion",
+		"averageNbRangelandsPerHh",
+		"averageNbHomefieldsPerHh",
 		"bushfieldsSurfacePerHh",
 		"homefieldsSurfacePerHh",
+		
 		// Practices
 		"maxNbNightsPerCellInPaddock",
 		"maxNbFallowPaddock",
@@ -47,6 +54,7 @@ global {
 		"propFatteningHh",
 		"nbFatteningHh",
 		"meanFattenedGroupSize",
+		
 		// Biophysical
 		"SOCxSONOn",
 		"SOCxSONAlpha",
@@ -104,20 +112,26 @@ global {
 		float rangelandSurface <- (landscape count (each.cellLU = "Rangeland")) / hectareToCell; // ha
 		float bushfieldsSurface <- (landscape count (each.cellLU = "Cropland" and (each.myParcel = nil or !each.myParcel.homeField ))) / hectareToCell; // ha
 		float homefieldsSurface <- (landscape count (each.cellLU = "Cropland" and (each.homefieldCell ))) / hectareToCell; // ha
+		int nbHomefieldsParcelsTotal <- parcel count (each.homeField);
+		int nbRangelandParcelsTotal <- parcel count (!each.homeField);
 		float bushfieldsSurfacePerHh <- household mean_of (each.myHomeParcelsList sum_of each.parcelSurface);
 		float homefieldsSurfacePerHh <- household mean_of (each.myBushParcelsList sum_of each.parcelSurface);
+		float averageNbHomefieldsPerHh <- household mean_of (length(each.myHomeParcelsList));
+		float averageNbRangelandsPerHh <- household mean_of (length(each.myBushParcelsList));
 		
 		parametersList <- [
 			// Simulation
 			machine_time,
 			int(self),
 			experimentType,
+			
 			// Time
 			starting_date,
 			endDate,
 			cycle,
 			(current_date - starting_date)/#year,
 			runTime,
+			
 			// Landscape structure
 			meteoUpdateType,
 			fallowEnabled,
@@ -126,14 +140,19 @@ global {
 			rangelandSurface,
 			bushfieldsSurface,
 			homefieldsSurface,
-			homeFieldsRadius,
+			nbHomefieldsParcelsTotal,
+			nbRangelandParcelsTotal,
+			
 			// Population
 			nbHousehold,
 			meanHerdSize,
 			nbTLUHerds,
 			homeFieldsProportion,
+			averageNbRangelandsPerHh,
+			averageNbHomefieldsPerHh,
 			bushfieldsSurfacePerHh,
 			homefieldsSurfacePerHh,
+			
 			// Practices
 			maxNbNightsPerCellInPaddock,
 			maxNbFallowPaddock,
@@ -142,6 +161,7 @@ global {
 			propFatteningHh,
 			nbFatteningHh,
 			meanFattenedGroupSize,
+			
 			// Biophysical
 			SOCxSONOn,
 			SOCxSONAlpha,
@@ -190,12 +210,14 @@ global {
 			meanRangelandSOCSVariation, // kgC
 			totalMeanSOCSVariation // kgC
 		];
+		
+		assert length(outputsList) = length(outputsStringList);
+		assert length(parametersList) = length(parametersStringList);
 	}
 }
 
 experiment ExplorationParameters virtual: true {
 	
-	parameter "Home fields area radius (m)" category: "Scenario - Spatial layout" var: homeFieldsRadius min: 0.0;
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold min: 0;
 	parameter "Proportion of transhuming households" category: "Scenario - Population structure" var: propTranshumantHh min: 0.0 max: 1.0;
 	parameter "Proportion of fattening households" category: "Scenario - Population structure" var: propFatteningHh min: 0.0 max: 1.0;
