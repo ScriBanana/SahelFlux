@@ -31,6 +31,10 @@ global {
 	float kineticLabile <- 0.8; // Dimensionless; own regression
 	float kineticStable <- 0.01; // Dimensionless; own regression
 	float humificationCoef <- 0.05; // Dimensionless; own regression
+	init { // Conversion to get the SOC process to work with kgC/cell insteat of tC/ha
+		kineticLabile <- kineticLabile / 1000 / hectareToCell;
+		kineticStable <- kineticStable / 1000 / hectareToCell;
+	}
 	
 	// Setting Euler discretisation solver parameter
 	float criticalNbStepLabileForDiscretisation <- 2 / (kineticLabile * edaphicClimateFactor); // Computed for Euler method.
