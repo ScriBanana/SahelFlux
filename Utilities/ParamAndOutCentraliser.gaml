@@ -103,15 +103,17 @@ global {
 		"meanBushfieldsSOCSVariation (kgC)",
 		"meanRangelandSOCSVariation (kgC)",
 		"totalMeanSOCSVariation (kgC)"
+		
+		// Moran
 	];
 	
 	action gatherOutputsAndParameters {
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
 		float biomassProducingSurface <- length(grazableLandscape) / hectareToCell; // ha
-		float rangelandSurface <- (landscape count (each.cellLU = "Rangeland")) / hectareToCell; // ha
-		float bushfieldsSurface <- (landscape count (each.cellLU = "Cropland" and (each.myParcel = nil or !each.myParcel.homeField ))) / hectareToCell; // ha
-		float homefieldsSurface <- (landscape count (each.cellLU = "Cropland" and (each.homefieldCell ))) / hectareToCell; // ha
+		float rangelandSurface <- (grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell; // ha
+		float bushfieldsSurface <- (grazableLandscape count (each.cellLU = "Cropland" and (each.myParcel = nil or !each.myParcel.homeField ))) / hectareToCell; // ha
+		float homefieldsSurface <- (grazableLandscape count (each.cellLU = "Cropland" and (each.homefieldCell ))) / hectareToCell; // ha
 		int nbHomefieldsParcelsTotal <- parcel count (each.homeField);
 		int nbRangelandParcelsTotal <- parcel count (!each.homeField);
 		float bushfieldsSurfacePerHh <- household mean_of (each.myHomeParcelsList sum_of each.parcelSurface);

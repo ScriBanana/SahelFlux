@@ -111,7 +111,7 @@ global {
  		release list(transhumingHerd) as: mobileHerd {
  			myHousehold.myMobileHerd <- self;
  			location <- currentSleepSpot.location;
-// 			chymeChunksList <- []; TODO temporary? As of now, they poop what they eat 4 months ago.
+// 		chymeChunksList <- []; TODO temporary? As of now, they poop what they ate 4 months ago.
 		}
  	}
  }

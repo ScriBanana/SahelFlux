@@ -18,23 +18,25 @@ global {
 	bool parallelHerds <- false; // Needs to be false for parallel batch runs
 	
 	float meanHerdSize; // <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018)
-	float SDHerdSize;// <- meanHerdSize * 0.4;
+	float SDHerdSize; // <- meanHerdSize * 0.4;
 	
 	// Behaviour parameters
 	float herdSpeed <- 0.833; // m/s = 3 km/h Does not account for grazing speed due to scale. (Own GPS data)
-	float herdVisionRadius <- 20.0 #m; // (Gersie, 2020)
-	int wakeUpTime <- 7; // Time of the day (24h) at which animals are released in the morning (Own accelerometer data)
-	int eveningTime <- 19; // Time of the day (24h) at which animals come back to their sleeping spot (Own accelerometer data)
-	bool sleepTime <- true; 
-	int dailyRestStartTime <- 12; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
-	int dailyRestEndTime <- 15; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
-	bool restTime <- false;
+	float herdVisionRadius <- 20.0 #m const: true; // (Gersie, 2020)
+	int wakeUpTime <- 7 const: true; // Time of the day (24h) at which animals are released in the morning (Own accelerometer data)
+	int eveningTime <- 19 const: true; // Time of the day (24h) at which animals come back to their sleeping spot (Own accelerometer data)
+	int dailyRestStartTime <- 12 const: true; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
+	int dailyRestEndTime <- 15 const: true; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	int maxNbNightsPerCellInPaddock <- 4; // Field data TODO Doit être un UBT/cell demandé à Jonathan
 	int maxNbFallowPaddock <- 2; // TODO Confirm
 	
 	// Zootechnical data
 	float IIRRangelandTLU <- 14.2; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	float IIRCroplandTLU <- 10.9; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
+	
+	// Variables
+	bool sleepTime;
+	bool restTime;
 	
 	reflex herdsInternalClock { // Unsure if time is gained over updates.
 		sleepTime <- !(

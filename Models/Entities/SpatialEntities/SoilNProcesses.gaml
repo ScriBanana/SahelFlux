@@ -20,7 +20,7 @@ global {
 		"HerdsUrine"::[1.0, 0.0, 0.0],
 		"ORP"::[0.4, 0.3, 0.3],
 		"MineralFerti"::[1.0, 0.0, 0.0]
-	];
+	] const: true;
 	
 	// SOC on available N model parameters
 	bool SOCxSONOn <- false;

@@ -15,13 +15,13 @@ global {
 	//// Global manure heap parameters
 	
 	// Input
-	float kitchenWasteInputRate <- 0.33; // kgDM/day/hh
-	float otherWastesInputRate <- 0.25; // kgDM/day/hh (Grillot 2018)
-	float ratioStrawToManureInORP <- 29/71; // kgDM/kgDM, Wade 2016
+	float kitchenWasteInputRate <- 0.33 const: true; // kgDM/day/hh
+	float otherWastesInputRate <- 0.25 const: true; // kgDM/day/hh (Grillot 2018)
+	float ratioStrawToManureInORP <- 29/71 const: true; // kgDM/kgDM, Wade 2016
 	
 	// Spreading
-	float maxManureCartWeight <- 300 / 2; // kgDM expert knowledge
-	float maxORPSpreadPerParcel <- 15500.0; // kgDM/ha ORP Spread on each home parcel each year
+	float maxManureCartWeight <- 300 / 2 const: true; // kgDM expert knowledge
+	float maxORPSpreadPerParcel <- 15500.0 const: true; // kgDM/ha ORP Spread on each home parcel each year
 	
 	//// Global manure heap functions
 	

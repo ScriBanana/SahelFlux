@@ -16,7 +16,7 @@ global {
 	//// Global Animals parameters
 	
 	// Animal constitution
-	float weightTLU <- 250.0; //kg live weight
+	float weightTLU <- 250.0 const: true; //kg live weight
 	
 	// Shared parameters for mobile and fattened
 	float dailyIntakeRatePerMobileTLU <- 6.25; // kgDM/TLU/day Maximum amount of forage biomass consumed daily. (Rivière, 1991)
@@ -24,31 +24,31 @@ global {
 	// Digestion parameters
 	int digestionLengthParamAsInt <- 20; // Hours
 	float digestionLength <- digestionLengthParamAsInt * 3600.0; // Duration of the digestion of biomass in the animals
-	float ratioNExcretedOnIngested <- 0.43; // Lecomte 2002
-	float ratioCExcretedOnIngested <- 0.45; // Lecomte 2002
-	float ratioNUrineOnFaeces <- 0.25; // Wade 2016
-	float urineEnergyFactor <- 0.04; // IPCC 2019; default value for cattle
-	float dietaryEnergyConversionFactor <- 18.45;
+	float ratioNExcretedOnIngested <- 0.43 const: true; // Lecomte 2002
+	float ratioCExcretedOnIngested <- 0.45 const: true; // Lecomte 2002
+	float ratioNUrineOnFaeces <- 0.25 const: true; // Wade 2016
+	float urineEnergyFactor <- 0.04 const: true; // IPCC 2019; default value for cattle
+	float dietaryEnergyConversionFactor <- 18.45 const: true;
 	
 	// Feed nutritional values
-	float milletResiduesEnergyContent <- 17.17; // MJ/kgDM INRA 2018
-	float fattenedRationEnergyContent <- 18.79; // MJ/kgDM Surveys, INRA 2018, Feedipedia
-	float forageDSEnergyContent <- 18.67; // MJ/kgDM INRA 2018
-	float forageRSEnergyContent <- 17.94; // MJ/kgDM INRA 2018 (mean value)
-	float milletResiduesAshContent <- 11.40; // % INRA 2018
-	float fattenedRationAshContent <- 3.838; // % Surveys, INRA 2018, Feedipedia
-	float forageDSAshContent <- 4.6; // % INRA 2018
-	float forageRSAshContent <- 10.25; // % INRA 2018 (mean value)
-	float milletResiduesDigestibility <- 30.0; // % INRA 2018
-	float fattenedRationDigestibility <- 54.9; // % Surveys, INRA 2018, Feedipedia
-	float forageDSDigestibility <- 49.0; // % INRA 2018
-	float forageRSDigestibility <- 60.5; // % INRA 2018 (mean value)
+	float milletResiduesEnergyContent <- 17.17 const: true; // MJ/kgDM INRA 2018
+	float fattenedRationEnergyContent <- 18.79 const: true; // MJ/kgDM Surveys, INRA 2018, Feedipedia
+	float forageDSEnergyContent <- 18.67 const: true; // MJ/kgDM INRA 2018
+	float forageRSEnergyContent <- 17.94 const: true; // MJ/kgDM INRA 2018 (mean value)
+	float milletResiduesAshContent <- 11.40 const: true; // % INRA 2018
+	float fattenedRationAshContent <- 3.838 const: true; // % Surveys, INRA 2018, Feedipedia
+	float forageDSAshContent <- 4.6 const: true; // % INRA 2018
+	float forageRSAshContent <- 10.25 const: true; // % INRA 2018 (mean value)
+	float milletResiduesDigestibility <- 30.0 const: true; // % INRA 2018
+	float fattenedRationDigestibility <- 54.9 const: true; // % Surveys, INRA 2018, Feedipedia
+	float forageDSDigestibility <- 49.0 const: true; // % INRA 2018
+	float forageRSDigestibility <- 60.5 const: true; // % INRA 2018 (mean value)
 	
 	// Carboned gases parameters
-	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
-	float methaneEnergyContent <- 55.65; // MJ/kgCH4
-	float CH4ToCO2Slope <- 0.02859; // Adapted from Aubry et al
-	float CH4ToCO2Offset <- 0.01141; // Adapted from Aubry et al
+	float Fm <- 0.07 const: true; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
+	float methaneEnergyContent <- 55.65 const: true; // MJ/kgCH4
+	float CH4ToCO2Slope <- 0.02859 const: true; // Adapted from Aubry et al
+	float CH4ToCO2Offset <- 0.01141 const: true; // Adapted from Aubry et al
 }
 
 species animalGroup virtual: true schedules: [] { // Not sure if schedules is not already empty if virtual is true.

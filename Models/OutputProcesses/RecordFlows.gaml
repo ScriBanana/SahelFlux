@@ -40,7 +40,7 @@ global {
 		"OF-ToTranshu"::0.0,
 		"OF-GHG"::0.0,
 		"OF-AtmoLosses"::0.0
-	];
+	] const: true;
 	int nbFlows <- length(flowsMapTemplate);
 	int nbInflows <- flowsMapTemplate.pairs count (each.key contains "IF-");
 	int nbThroughflows <- flowsMapTemplate.pairs count (each.key contains "TF-");

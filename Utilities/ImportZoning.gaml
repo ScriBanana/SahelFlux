@@ -24,6 +24,7 @@ global {
 	
 	action readLandscapeInputData {
 		write "Reading grid data from " + "LU&ParcGrid" + villageName + cellSize + ".asc.";
+		nonEmptyLandscape <- list(landscape);
 		ask landscape {
 			if grid_value = 0.0 {
 				nonEmptyLandscape >- self;

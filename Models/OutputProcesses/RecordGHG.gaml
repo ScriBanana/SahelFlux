@@ -15,7 +15,7 @@ global {
 		"CO2"::0.0,
 		"CH4"::0.0,
 		"N2O"::0.0
-	]; // kgCO2/kgCH4/kgN2O
+	] const: true; // kgCO2/kgCH4/kgN2O
 	map<string, map> GHGFlowsMap <- [
 			"Households"::copy(GHGFlowsMapTemplate),
 			"MobileHerds"::copy(GHGFlowsMapTemplate),

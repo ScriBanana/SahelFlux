@@ -20,33 +20,33 @@ global {
 	
 	//// Global landscape parameters
 	
-	float cropBiomassContentInitHa <- 351.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; weeds and crop residues
-	float rangelandBiomassContentInitHa <- 375.0; // kgDM/ha Achard & Banoin (2003) - palatable BM; grass and shrubs
+	float cropBiomassContentInitHa <- 351.0 const: true; // kgDM/ha Achard & Banoin (2003) - palatable BM; weeds and crop residues
+	float rangelandBiomassContentInitHa <- 375.0 const: true; // kgDM/ha Achard & Banoin (2003) - palatable BM; grass and shrubs
 	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell;
 	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell;
 	
 	// Trees initialisation
-	int nbTreesInitHomefields <- 6; // Grillot, 2018
-	int nbTreesInitBushfields <- 10; // Grillot, 2018
-	int nbTreesInitRangeland <- 15; // Grillot, 2018
+	int nbTreesInitHomefields <- 6 const: true; // Grillot, 2018
+	int nbTreesInitBushfields <- 10 const: true; // Grillot, 2018
+	int nbTreesInitRangeland <- 15 const: true; // Grillot, 2018
 		
 	// Weeds biomass production parameters
-	float weedProdRangelandHa <- 0.0; //475.0; // kgDM/ha Grillot 2018
-	float weedProdCroplandHa <- 0.0; //100.0; // kgDM/ha Grillot 2018
+	float weedProdRangelandHa <- 0.0 const: true; //475.0; // kgDM/ha Grillot 2018
+	float weedProdCroplandHa <- 0.0 const: true; //100.0; // kgDM/ha Grillot 2018
 	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
 	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
 	
 	// Roots production
-	float milletRootProportion <- 0.11; // From Manlay 2000 tab 3.1 p.103
-	float groundnutRootProportion <- 0.62; // From Manlay 2000 tab 3.1 p.103
-	float spontVegRootProportion <- 0.57; // From Manlay 2000 tab 1.3 p.47
-	float weedsRootProportion <- 0.57; // From Manlay 2000 tab 1.3 p.47
+	float milletRootProportion <- 0.11 const: true; // From Manlay 2000 tab 3.1 p.103
+	float groundnutRootProportion <- 0.62 const: true; // From Manlay 2000 tab 3.1 p.103
+	float spontVegRootProportion <- 0.57 const: true; // From Manlay 2000 tab 1.3 p.47
+	float weedsRootProportion <- 0.57 const: true; // From Manlay 2000 tab 1.3 p.47
 	
 	// Harvest parameters
-	float milletExportedAgriProductRatio <- 0.3; // Grillot et al, 2018
-	float milletExportedStrawRatio <- 0.38; // Ratio of produced straw that gets exported. Grillot et al, 2018
-	float groundnutExportedBiomassRatio <- 1.0;
-	float fallowExportedBiomass <- 0.55; // Surveys
+	float milletExportedAgriProductRatio <- 0.3 const: true; // Grillot et al, 2018
+	float milletExportedStrawRatio <- 0.38 const: true; // Ratio of produced straw that gets exported. Grillot et al, 2018
+	float groundnutExportedBiomassRatio <- 1.0 const: true;
+	float fallowExportedBiomass <- 0.55 const: true; // Surveys
 	
 	// Cells categories
 	list<landscape> nonEmptyLandscape;
@@ -229,15 +229,15 @@ grid landscape
 	action growBiomass { // To be called nbBiophUpdatesDuringRainySeason times during the rainy season
 	
 		// Grow biomass
-		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesDuringRainySeason;
+		biomassContent <- biomassContent + (yearlyBiomassToBeProduced + yearlyWeedsBiomassToBeProduced) / nbBiophUpdatesInRainySeason;
 		
 		// Registering N (uptake from soil) and C (photosynthesis) flows
 		// Note : groundnut N2 fixation runs through SoilNProcess
-		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesDuringRainySeason;
+		float NFlowsToSaveEachCall <- (1 - weedProportionInBiomass) * thisYearNAvailable / nbBiophUpdatesInRainySeason;
 		if thisYearNFlowReceivingPool = "TF-ToWeeds" { // Weeds out
 			NFlowsToSaveEachCall <- 0.0;
 		}
-		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesDuringRainySeason;
+		float cropCFlowsToSaveEachCall <- yearlyBiomassToBeProduced * thisYearBiomassCContent / nbBiophUpdatesInRainySeason;
 		string emittingPool <- cellLU = "Rangeland" ? "Rangelands" : (homefieldCell ? "HomeFields" : "BushFields");
 		ask world {	do saveFlowInMap("N", emittingPool, myself.thisYearNFlowReceivingPool, NFlowsToSaveEachCall);} // Assumes all N available is consumed.
 		ask world {	do saveFlowInMap("C", myself.thisYearCFlowReceivingPool, "IF-FromAtmo", cropCFlowsToSaveEachCall);}

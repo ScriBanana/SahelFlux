@@ -22,10 +22,10 @@ global {
 	int nbHousehold;
 	float propTranshumantHh min: 0.0 max: 1.0;
 	float propFatteningHh min: 0.0 max: 1.0;
-	int nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
-	int nbFatteningHh <- round(propFatteningHh * nbHousehold);
+	int nbTranshumantHh;
+	int nbFatteningHh;
 	
-	float meanForagePileBiomassContent <- 300.0; // kgDM TODO DUMMY
+	float meanForagePileBiomassContent <- 300.0 const: true; // kgDM TODO DUMMY
 	
 	//// Global households functions
 	
@@ -68,9 +68,10 @@ global {
 		ask nbTranshumantHh among household {
 			isTranshumant <- true;
 		}
+		
 		ask nbFatteningHh among household {
 			doesFattening <- true;
-			myMeanNbFattenedAnx <- abs(gauss(meanFattenedGroupSize, meanFattenedGroupSize * 0.2)) + 0.1;// avoids 0
+			myMeanNbFattenedAnx <- abs(gauss(meanFattenedGroupSize, meanFattenedGroupSize * 0.2) with_precision 3) + 0.1;// avoids 0
 			do renewFattenedAnimals;
 		}
 		
@@ -134,7 +135,7 @@ species household schedules: [] {
 	}
 	
 	action renewFattenedAnimals {
- 		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2); // TODO DUMMY 0.2
+ 		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2) with_precision 2; // TODO DUMMY 0.2
 // 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
  		if
 	 		myForagePileBiomassContent != 0.0 and

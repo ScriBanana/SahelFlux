@@ -19,18 +19,18 @@ global {
 	float homefieldsSOChaInit; // kgC/ha
 	float bushfieldsSOChaInit; // kgC/ha
 	float rangelandSOChaInit; // kgC/ha
-	float homefieldsSOCInit <- homefieldsSOChaInit * hectareToCell; // kgC/cell
-	float bushfieldsSOCInit <- bushfieldsSOChaInit * hectareToCell; // kgC/cell
-	float rangelandSOCInit <- rangelandSOChaInit * hectareToCell; // kgC/cell
+	float homefieldsSOCInit; // kgC/cell
+	float bushfieldsSOCInit; // kgC/cell
+	float rangelandSOCInit; // kgC/cell
 	
 	// SOC model (ICBM) parameters
 	float labileCPoolProportionInit <- 0.2; // own regression
 	float stableCPoolProportionInit <- 0.8; // own regression
 	
-	float edaphicClimateFactor <- 3.0; // Dimensionless; own regression
+	float edaphicClimateFactor <- 3.0 const: true; // Dimensionless; own regression
 	float kineticLabile <- 0.8; // Dimensionless; own regression
 	float kineticStable <- 0.01; // Dimensionless; own regression
-	float humificationCoef <- 0.05; // Dimensionless; own regression
+	float humificationCoef <- 0.05 const: true; // Dimensionless; own regression
 	init { // Conversion to get the SOC process to work with kgC/cell insteat of tC/ha
 		kineticLabile <- kineticLabile / 1000 / hectareToCell;
 		kineticStable <- kineticStable / 1000 / hectareToCell;

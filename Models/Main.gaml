@@ -30,7 +30,7 @@ global {
 	bool enabledGUI <- false;
 	
 	// Village choice
-	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"];
+	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;
 	string villageName <- "Sob" among: villageNamesList;
 	
 	// Space related parameter
@@ -50,7 +50,7 @@ global {
 	int lengthRainySeason <- int(milliseconds_between(
 		date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])
 	) / 86400000.0); // days. Weird, but hard to find better
-	int nbBiophUpdatesDuringRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
+	int nbBiophUpdatesInRainySeason <- int(floor(lengthRainySeason / biophysicalProcessesUpdateFreq));
 	
 	// Time related variables
 	bool updateTimeOfDay <- current_date.hour = startHour + 1 and current_date.minute = 0
@@ -76,7 +76,6 @@ global {
 			starting_date.month >= rainySeasonFirstMonth - ORPSpreadingPeriodLength and
 			starting_date.month < rainySeasonFirstMonth
 		);
-		nonEmptyLandscape <- list(landscape);
 		
 		// All init actions defined in related species files.
 		do readInputParameters;
@@ -84,7 +83,7 @@ global {
 		do readLandscapeInputData;
 		do initGrid;
 		do placeParcels;
-		do instantiateHouseholds; // Calls instantiation functions for several other species.
+		do instantiateHouseholds; // Instantiantes several other species.
 		do designateHomeFields;
 		do createMobileHerds;
 		create transhumance;
