@@ -13,7 +13,6 @@ global {
 	
 	//// Global world grid parameters
 	
-	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m
 	float cellHeight <- cellSize #m;
 	float cellWidth <- cellSize #m;
 	float hectareToCell <- cellWidth * cellHeight / 10000 #m2; // cell/ha
@@ -24,7 +23,7 @@ global {
 	float totalAreaHa <- shape.area / 10000 #m2;
 	
 	action readLandscapeInputData {
-		write "Reading grid data from " + gridData;
+		write "Reading grid data from " + "LU&ParcGrid" + villageName + cellSize + ".asc.";
 		ask landscape {
 			if grid_value = 0.0 {
 				nonEmptyLandscape >- self;
@@ -43,6 +42,7 @@ global {
 		}
 		parcelsIDList <- remove_duplicates(parcelsIDList);
 		parcelsIDList >- 0;
+		write "	Done. Village: " + villageName + ", cell size: " + cellSize + " m.";
 	}
 }
 

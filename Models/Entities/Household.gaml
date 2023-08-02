@@ -19,9 +19,9 @@ global {
 	
 	//// Global households parameters
 	
-	int nbHousehold <- 84; // Grillot 2018
-	float propTranshumantHh <- 0.4 min: 0.0 max: 1.0; // TODO DUMMY
-	float propFatteningHh <- 0.114 min: 0.0 max: 1.0; // Audouin 2014 Diohine
+	int nbHousehold;
+	float propTranshumantHh min: 0.0 max: 1.0;
+	float propFatteningHh min: 0.0 max: 1.0;
 	int nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
 	int nbFatteningHh <- round(propFatteningHh * nbHousehold);
 	

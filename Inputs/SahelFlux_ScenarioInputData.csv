@@ -1,0 +1,16 @@
+Parameter;Format;Sob;Barry;Diohine;Sources
+villageName;string;Sob;Barry;Diohine;
+villageCenterPoint;point;{2100, 1700};{1200, 700};{4300, 3500};
+fallowEnabled;boolean;False;False;True;
+nbHousehold;int;50;29;246;Delaunay Lalou 2012
+propTranshumantHh;float;0.79;0.93;0;Dugy. 2015 (all ruminants)
+propFatteningHh;float;0.56;0.78;0.16;Delaunay Lalou 2012, coherent with CERAO data
+sumAnimalsPerHh;float;7.1;12.9;3.8;CERAO data. all ruminants. TERROIR : S 5,2 B 7,3 D 3,7
+propFattenedAnx;float;0.12;0.19;0.01;From TERROIR input data
+meanHerdSize;float;6.248;10.449;3.762;
+meanFattenedGroupSize;float;0.852;2.451;0.038;
+SDHerdSize;float;2.4992;4.1796;1.5048;Arbitrary *0.4
+homeFieldsProportion;float;0.3;0.6;0.3;CERAO data
+homefieldsSOChaInit;float;16995;15811;21821;Malou personal comm.
+bushfieldsSOChaInit;float;12829;17104;11706;Malou personal comm.
+rangelandSOChaInit;float;11100;11100;11100;Loum according to Ndour 2020

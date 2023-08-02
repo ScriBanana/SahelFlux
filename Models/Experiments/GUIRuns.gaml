@@ -27,7 +27,6 @@ experiment Run type: gui parent: ParamGatherer {
 	
 	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName;
 	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- false;
-	parameter "Home fields area radius (m)" category: "Scenario - Spatial layout" var: homeFieldsRadius min: 0.0;
 	
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold min: 0;
 	parameter "Number transhuming households" category: "Scenario - Population structure" var: propTranshumantHh min: 0.0 max: 1.0;
@@ -93,7 +92,7 @@ experiment SOCDispRun parent: Run {
 	}
 }
 
-experiment stateObserver parent: Run {
+experiment StateObserver parent: Run {
 	
 	init { experimentType <- "stateObserver";}
 	

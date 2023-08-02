@@ -14,9 +14,8 @@ global {
 	//// Global parcels parameters and variables
 	
 	// Parameters
-	point villageCenterPoint <- point(2100, 1700); // TODO doit être une input fonction du scenario
-	float homeFieldsRadius <- 1200 #m; // Distance from village center TODO dummy
-	float homeFieldsProportion <- 0.2; // TODO Dummy
+	point villageCenterPoint;
+	float homeFieldsProportion;
 	
 	// Variables
 	bool fallowEnabled;
@@ -30,7 +29,7 @@ global {
 	// Init functions
 	
 	action placeParcels {
-		write "Placing parcels according to input data";
+		write "Placing parcels according to input data.";
 		
 		list<int> createdParcelsIDList;
 		ask (nonEmptyLandscape where (each.parcelID != 0)) sort_by each.parcelID {
@@ -71,6 +70,7 @@ global {
 					self.homeField <- true;
 					ask myCells {
 						homefieldCell <- true;
+						nbTrees <- nbTreesInitHomefields;
 					}
 					parcelColour <- parcelColour / 1.02; // Arbitrary esthetic factor
 				}

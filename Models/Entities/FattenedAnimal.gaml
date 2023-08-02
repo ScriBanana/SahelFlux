@@ -14,7 +14,7 @@ global {
 	
 	//// Global fattening parameters
 	
-	float meanFattenedGroupSize <- 1.0; // TLU TODO DUMMY
+	float meanFattenedGroupSize; // TLU
 	
 	float fattenedTLUDailyIntake <- 9.59; // kgDM/TLU/day Ndiaye 2022 TODO too high. 7.5 Valenza
 	float strawInFattenedTLUDailyRation <- 2.79; // kgDM/TLU/day Ndiaye 2022, Audouin 2014

@@ -10,6 +10,7 @@
 model SahelFlux
 
 import "../Utilities/UnitTests.gaml"
+import "../Utilities/ImportInputData.gaml"
 import "../Utilities/GenerateExportFiles.gaml"
 import "OutputProcesses/ComputeOutputs.gaml"
 import "Entities/GlobalProcesses.gaml"
@@ -31,6 +32,9 @@ global {
 	// Village choice
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"];
 	string villageName <- "Sob" among: villageNamesList;
+	
+	// Space related parameter
+	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m
 	
 	// Time and calendar parameters
 	float step <- 30.0 #minutes;
@@ -75,16 +79,17 @@ global {
 		nonEmptyLandscape <- list(landscape);
 		
 		// All init actions defined in related species files.
+		do readInputParameters;
 		do resetFlowsMaps;
 		do readLandscapeInputData;
-		do initGrazableCells;
+		do initGrid;
 		do placeParcels;
 		do instantiateHouseholds; // Calls instantiation functions for several other species.
 		do designateHomeFields;
 		do createMobileHerds;
 		create transhumance;
 		do initiateRotations;
-		write "Initialising meteorological conditions for year 1";
+		write "Initialising meteorological conditions for year 1.";
 		do updateMeteo;
 		do initSOCStocks;
 		do getMeanSOCS;
@@ -93,7 +98,7 @@ global {
 		meanRangelandSOCSInit <- meanRangelandSOCS;
 		totalMeanSOCSInit <- totalMeanSOCS;
 		
-		write "Start date : " + starting_date + ", end date : " + endDate;
+		write "Start date : " + starting_date + ", end date : " + endDate + ".";
 		runTime <- (machine_time - startTimeReal) / 60000;
 		write "=== MODEL INITIALISED (" + runTime * 60 + " s) ===";
 	}

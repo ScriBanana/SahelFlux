@@ -44,7 +44,6 @@ global {
 	float forageDSDigestibility <- 49.0; // % INRA 2018
 	float forageRSDigestibility <- 60.5; // % INRA 2018 (mean value)
 	
-	// TODO à grouper dans un fichier param
 	// Carboned gases parameters
 	float Fm <- 0.07; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
 	float methaneEnergyContent <- 55.65; // MJ/kgCH4

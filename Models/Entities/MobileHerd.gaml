@@ -17,9 +17,8 @@ global {
 	
 	bool parallelHerds <- false; // Needs to be false for parallel batch runs
 	
-	//int nbHerds <- 10; // TODO DUMMY 84; // (Grillot et al, 2018)
-	float meanHerdSize <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018) TODO DUMMY
-	float SDHerdSize <- 3.7 * 0.4; // TODO DUMMY
+	float meanHerdSize; // <- 3.7; // Tropical livestock unit (TLU) - cattle and small ruminants (Grillot et al, 2018)
+	float SDHerdSize;// <- meanHerdSize * 0.4;
 	
 	// Behaviour parameters
 	float herdSpeed <- 0.833; // m/s = 3 km/h Does not account for grazing speed due to scale. (Own GPS data)
@@ -38,12 +37,18 @@ global {
 	float IIRCroplandTLU <- 10.9; // instantaneous intake rate; g DM biomass eaten per minute (Chirat et al, 2014)
 	
 	reflex herdsInternalClock { // Unsure if time is gained over updates.
-		sleepTime <- !(abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) < (eveningTime - wakeUpTime - 1) / 2) ? true : false;
-		restTime <- abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) < (dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2 ? true : false;
+		sleepTime <- !(
+			abs(current_date.hour - (eveningTime + wakeUpTime - 1) / 2) <
+			(eveningTime - wakeUpTime - 1) / 2
+		) ? true : false;
+		restTime <-
+			abs(current_date.hour - (dailyRestEndTime + dailyRestStartTime - 1/2 ) / 2) <
+			(dailyRestEndTime - dailyRestStartTime + 1/2 ) / 2
+		? true : false;
 	}
 	
 	action createMobileHerds{
-		write "Creating mobile herds";
+		write "Creating mobile herds.";
 		ask household {
 			create mobileHerd with: [
 				myHousehold::self,

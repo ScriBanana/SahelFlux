@@ -57,7 +57,7 @@ global {
 	//// Global landscape functions
 	
 	action initGrid {
-		write "Initialising landscape grid";
+		write "Initialising landscape grid.";
 		ask nonEmptyLandscape {
 			 
 			// Check LUList in GenerateSpatialInput for cellLUId
@@ -95,7 +95,7 @@ global {
 		}
 		
 		write "	Done. " + length(grazableLandscape where (each.cellLU = "Cropland")) + " ha cropland, "
-			+ length(grazableLandscape where (each.cellLU = "Rangeland")) + " ha rangeland";
+			+ length(grazableLandscape where (each.cellLU = "Rangeland")) + " ha rangeland.";
 	}
 	
 	// Aggregation of biomass content for herds to identify cells to move to and graze and household to decide to leave for transhumance
