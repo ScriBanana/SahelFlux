@@ -159,3 +159,70 @@ experiment StateObserver parent: Run {
 	}
 }
 
+experiment Dashboard parent: BMDispRun {
+	
+	init { experimentType <- "Dashboard";}
+	
+	int nbSleepGoers;
+	int nbSleepers;
+	int nbSpotChangers;
+	int nbGrazers;
+	int nbResters;
+	int totalSleepGoers;
+	int totalSleepers;
+	int totalSpotChangers;
+	int totalGrazers;
+	int totalResters;
+	reflex {
+		nbSleepGoers <- mobileHerd count (each.state = "isGoingToSleepSpot");
+		nbSleepers <- mobileHerd count (each.state = "isSleepingInPaddock");
+		nbSpotChangers <- mobileHerd count (each.state = "isChangingSite");
+		nbGrazers <- mobileHerd count (each.state = "isGrazing");
+		nbResters <- mobileHerd count (each.state = "isResting");
+		totalSleepGoers <- totalSleepGoers + nbSleepGoers;
+		totalSleepers <- totalSleepers + nbSleepers;
+		totalSpotChangers <- totalSpotChangers + nbSpotChangers;
+		totalGrazers <- totalGrazers + nbGrazers;
+		totalResters <- totalResters + nbResters;
+	}
+	
+	output {
+		layout vertical([vertical([0::5000,1::5000])::5000, horizontal([2::5000,3::5000])::5000]) tabs: false;
+		
+		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
+				data "Biomass cropland" value: (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell color: #olive;
+				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
+			}
+		}
+		
+		display SOCCompartiments type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Average SOC per compartment (kgC/ha)" type: series {
+				data "Labile C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
+				data "Stable C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
+				data "Labile C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
+				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
+				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
+				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
+			}
+		}
+		
+		display carbonDisplay type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
+			grid landscape;
+			species SOCStock;
+		}
+		
+		display stateMeter type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
+			chart "State meter" type: pie {
+				data "isGoingToSleepSpot" value: totalSleepGoers color: #blue;
+				data "isSleepingInPaddock" value: totalSleepers color: #darkblue;
+				data "isChangingSite" value: totalSpotChangers color: #red;
+				data "isGrazing" value: totalGrazers color: #green;
+				data "isResting" value: totalResters color: #yellow;
+			}
+		}
+		
+		
+	}
+}
+
