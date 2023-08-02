@@ -52,7 +52,7 @@ global {
 		(1 - milletRootProportion) * (1 - milletExportedAgriProductRatio) * (1 - milletExportedStrawRatio)
 	const: true; // See Biomass production model; NRF = 0.7
 	float rangelandBiomassContentInitHa <-
-		0.7 * 1000 * (0.4322 * ln (meanRainfall) - 1.195) * (1 - spontVegRootProportion) 
+		0.7 * 1000 * (0.4322 * ln (meanRainfall) - 1.195) * (1 - spontVegRootProportion)
 	const: true; // See Biomass production model; NRF = 0.7
 	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell const: true;
 	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell const: true;

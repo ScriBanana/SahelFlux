@@ -98,7 +98,15 @@ global {
 		"SCS",
 		"CFootprint",
 		
+		// Biomass
+		"averageCroplandBiomass (kgDM)",
+		"averageRangelandBiomass (kgDM)",
+		
 		// SOC
+		"meanHomefieldsSOCS (kgC)",
+		"meanBushfieldsSOCS (kgC)",
+		"meanRangelandSOCS (kgC)",
+		"totalMeanSOCS (kgC)",
 		"meanHomefieldsSOCSVariation (kgC)",
 		"meanBushfieldsSOCSVariation (kgC)",
 		"meanRangelandSOCSVariation (kgC)",
@@ -120,6 +128,8 @@ global {
 		float homefieldsSurfacePerHh <- household mean_of (each.myBushParcelsList sum_of each.parcelSurface);
 		float averageNbHomefieldsPerHh <- household mean_of (length(each.myHomeParcelsList));
 		float averageNbRangelandsPerHh <- household mean_of (length(each.myBushParcelsList));
+		float averageCroplandBiomass <- (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell; // kgDM/ha
+		float averageRangelandBiomass <- (grazableLandscape where (each.cellLU = "Rangeland") mean_of each.biomassContent) / hectareToCell; // kgDM/ha
 		
 		parametersList <- [
 			// Simulation
@@ -206,7 +216,15 @@ global {
 			SCS,
 			CFootprint,
 			
+			// Biomass
+			averageCroplandBiomass,
+			averageRangelandBiomass,
+			
 			// SOC
+			meanHomefieldsSOCS, // kgC
+			meanBushfieldsSOCS, // kgC
+			meanRangelandSOCS, // kgC
+			totalMeanSOCS, // kgC
 			meanHomefieldsSOCSVariation, // kgC
 			meanBushfieldsSOCSVariation, // kgC
 			meanRangelandSOCSVariation, // kgC
