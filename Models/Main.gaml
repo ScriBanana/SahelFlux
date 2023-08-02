@@ -11,6 +11,7 @@ model SahelFlux
 
 import "../Utilities/UnitTests.gaml"
 import "../Utilities/ImportInputData.gaml"
+import "../Utilities/ImportZoning.gaml"
 import "../Utilities/GenerateExportFiles.gaml"
 import "OutputProcesses/ComputeOutputs.gaml"
 import "Entities/GlobalProcesses.gaml"
@@ -31,7 +32,7 @@ global {
 	
 	// Village choice
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;
-	string villageName <- "Barry" among: villageNamesList;
+	string villageName <- "Sob" among: villageNamesList;
 	
 	// Space related parameter
 	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m

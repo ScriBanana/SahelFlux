@@ -9,7 +9,6 @@
 model Landscape
 
 import "../../Main.gaml"
-import "../../../Utilities/ImportZoning.gaml"
 import "../../../Utilities/CnNFlowsParameters.gaml"
 import "Parcel.gaml"
 import "SOCStock.gaml"
@@ -19,11 +18,6 @@ import "../GlobalProcesses.gaml"
 global {
 	
 	//// Global landscape parameters
-	
-	float cropBiomassContentInitHa <- 351.0 const: true; // kgDM/ha Achard & Banoin (2003) - palatable BM; weeds and crop residues
-	float rangelandBiomassContentInitHa <- 375.0 const: true; // kgDM/ha Achard & Banoin (2003) - palatable BM; grass and shrubs
-	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell;
-	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell;
 	
 	// Trees initialisation
 	int nbTreesInitHomefields <- 6 const: true; // Grillot, 2018
@@ -47,6 +41,21 @@ global {
 	float milletExportedStrawRatio <- 0.38 const: true; // Ratio of produced straw that gets exported. Grillot et al, 2018
 	float groundnutExportedBiomassRatio <- 1.0 const: true;
 	float fallowExportedBiomass <- 0.55 const: true; // Surveys
+	
+	// Cell biomass parameters
+	float maxCroplandBiomass <-
+		milletMaxYw * (1 - milletRootProportion) * (1 - milletExportedAgriProductRatio) * (1 - milletExportedStrawRatio)
+	const: true;
+	float maxRangelandBiomass <- spontVegMaxYw * (1 - spontVegRootProportion) const: true;
+	float cropBiomassContentInitHa <-
+		0.7 * 950 * (1.8608 * ln (meanRainfall) - 8.6756) *
+		(1 - milletRootProportion) * (1 - milletExportedAgriProductRatio) * (1 - milletExportedStrawRatio)
+	const: true; // See Biomass production model; NRF = 0.7
+	float rangelandBiomassContentInitHa <-
+		0.7 * 1000 * (0.4322 * ln (meanRainfall) - 1.195) * (1 - spontVegRootProportion) 
+	const: true; // See Biomass production model; NRF = 0.7
+	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell const: true;
+	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell const: true;
 	
 	// Cells categories
 	list<landscape> nonEmptyLandscape;
@@ -394,7 +403,6 @@ grid landscape
 		ask world {	do saveFlowInMap("C", emittingPool, soilFlowReciever, remainingResiduesBiomass * residuesAndStrawCContent);}
 		biomassContent <- remainingResiduesBiomass;
 		
-		
 		if enabledGUI {
 			do updateColour;
 		}
@@ -439,15 +447,15 @@ grid landscape
 	action updateColour {
 		if cellLU = "Cropland" { // Ternary possible, but if statement more secure and readable
 			color <- rgb(
-				255 + (216 - 255) / (milletMaxYw * hectareToCell) * biomassContent,
-				255 + (232 - 255) / (milletMaxYw * hectareToCell) * biomassContent,
+				255 + (216 - 255) / (maxCroplandBiomass * hectareToCell) * biomassContent,
+				255 + (232 - 255) / (maxCroplandBiomass * hectareToCell) * biomassContent,
 				180
 			);
 		} else if cellLU = "Rangeland" {
 			color <- rgb(
-				200 + (101 - 200) / (spontVegMaxYw * hectareToCell) * biomassContent,
-				230 + (198 - 230) / (spontVegMaxYw * hectareToCell) * biomassContent,
-				180 + (110 - 180) / (spontVegMaxYw * hectareToCell) * biomassContent
+				200 + (101 - 200) / (maxRangelandBiomass * hectareToCell) * biomassContent,
+				230 + (198 - 230) / (maxRangelandBiomass * hectareToCell) * biomassContent,
+				180 + (110 - 180) / (maxRangelandBiomass * hectareToCell) * biomassContent
 			);
 		}
 		
