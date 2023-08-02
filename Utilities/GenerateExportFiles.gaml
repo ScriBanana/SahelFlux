@@ -66,14 +66,14 @@ global {
 			"ORPHeaps"::length(ORPHeap),
 			"StrawPiles"::length(household),
 			"HomeFields"::(listAllHomeParcels sum_of each.parcelSurface),
-			"BushFields"::((landscape count (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.homeField))) / hectareToCell),
-			"Rangelands"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
+			"BushFields"::((grazableLandscape count (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.homeField))) / hectareToCell),
+			"Rangelands"::((grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell),
 			"Millet"::(parcel sum_of each.parcelSurface),
 			"Groundnut"::(listAllBushParcels sum_of each.parcelSurface),
 			"FallowVeg"::(listAllBushParcels sum_of each.parcelSurface),
-			"SpontVeg"::((landscape count (each.cellLU = "Rangeland")) / hectareToCell),
+			"SpontVeg"::((grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell),
 			"Weeds"::(length(grazableLandscape) / hectareToCell),
-			"Trees"::(landscape sum_of each.nbTrees)
+			"Trees"::(walkableLandscape sum_of each.nbTrees)
 		];
 		
 		string pathN <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Nmat.csv";

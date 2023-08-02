@@ -49,8 +49,6 @@ global {
 			// Assiciating an ORP heap
 			create ORPHeap with: [myHousehold::self] {	
 				myHousehold.myORPHeap <- self;
-				nextSpreadParcelsOrder <- myself.myHomeParcelsList;
-				parcelSpreadOn <- first(nextSpreadParcelsOrder);
 			}
 		}
 		
@@ -135,7 +133,7 @@ species household schedules: [] {
 	}
 	
 	action renewFattenedAnimals {
- 		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2) with_precision 2; // TODO DUMMY 0.2
+ 		float nbFatteningRenewal <- gauss(myMeanNbFattenedAnx, myMeanNbFattenedAnx * 0.2); // TODO DUMMY 0.2
 // 		nbFatteningRenewal <- nbFatteningRenewal * increaseNbTLUBoughtPerTLUSold * nbAnxSoldLastSeason / myMeanNbFattenedAnx;
  		if
 	 		myForagePileBiomassContent != 0.0 and
@@ -149,7 +147,7 @@ species household schedules: [] {
  				)
  			); // Doesn't take into account mobileherds
  		}
- 		nbFatteningRenewal <- floor(nbFatteningRenewal * 100) / 100; // Less decimals
+ 		nbFatteningRenewal <- nbFatteningRenewal  with_precision 2; // Less decimals
  		
  		if nbFatteningRenewal > 0.0 {
 			float boughtFattenedNFlow <- nbFatteningRenewal * TLUNContent * weightTLU;

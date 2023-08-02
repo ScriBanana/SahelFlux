@@ -62,6 +62,7 @@ global {
 				myPaddockList <- copy(myHousehold.myHomeParcelsList);
 				do resetSleepSpot;
 				location <- currentSleepSpot.location;
+				currentCell <- first(landscape overlapping self);
 			}
 		}
 		if enableDebug {assert mobileHerd min_of each.herdSize > 0;}

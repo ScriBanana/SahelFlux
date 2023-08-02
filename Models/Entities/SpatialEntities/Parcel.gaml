@@ -74,6 +74,11 @@ global {
 					}
 					parcelColour <- parcelColour / 1.02; // Arbitrary esthetic factor
 				}
+				
+				ask myORPHeap {
+					nextSpreadParcelsOrder <- myself.myHomeParcelsList;
+					parcelSpreadOn <- first(nextSpreadParcelsOrder);
+				}
 			}
 		}
 		

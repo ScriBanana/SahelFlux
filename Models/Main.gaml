@@ -99,7 +99,7 @@ global {
 		
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
 		runTime <- (machine_time - startTimeReal) / 60000;
-		write "=== MODEL INITIALISED (" + runTime * 60 + " s) ===";
+		write "=== MODEL INITIALISED (" + (runTime * 60) with_precision 2 + " s) ===";
 	}
 	
 	////	--------------------------		////
@@ -147,8 +147,7 @@ global {
 				
 				ask SOCStock { do emitRSSoilCH4;}
 				ask ORPHeap { do emitRSHeapsCH4;}
-				write "	Incorporating and burning (millet) remaining biomass.";
-				write "	Computing plant biomass production for the upcoming rainy season.";
+				write "	Burning remaining biomass and computing future plant biomass production.";
 				ask grazableLandscape {
 					do burnAndIncorporateResidualBiomass;
 					do computeYearlyBiomassProduction;
@@ -227,7 +226,7 @@ global {
 					ask household where each.doesFattening {
 						do renewFattenedAnimals;
 					}
-					write "	Renewed fattened animals. " +  fattenedAnimal sum_of each.groupSize + " new animals.";
+					write "	Renewed " + (fattenedAnimal sum_of each.groupSize) with_precision 2 + " fattened animals.";
 				}
 			}
 		}

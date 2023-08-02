@@ -36,7 +36,7 @@ global {
 				assert false; // TODO Not implemented yet
 			}
 		}
-		write "	Meteo for the year to come : " + yearRainfall + " mm, " + int(yearMeteoQuality * 10) + "/10 groundnut quality.";
+		write "	Meteo : " + yearRainfall + " mm & " + int(yearMeteoQuality * 10) + "/10 groundnut quality.";
 		
 	}
 	
