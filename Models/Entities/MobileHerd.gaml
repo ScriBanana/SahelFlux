@@ -113,9 +113,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	
 	// States
 	state isGoingToSleepSpot {
-//		if !(location overlaps currentSleepSpot.location) {
+		if !(location overlaps currentSleepSpot.location) {
 			do goto on: grazableLandscape speed: herdSpeed target: currentSleepSpot recompute_path: false;
-//		}
+		}
 		
 		transition to: isSleepingInPaddock when: location overlaps currentSleepSpot.location;
 	}

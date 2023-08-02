@@ -103,7 +103,10 @@ species household schedules: [] {
 	//// Functions
 	
 	action checkTranshuCondition {
-		if (myForagePileBiomassContent + (sumBiomassContent / nbHousehold)) / myMobileHerd.dailyIntakeRatePerHerd < nbReserveDaysToTriggerTranshu {
+		if
+			(myForagePileBiomassContent + (sumBiomassContent / nbHousehold)) / myMobileHerd.dailyIntakeRatePerHerd <
+			nbReserveDaysToTriggerTranshu
+		{
 			write "	" + myMobileHerd + " is leaving for transhumance early."; // TODO remove after calibration
 			
 	 		float leavingHerdNFlow <- myMobileHerd.herdSize * TLUNContent * weightTLU;

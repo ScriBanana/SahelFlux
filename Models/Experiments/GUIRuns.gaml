@@ -92,6 +92,20 @@ experiment SOCDispRun parent: Run {
 	}
 }
 
+experiment BMDispRun parent: Run {
+	
+	init { experimentType <- "BMDispRun";}
+	
+	output {
+		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
+				data "Biomass cropland" value: (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell color: #olive;
+				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
+			}
+		}
+	}
+}
+
 experiment StateObserver parent: Run {
 	
 	init { experimentType <- "stateObserver";}
@@ -124,7 +138,7 @@ experiment StateObserver parent: Run {
 	}
 	
 	output {
-		display stateMeter type: java2D {
+		display stateMeter type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "State meter" type: pie {
 				data "isGoingToSleepSpot" value: totalSleepGoers color: #blue;
 				data "isSleepingInPaddock" value: totalSleepers color: #darkblue;

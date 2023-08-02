@@ -73,7 +73,7 @@ global {
 			"FallowVeg"::(listAllBushParcels sum_of each.parcelSurface),
 			"SpontVeg"::((grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell),
 			"Weeds"::(length(grazableLandscape) / hectareToCell),
-			"Trees"::(walkableLandscape sum_of each.nbTrees)
+			"Trees"::(grazableLandscape sum_of each.nbTrees)
 		];
 		
 		string pathN <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Nmat.csv";

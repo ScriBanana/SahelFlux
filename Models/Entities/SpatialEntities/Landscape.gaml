@@ -29,12 +29,12 @@ global {
 	int nbTreesInitHomefields <- 6 const: true; // Grillot, 2018
 	int nbTreesInitBushfields <- 10 const: true; // Grillot, 2018
 	int nbTreesInitRangeland <- 15 const: true; // Grillot, 2018
-		
-	// Weeds biomass production parameters
-	float weedProdRangelandHa <- 0.0 const: true; //475.0; // kgDM/ha Grillot 2018
-	float weedProdCroplandHa <- 0.0 const: true; //100.0; // kgDM/ha Grillot 2018
-	float weedProdRangeland <- weedProdRangelandHa * hectareToCell;
-	float weedProdCropland <- weedProdCroplandHa * hectareToCell;
+	
+	// Yield model parameters
+	float milletMaxYw <- 3775.0 const: true; // Grillot, 2018
+	float spontVegMaxYw <- 1498.0 const: true; // Grillot, 2018
+	float groundnutBaseYield <- 450.0 const: true; // Grillot, 2018
+	// See the rest in the code. Purely copied off Grillot anyway.
 	
 	// Roots production
 	float milletRootProportion <- 0.11 const: true; // From Manlay 2000 tab 3.1 p.103
@@ -50,7 +50,6 @@ global {
 	
 	// Cells categories
 	list<landscape> nonEmptyLandscape;
-	list<landscape> walkableLandscape;
 	list<landscape> grazableLandscape;
 	list<landscape> targetableCellsForChangingSite;
 	
@@ -63,12 +62,8 @@ global {
 			// Check LUList in GenerateSpatialInput for cellLUId
 			if !(cellLUId in [1, 2, 3, 7, 9, 11]) {
 				cellLU <- "NonGrazable";
-				if cellLUId in [4, 6] {
-					walkableLandscape <+ self;
-				}
 			} else {
 				grazableLandscape <+ self;
-				walkableLandscape <+ self;
 				
 				if cellLUId in [2, 3, 9] {
 					cellLU <- "Cropland";
@@ -115,8 +110,19 @@ global {
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
 		targetableCellsForChangingSite <- grazableLandscape where (
-			(each.biomassContent > meanBiomassContent + biomassContentSD)
+			(each.biomassContent >= meanBiomassContent + biomassContentSD)
 		);
+		if empty(targetableCellsForChangingSite) {
+			targetableCellsForChangingSite <- grazableLandscape where (
+				(each.biomassContent >= meanBiomassContent)
+			);
+		}
+		if enableDebug {
+			if empty(targetableCellsForChangingSite) {
+				write drySeason;
+			}
+			assert !empty(targetableCellsForChangingSite);
+		}
 	}
 	
 }
@@ -170,7 +176,7 @@ grid landscape
 			thisYearNFlowReceivingPool <- "TF-ToSpontVeg";
 			thisYearCFlowReceivingPool <- "SpontVeg";
 			thisYearBiomassCContent <- rangelandVegCContent;
-			waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
+			waterLimitedYieldHa <- max(0.0, min(spontVegMaxYw, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 			rootProportion <- spontVegRootProportion;
 			
@@ -181,7 +187,7 @@ grid landscape
 					thisYearNFlowReceivingPool <- "TF-ToMillet";
 					thisYearCFlowReceivingPool <- "Millet";
 					thisYearBiomassCContent <- wholeMilletCContent;
-					waterLimitedYieldHa <- max(0.0, min(3775.0, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
+					waterLimitedYieldHa <- max(0.0, min(milletMaxYw, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
 					rootProportion <- milletRootProportion;
 				
@@ -189,7 +195,7 @@ grid landscape
 					thisYearNFlowReceivingPool <- "TF-ToGroundnut";
 					thisYearCFlowReceivingPool <- "Groundnut";
 					thisYearBiomassCContent <- groundnutAerialPartCContent;
-					waterLimitedYieldHa <- 450.0 + 150 * yearMeteoQuality; // TODO confirmer
+					waterLimitedYieldHa <- groundnutBaseYield + (groundnutBaseYield / 3) * yearMeteoQuality; // TODO confirmer
 					nitrogenReductionFactor <- 1.0; // TODO Faute de mieux?
 					rootProportion <- groundnutRootProportion;
 					
@@ -198,7 +204,7 @@ grid landscape
 					thisYearCFlowReceivingPool <- "FallowVeg";
 					// Same as rangeland veg
 					thisYearBiomassCContent <- fallowVegCContent;
-					waterLimitedYieldHa <- max(0.0, min(1498.0, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
+					waterLimitedYieldHa <- max(0.0, min(spontVegMaxYw, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
 					nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
 					rootProportion <- spontVegRootProportion;
 				
@@ -433,15 +439,15 @@ grid landscape
 	action updateColour {
 		if cellLU = "Cropland" { // Ternary possible, but if statement more secure and readable
 			color <- rgb(
-				255 + (216 - 255) / cropBiomassContentInit * biomassContent,
-				255 + (232 - 255) / cropBiomassContentInit * biomassContent,
+				255 + (216 - 255) / (milletMaxYw * hectareToCell) * biomassContent,
+				255 + (232 - 255) / (milletMaxYw * hectareToCell) * biomassContent,
 				180
 			);
 		} else if cellLU = "Rangeland" {
 			color <- rgb(
-				200 + (101 - 200) / rangelandBiomassContentInit * biomassContent,
-				230 + (198 - 230) / rangelandBiomassContentInit * biomassContent,
-				180 + (110 - 180) / rangelandBiomassContentInit * biomassContent
+				200 + (101 - 200) / (spontVegMaxYw * hectareToCell) * biomassContent,
+				230 + (198 - 230) / (spontVegMaxYw * hectareToCell) * biomassContent,
+				180 + (110 - 180) / (spontVegMaxYw * hectareToCell) * biomassContent
 			);
 		}
 		

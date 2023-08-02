@@ -31,7 +31,7 @@ global {
 	
 	// Village choice
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;
-	string villageName <- "Sob" among: villageNamesList;
+	string villageName <- "Barry" among: villageNamesList;
 	
 	// Space related parameter
 	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m
@@ -80,6 +80,8 @@ global {
 		// All init actions defined in related species files.
 		do readInputParameters;
 		do resetFlowsMaps;
+		write "Initialising meteorological conditions.";
+		do updateMeteo;
 		do readLandscapeInputData;
 		do initGrid;
 		do placeParcels;
@@ -88,8 +90,6 @@ global {
 		do createMobileHerds;
 		create transhumance;
 		do initiateRotations;
-		write "Initialising meteorological conditions for year 1.";
-		do updateMeteo;
 		do initSOCStocks;
 		do getMeanSOCS;
 		meanHomefieldsSOCSInit <- meanHomefieldsSOCS;
