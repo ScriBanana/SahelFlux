@@ -152,6 +152,18 @@ global {
 		save parametersList to: pathParameters format: csv rewrite: false header: false;
 	}
 	
+	action initOutputsDuringSim {
+		list<string> inSimHeader <-  ["Year", "Month", "Cycle", "Machine time", "Runtime"];
+		inSimHeader <<+ list<string>(outputsStringList);
+		
+		save inSimHeader
+			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-Sim" + int(self) + ".csv"
+			format: "csv"
+			rewrite: true
+			header: false
+		;
+	}
+	
 	action saveOutputsDuringSim {
 		do gatherFlows;
 		do computeOutputs;
@@ -163,7 +175,7 @@ global {
 			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-Sim" + int(self) + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
-			header: true
+			header: false
 		;
 	}
 }

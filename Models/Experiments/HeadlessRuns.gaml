@@ -46,6 +46,20 @@ experiment LongRun {
 		experimentType <- "LongRun";
 	}
 	
+	
+	output {
+		display SOCCompartiments type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Average SOC per compartment (kgC/ha)" type: series {
+				data "Labile C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
+				data "Stable C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
+				data "Labile C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
+				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
+				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
+				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
+			}
+		}
+	}
+	
 }
 
 experiment BenchmarkRun benchmark: true autorun: true {
@@ -53,7 +67,7 @@ experiment BenchmarkRun benchmark: true autorun: true {
 	init {
 		parallelHerds <- false;
 		enableDebug <- false;
-		endDate <- date([2021, 11, 1, eveningTime + 1, 0, 0]);
+		endDate <- date([2022, 11, 1, eveningTime + 1, 0, 0]);
 		experimentType <- "BenchmarkRun";
 	}
 }

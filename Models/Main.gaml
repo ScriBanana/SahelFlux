@@ -97,6 +97,7 @@ global {
 		meanBushfieldsSOCSInit <- meanBushfieldsSOCS;
 		meanRangelandSOCSInit <- meanRangelandSOCS;
 		totalMeanSOCSInit <- totalMeanSOCS;
+		if generateMonthlySaves { do initOutputsDuringSim;}
 		
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
 		runTime <- (machine_time - startTimeReal) / 60000;

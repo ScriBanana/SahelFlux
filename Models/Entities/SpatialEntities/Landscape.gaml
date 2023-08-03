@@ -127,9 +127,6 @@ global {
 			);
 		}
 		if enableDebug {
-			if empty(targetableCellsForChangingSite) {
-				write drySeason;
-			}
 			assert !empty(targetableCellsForChangingSite);
 		}
 	}

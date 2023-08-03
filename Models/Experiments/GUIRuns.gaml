@@ -101,6 +101,8 @@ experiment BMDispRun parent: Run {
 			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
 				data "Biomass cropland" value: (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell color: #olive;
 				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
+				data "Mean available biomass" value: meanBiomassContent / hectareToCell color: #brown;
+				data "Available standard deviation" value: biomassContentSD / hectareToCell color: #sienna;
 			}
 		}
 	}
@@ -187,7 +189,7 @@ experiment Dashboard parent: BMDispRun {
 	}
 	
 	output {
-		layout vertical([vertical([0::5000,1::5000])::5000, horizontal([2::5000,3::5000])::5000]) tabs: false;
+		layout vertical([0::3333,1::3333, horizontal([2::5000,3::5000])::3334]);
 		
 		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
 			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {

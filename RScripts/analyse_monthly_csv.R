@@ -13,7 +13,7 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "/"
+path <- "Monthly/"
 file.names <- list.files(paste0(path))
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
@@ -23,7 +23,7 @@ data.df <- data.frame()
 for (i in 1:(length(file.names))){
   tmp <- read.csv(paste0(path,file.names[i]))                            ##lecture du premier CSV qui contient un nombre
   # Appliquer la soustraction de chaque ligne avec la valeur précédente
-  tmp1 <- as.data.frame(lapply(tmp[,6:32], function(x) c(x[1], diff(x))))
+  tmp1 <- as.data.frame(lapply(tmp[,6:38], function(x) c(x[1], diff(x))))
   tmp <- cbind(tmp[,1:5],tmp1)
   tmp$run <- i      ## extraction du nombre depuis le nom du fichier
   data.df <- rbind(data.df, tmp)                                         ##ajout a data frame général, les données de tmp 
@@ -35,7 +35,7 @@ for (i in 1:(length(file.names))){
 
 # Calculer la moyenne par groupe
 df_grouped <- data.df %>%
-  group_by(current_date.month, current_date.year) %>%
+  group_by(Month, Year) %>%
   summarize(totalNFlows..kgN. = mean(totalNFlows..kgN.), 
             totalNInflows..kgN. = mean(totalNInflows..kgN.), 
             totalNThroughflows..kgN. = mean(totalNThroughflows..kgN.), 
@@ -59,8 +59,8 @@ df_grouped <- data.df %>%
             ecosystemGHGBalance..kgCO2eq. = mean(ecosystemGHGBalance..kgCO2eq.), 
             SCS = mean(SCS), 
             CFootprint = mean(CFootprint), 
-            averageCroplandBiomass..kgC. = mean(averageCroplandBiomass..kgC.), 
-            averageRangelandBiomass..kgC. = mean(averageRangelandBiomass..kgC.), 
+            averageCroplandBiomass..kgDM. = mean(averageCroplandBiomass..kgDM.), 
+            averageRangelandBiomass..kgDM. = mean(averageRangelandBiomass..kgDM.), 
             meanHomefieldsSOCS..kgC. = mean(meanHomefieldsSOCS..kgC.), 
             meanBushfieldsSOCS..kgC. = mean(meanBushfieldsSOCS..kgC.), 
             meanRangelandSOCS..kgC. = mean(meanRangelandSOCS..kgC.), 
@@ -72,7 +72,7 @@ df_grouped <- data.df %>%
             .groups = 'drop'
             )
 
-df_grouped$date <- as.Date(paste(df_grouped$current_date.year, sprintf("%02d", df_grouped$current_date.month), "01", sep = "-"), format = "%Y-%m-%d")
+df_grouped$date <- as.Date(paste(df_grouped$Year, sprintf("%02d", df_grouped$Month), "01", sep = "-"), format = "%Y-%m-%d")
 df_grouped <- df_grouped[,-c(1:2)]
 
 df_grouped_diff <- data.frame(
@@ -99,8 +99,8 @@ df_grouped_diff <- data.frame(
     diff(df_grouped$ecosystemGHGBalance..kgCO2eq.),
     diff(df_grouped$SCS),
     diff(df_grouped$CFootprint),
-    diff(df_grouped$averageCroplandBiomass..kgC.),
-    diff(df_grouped$averageRangelandBiomass..kgC.),
+    diff(df_grouped$averageCroplandBiomass..kgDM.),
+    diff(df_grouped$averageRangelandBiomass..kgDM.),
     diff(df_grouped$meanHomefieldsSOCS..kgC.),
     diff(df_grouped$meanBushfieldsSOCS..kgC.),
     diff(df_grouped$meanRangelandSOCS..kgC.),
@@ -112,9 +112,9 @@ df_grouped_diff <- data.frame(
   )
 df_grouped_diff$date <- df_grouped$date[-1]
 
-outFilesName <- "230710-Whole"
+outFilesName <- "230803-Whole"
 
-write.csv(df_grouped_diff, file=paste0(path, "/out/", outFilesName, ".csv"))
+write.csv(df_grouped_diff, file=paste0(outFilesName, ".csv"))
 
 # Conversion du data frame en format long avec la fonction melt()
 df_long <- melt(df_grouped_diff, id.vars = "date")
@@ -143,6 +143,11 @@ levels(df_long$variable) <- c(
     "ecosystemGHGBalance (kgCO2eq)",
     "SCS",
     "CFootprint",
+    "averageCroplandBiomass (kgDM)",
+    "averageRangelandBiomass (kgDM)",
+    "meanBushfieldsSOCS (kgC)",
+    "meanRangelandSOCS (kgC)",
+    "totalMeanSOCS (kgC)",
     "meanHomefieldsSOCSVariation (kgC)",
     "meanBushfieldsSOCSVariation (kgC)",
     "meanRangelandSOCSVariation (kgC)",
@@ -154,10 +159,10 @@ ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
   geom_smooth(span = 0.25)+
   facet_wrap(. ~ variable, scales = "free_y") +
-  labs(title = "Moyenne de 10 réplications de 2020 à 2040")+
+  labs(title = "Moyenne de 52 réplications de 2020 à 2040")+
   theme_bw()+
   ylim(c(-38816740.21,24804845.397))+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
-ggsave(paste0(path, "/out/", outFilesName, ".png"), height = 14, width = 18)
+ggsave(paste0(outFilesName, ".png"), height = 14, width = 18)

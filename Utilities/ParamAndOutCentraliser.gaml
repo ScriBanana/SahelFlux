@@ -26,6 +26,8 @@ global {
 		"runTime",
 		
 		// Landscape structure
+		"villageName",
+		"cellSize",
 		"meteoUpdateType",
 		"fallowEnabled",
 		"totalAreaHa",
@@ -145,6 +147,8 @@ global {
 			runTime,
 			
 			// Landscape structure
+			villageName,
+			cellSize,
 			meteoUpdateType,
 			fallowEnabled,
 			totalAreaHa,
@@ -235,14 +239,3 @@ global {
 		assert length(parametersList) = length(parametersStringList);
 	}
 }
-
-experiment ExplorationParameters virtual: true {
-	
-	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold min: 0;
-	parameter "Proportion of transhuming households" category: "Scenario - Population structure" var: propTranshumantHh min: 0.0 max: 1.0;
-	parameter "Proportion of fattening households" category: "Scenario - Population structure" var: propFatteningHh min: 0.0 max: 1.0;
-	parameter "Mobile herds mean sizes (TLU)" category: "Scenario - Production means repartition" var: meanHerdSize min: 0.0;
-	parameter "Proportion of Home fields among each household parcels" category: "Scenario - Production means repartition" var: homeFieldsProportion min: 0.0;
-	parameter "Mean number of fattened animals per season" category: "Scenario - Production means repartition" var: meanFattenedGroupSize min: 0.0;
-}
-	

@@ -150,7 +150,7 @@ species household schedules: [] {
  				)
  			); // Doesn't take into account mobileherds
  		}
- 		nbFatteningRenewal <- nbFatteningRenewal  with_precision 2; // Less decimals
+ 		nbFatteningRenewal <- nbFatteningRenewal  with_precision 2;
  		
  		if nbFatteningRenewal > 0.0 {
 			float boughtFattenedNFlow <- nbFatteningRenewal * TLUNContent * weightTLU;
