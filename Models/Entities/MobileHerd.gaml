@@ -25,7 +25,7 @@ global {
 	float herdVisionRadius <- 20.0 #m const: true; // (Gersie, 2020)
 	int wakeUpTime <- 7 const: true; // Time of the day (24h) at which animals are released in the morning (Own accelerometer data)
 	int eveningTime <- 19 const: true; // Time of the day (24h) at which animals come back to their sleeping spot (Own accelerometer data)
-	int dailyRestStartTime <- 12 const: true; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
+	int dailyRestStartTime <- 13 const: true; // Time of the day (24h) at which animals start resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	int dailyRestEndTime <- 15 const: true; // Time of the day (24h) at which animals stop resting to avoid heat, if satiety is close to reached (Own accelerometer data)
 	int maxNbNightsPerCellInPaddock <- 4; // Field data TODO Doit être un UBT/cell demandé à Jonathan
 	int maxNbFallowPaddock <- 2; // TODO Confirm
@@ -101,7 +101,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	float IIRRangelandHerd <- IIRRangelandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float IIRCroplandHerd <- IIRCroplandTLU / 1000 * step / #minute * herdSize; // kgDM/herd/timestep
 	float satietyMeter <- 0.0;
-	bool hungry;
+	bool hungry update: satietyMeter <= dailyIntakeRatePerHerd;
 	landscape currentCell update: first(landscape overlapping self);
 	map<string, float> dailyIntakes <- ["Rangeland"::0.0, "HomeFields"::0.0, "BushFields"::0.0];
 	
@@ -181,8 +181,8 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	
 	// Identify if current cell is suitable enough, in comparison to neighbouring cells.
 	list<landscape> checkSpotQuality { // and return visible cells.
-		list<landscape> cellsAround <- landscape at_distance herdVisionRadius; // Seems to cause slow down
-		float goodSpotThreshold <- meanBiomassContent + biomassContentSD; // Gersie, 2020
+		list<landscape> cellsAround <- landscape at_distance herdVisionRadius;
+		float goodSpotThreshold <- meanBiomassContent;// + biomassContentSD; // Gersie, 2020
 		isInGoodSpot <- cellsAround mean_of each.biomassContent > goodSpotThreshold;
 		return cellsAround;
 	}
@@ -211,14 +211,13 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 	action graze (landscape cellToGraze) {
 		string eatenBiomassType <- currentCell.cellLU;
 		float eatenQuantity <- eatenBiomassType = "Rangeland" ? IIRRangelandHerd : IIRCroplandHerd; // kgDM/herd/timestep
-		assert cellToGraze.biomassContent >= 0.0; // Grazing attempt on a depleted cell
+		if enableDebug {	assert cellToGraze.biomassContent >= 0.0;} // Grazing attempt on a depleted cell
 		
 		eatenQuantity <-  cellToGraze.biomassContent > eatenQuantity ? eatenQuantity : cellToGraze.biomassContent;
 		ask cellToGraze {
 			self.biomassContent <- self.biomassContent - eatenQuantity;
 		}
 		satietyMeter <- satietyMeter + eatenQuantity;
-		hungry <- satietyMeter <= dailyIntakeRatePerHerd;
 		chymeChunksList <+ [time, eatenBiomassType::eatenQuantity];
 		dailyIntakes[eatenBiomassType] <- dailyIntakes[eatenBiomassType] + eatenQuantity;
 		
