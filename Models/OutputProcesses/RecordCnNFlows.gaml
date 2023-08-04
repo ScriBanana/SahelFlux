@@ -1,11 +1,11 @@
 /**
 * In: SahelFlux
-* Name: RecordFlows
+* Name: RecordCnNFlows
 * Records flows in flow maps and holds a function to transform it in ENA compliant matrixes
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-model RecordFlows
+model RecordCnNFlows
 
 import "../Main.gaml"
 
@@ -130,7 +130,7 @@ global {
 			"SpontVeg"::copy(GHGFlowsMapTemplate),
 			"Weeds"::copy(GHGFlowsMapTemplate),
 			"Trees"::copy(GHGFlowsMapTemplate)
-	];
+		];
 	}
 	
 	// Flows matrix creation

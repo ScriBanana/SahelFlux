@@ -36,6 +36,10 @@ global {
 	// Variables
 	bool sleepTime;
 	bool restTime;
+	float herdsIntakeFlow;
+	float herdsExcretionsFlow;
+	float totalHerdsIntakeFlow;
+	float totalHerdsExcretionsFlow;
 	
 	reflex herdsInternalClock { // Unsure if time is gained over updates.
 		sleepTime <- !(
@@ -222,6 +226,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		
 		// emitMetaboIntake is called in main.gaml
 		
+		// Follows global grazing rate
+		herdsIntakeFlow <- herdsIntakeFlow + eatenQuantity;
+		
 		string emittingPool;
 		float eatenBiomassNContent;
 		float eatenBiomassCContent;
@@ -278,6 +285,9 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		currentCell.mySoilNProcesses.NInflows["HerdsUrine"] <-
 			currentCell.mySoilNProcesses.NInflows["HerdsUrine"] + mobileHerdIncorporatedUrineN
 		;
+		
+		// Follows global excretion rate
+		herdsExcretionsFlow <- herdsExcretionsFlow + currentVSE;
 		
 		// Save flows to flows map
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (

@@ -37,11 +37,12 @@ experiment LongRun {
 	
 	init {
 		experimentType <- "LongRun";
+		enableDebug <- true;
 	}
 	
 	// 20 year run that records output matrixes each month
 	parameter "Long run start date" category: "Scenario - Time" var: starting_date;
-	parameter "Long run end date" category: "Scenario - Time" var: endDate <- date([2040, 11, 1, eveningTime + 1, 0, 0]);
+	parameter "Long run end date" category: "Scenario - Time" var: endDate <- date([2022, 11, 1, eveningTime + 1, 0, 0]);
 	
 	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- true;
 //	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 50 min: 0;// updates: [nbTranshumantHh, nbFatteningHh];

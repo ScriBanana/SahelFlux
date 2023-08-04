@@ -19,7 +19,7 @@ import "Entities/SpatialEntities/Landscape.gaml"
 import "Entities/Households/Household.gaml"
 import "Entities/Animals/FattenedAnimal.gaml"
 import "Entities/Animals/MobileHerd.gaml"
-import "OutputProcesses/RecordFlows.gaml"
+import "OutputProcesses/RecordCnNFlows.gaml"
 import "OutputProcesses/RecordGHG.gaml"
 import "OutputProcesses/GenerateExportFiles.gaml"
 

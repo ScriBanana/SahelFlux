@@ -105,6 +105,10 @@ global {
 		// Animal density
 		"nbTLUHerdsInArea",
 		"nbTLUFattened",
+		"herdsIntakeFlow (kgDM)",
+		"herdsExcretionsFlow (kgDM VSE)",
+		"totalHerdsIntakeFlow (kgDM)",
+		"totalHerdsExcretionsFlow (kgDM VSE)",
 		
 		// Biomass
 		"averageCroplandBiomass (kgDM)",
@@ -126,8 +130,6 @@ global {
 	
 	action gatherOutputsAndParameters (map NMap, map CMap, map GHGMap)  {
 		
-		do computeOutputs(NMap, CMap, GHGMap);
-		
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		float nbTLUHerdsInArea <- nbTLUHerds;
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
@@ -144,6 +146,8 @@ global {
 		float averageNbRangelandsPerHh <- household mean_of (length(each.myBushParcelsList));
 		float averageCroplandBiomass <- (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell; // kgDM/ha
 		float averageRangelandBiomass <- (grazableLandscape where (each.cellLU = "Rangeland") mean_of each.biomassContent) / hectareToCell; // kgDM/ha
+		
+		do computeOutputs(NMap, CMap, GHGMap);
 		
 		parametersList <- [
 			// Simulation
@@ -235,6 +239,10 @@ global {
 			// Animal density
 			nbTLUHerdsInArea,
 			nbTLUFattened,
+			herdsIntakeFlow,
+			herdsExcretionsFlow,
+			totalHerdsIntakeFlow,
+			totalHerdsExcretionsFlow,
 			
 			// Biomass
 			averageCroplandBiomass,
@@ -250,6 +258,11 @@ global {
 			meanRangelandSOCSVariation, // kgC
 			totalMeanSOCSVariation // kgC
 		];
+		
+		totalHerdsIntakeFlow <- totalHerdsIntakeFlow + herdsIntakeFlow;
+		totalHerdsExcretionsFlow <- totalHerdsExcretionsFlow + herdsExcretionsFlow;
+		herdsIntakeFlow <- 0.0;
+		herdsExcretionsFlow <- 0.0;
 		
 		assert length(outputsList) = length(outputsStringList);
 		assert length(parametersList) = length(parametersStringList);
