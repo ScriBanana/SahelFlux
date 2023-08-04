@@ -8,12 +8,8 @@
 
 model Household
 
-import "../../Utilities/CnNFlowsParameters.gaml"
-import "SpatialEntities/Parcel.gaml"
-import "MobileHerd.gaml"
-import "FattenedAnimal.gaml"
+import "../../Main.gaml"
 import "ORPHeap.gaml"
-import "TranshumanceAndFallows.gaml"
 
 global {
 	

@@ -1,12 +1,12 @@
 /**
 * In: SahelFlux
-* Name: ORPHeap
+* Name: Meteo
 * Rainfall controller
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
-model GlobalProcesses
+model Meteo
 
 global {
 	

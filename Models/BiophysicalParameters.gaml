@@ -1,23 +1,14 @@
 /**
 * In: SahelFlux
-* Name: CnNFlowsParameters
+* Name: BiophysicalParameters
 * Holds C and N flows and stock contents
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
 
-model CnNFlowsParameters
-
-import "ImportZoning.gaml"
+model BiophysicalParameters
 
 global {
-	
-	// Gas stoichiometry
-	float coefCO2ToC <- 0.2729 const: true; // Proportion of C in the mass of CO2
-	float coefCH4ToC <- 0.7487 const: true; // Proportion of C in the mass of CH4
-	float coefCOToC <- 0.4288 const: true; // Proportion of C in the mass of CH4
-	float coefN2OToN <- 0.6365 const: true; // Proportion of N in the mass of N2O
-	float coefNOxToN <- 0.3045 const: true; // Proportion of N in the mass of NO2 (default)
 	
 	// Animals
 	float TLUNContent <- 0.0294 const: true; // kgN/kg Le Noë 2017 and own calculation
@@ -67,17 +58,6 @@ global {
 	float methaneConversionFactorORPPile <- 0.05 const: true; // dimless IPCC 10.17
 	float methaneConversionFactorORPSpread <- 0.01 const: true; // dimless IPCC 10.17
 	
-	// Soil N model
-	float baseNFromSoilHomefieldsHa <- 27.5 const: true; // kgN/ha const: true; Grillot et al., 2018
-	float baseNFromSoilBushfieldsHa <- 12.0 const: true; // kgN/ha const: true; Grillot et al., 2018
-	float baseNAtmoMicroOrgaHa <- 7.5 const: true; // kgN/ha const: true; Grillot et al., 2018
-	float baseNAtmoGroundnutHa <- 20.0 const: true; // kgN/ha const: true; Grillot et al., 2018
-	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectareToCell const: true; // kgN/cell
-	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectareToCell const: true; // kgN/cell
-	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell const: true; // kgN/cell
-	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell const: true; // kgN/cell
-	float baseNAtmoPerTree <- 4.0 const: true; // kgN const: true; Grillot et al., 2018
-	
 	// N gases emission factors
 	float emissionFactorN2OInHeap <- 0.01 const: true; // IPCC t10.21
 	float emissionFactorN2ODeposits <- 0.005 const: true; // IPCC t11.1
@@ -98,6 +78,13 @@ global {
 	float CH4FromBurning <- milletCombustionFactor * fireCH4EmissionFactor const: true;
 	float N2OFromBurning <- milletCombustionFactor * fireN2OEmissionFactor const: true;
 	float NOxFromBurning <- milletCombustionFactor * fireNOxEmissionFactor const: true;
+	
+	// Gas stoichiometry
+	float coefCO2ToC <- 0.2729 const: true; // Proportion of C in the mass of CO2
+	float coefCH4ToC <- 0.7487 const: true; // Proportion of C in the mass of CH4
+	float coefCOToC <- 0.4288 const: true; // Proportion of C in the mass of CH4
+	float coefN2OToN <- 0.6365 const: true; // Proportion of N in the mass of N2O
+	float coefNOxToN <- 0.3045 const: true; // Proportion of N in the mass of NO2 (default)
 	
 	// PRG
 	float PRGCH4 <- 25.0 const: true; // Over 100 years, as recommended by IPCC

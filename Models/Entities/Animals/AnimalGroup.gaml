@@ -8,8 +8,7 @@
 
 model AnimalGroup
 
-import "Household.gaml"
-import "../../Utilities/CnNFlowsParameters.gaml"
+import "../../Main.gaml"
 
 global {
 	

@@ -8,7 +8,7 @@
 
 model RecordGHG
 
-import "RecordFlows.gaml"
+import "../Main.gaml"
 
 global {
 	map<string, float> GHGFlowsMapTemplate <- [

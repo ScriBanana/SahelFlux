@@ -8,7 +8,7 @@
 
 model UnitTests
 
-import "../Models/Main.gaml"
+import "Main.gaml"
 
 global {
 	action inputUnitTests {

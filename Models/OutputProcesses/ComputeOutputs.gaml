@@ -8,9 +8,7 @@
 
 model ComputeOutputs
 
-import "RecordFlows.gaml"
-import "RecordGHG.gaml"
-import "../../Utilities/CnNFlowsParameters.gaml"
+import "../Main.gaml"
 
 global {
 	

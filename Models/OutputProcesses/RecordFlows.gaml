@@ -7,9 +7,9 @@
 
 model RecordFlows
 
+import "../Main.gaml"
+
 global {
-	
-	bool enableDebug <- false;
 	
 	//// Initiate data gathering tools ////
 	
@@ -99,16 +99,16 @@ global {
 		
 		// N flows
 		int originPoolId <- 0;
-		loop poolFlowsMap over: NFlowsMap.pairs {
+		loop flowsMap over: NFlowsMap.pairs {
 			// Inflows on each column of the pool's row
-			map poolInflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains "IF-"));
+			map poolInflowsMap <- map(flowsMap.value.pairs where (each.key contains "IF-"));
 			loop inflowId from: 0 to: nbInflows - 1 {
 				NFlowsMatrix[{inflowId, originPoolId}] <- // originPoolId is here actually the id of the receiving pool
 					NFlowsMatrix[{inflowId, originPoolId}] +
 					float(poolInflowsMap.values[inflowId]);
 			}
 			// Outflows and throughflow on each line the pool's column
-			map poolThroughAndOutflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains_any ["TF-", "OF-"]));
+			map poolThroughAndOutflowsMap <- map(flowsMap.value.pairs where (each.key contains_any ["TF-", "OF-"]));
 			loop recevingPoolId from: 0 to: nbThroughflows + nbOutflows - 1 {
 				NFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}]  <-
 					NFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}] +
@@ -119,16 +119,16 @@ global {
 		
 		// C flows
 		originPoolId <- 0;
-		loop poolFlowsMap over: CFlowsMap.pairs {
+		loop flowsMap over: CFlowsMap.pairs {
 			// Inflows on each column of the pool's row
-			map poolInflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains "IF-"));
+			map poolInflowsMap <- map(flowsMap.value.pairs where (each.key contains "IF-"));
 			loop inflowId from: 0 to: nbInflows - 1 {
 				CFlowsMatrix[{inflowId, originPoolId}] <- // originPoolId is here actually the id of the receiving pool
 					CFlowsMatrix[{inflowId, originPoolId}] +
 					float(poolInflowsMap.values[inflowId]);
 			}
 			// Outflows and throughflow on each line the pool's column
-			map poolThroughAndOutflowsMap <- map(poolFlowsMap.value.pairs where (each.key contains_any ["TF-", "OF-"]));
+			map poolThroughAndOutflowsMap <- map(flowsMap.value.pairs where (each.key contains_any ["TF-", "OF-"]));
 			loop recevingPoolId from: 0 to: nbThroughflows + nbOutflows - 1 {
 				CFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}]  <-
 					CFlowsMatrix[{nbInflows + originPoolId, recevingPoolId}] +

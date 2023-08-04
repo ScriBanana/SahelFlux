@@ -7,7 +7,6 @@
 model Parcel
 
 import "Landscape.gaml"
-import "../Household.gaml"
 
 global {
 	

@@ -7,9 +7,7 @@
 
 model TranshumanceAndFallows
 
-
-import "../../Utilities/CnNFlowsParameters.gaml"
-import "MobileHerd.gaml"
+import "../../Main.gaml"
 
 global {
 	int nbReserveDaysToTriggerTranshu <- 7; // Arbitrary

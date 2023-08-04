@@ -9,11 +9,9 @@
 model Landscape
 
 import "../../Main.gaml"
-import "../../../Utilities/CnNFlowsParameters.gaml"
-import "Parcel.gaml"
 import "SOCStock.gaml"
 import "SoilNProcesses.gaml"
-import "../GlobalProcesses.gaml"
+import "Parcel.gaml"
 
 global {
 	

@@ -9,8 +9,8 @@
 model GenerateSpatialInput
 
 global {
-	string inPath <- "../Inputs/SpatialInputs/";
-	string outPath <- "../Inputs/GridInputs/";
+	string inPath <- "../InputFiles/SpatialInputs/";
+	string outPath <- "../InputFiles/GridInputs/";
 	
 	float startTimeReal <- machine_time;
 	bool endSimu <- false;

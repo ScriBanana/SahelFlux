@@ -9,7 +9,6 @@
 model SOCStock
 
 import "Landscape.gaml"
-import "../../OutputProcesses/RecordFlows.gaml"
 
 global {
 	

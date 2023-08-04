@@ -7,7 +7,7 @@
 
 model ImportZoning
 
-import "../Models/Entities/SpatialEntities/Landscape.gaml"
+import "../Main.gaml"
 
 global {
 	
@@ -17,7 +17,7 @@ global {
 	float cellWidth <- cellSize #m;
 	float hectareToCell <- cellWidth * cellHeight / 10000 #m2; // cell/ha
 	
-	string filePath <- "../Inputs/GridInputs/";
+	string filePath <- "../InputFiles/GridInputs/";
 	file gridData <- file(filePath + "LU&ParcGrid" + villageName + cellSize + ".asc");
 	geometry shape <- envelope(gridData);
 	float totalAreaHa <- shape.area / 10000 #m2;

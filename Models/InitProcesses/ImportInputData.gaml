@@ -8,11 +8,11 @@
 
 model ImportInputData
 
-import "../Models/Entities/Household.gaml"
+import "../Main.gaml"
 
 global {
 	action readInputParameters {
-		csv_file inputDataFile <- csv_file("../Inputs/SahelFlux_ScenarioInputData.csv");
+		csv_file inputDataFile <- csv_file("../InputFiles/SahelFlux_ScenarioInputData.csv");
 		// Watch for character formatting (i.e. e.g. 1,5 instead of 1.5)
 		
 		matrix inputData <- matrix(inputDataFile);

@@ -9,7 +9,6 @@
 model MobileHerd
 
 import "AnimalGroup.gaml"
-import "SpatialEntities/Landscape.gaml"
 
 global {
 	

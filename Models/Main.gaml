@@ -9,16 +9,19 @@
 
 model SahelFlux
 
-import "../Utilities/UnitTests.gaml"
-import "../Utilities/ImportInputData.gaml"
-import "../Utilities/ImportZoning.gaml"
-import "../Utilities/GenerateExportFiles.gaml"
-import "OutputProcesses/ComputeOutputs.gaml"
-import "Entities/GlobalProcesses.gaml"
+import "UnitTests.gaml"
+import "BiophysicalParameters.gaml"
+import "InitProcesses/ImportInputData.gaml"
+import "InitProcesses/ImportZoning.gaml"
+import "Entities/Environment/Meteo.gaml"
+import "Entities/Environment/TranshumanceAndFallows.gaml"
 import "Entities/SpatialEntities/Landscape.gaml"
-import "Entities/AnimalGroup.gaml"
-import "Entities/Household.gaml"
-import "Entities/FattenedAnimal.gaml"
+import "Entities/Households/Household.gaml"
+import "Entities/Animals/FattenedAnimal.gaml"
+import "Entities/Animals/MobileHerd.gaml"
+import "OutputProcesses/RecordFlows.gaml"
+import "OutputProcesses/RecordGHG.gaml"
+import "OutputProcesses/GenerateExportFiles.gaml"
 
 global {
 	
@@ -29,6 +32,7 @@ global {
 	float startTimeReal <- machine_time;
 	bool batchOn <- false;
 	bool enabledGUI <- false;
+	bool enableDebug <- false;
 	
 	// Village choice
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;
@@ -252,8 +256,6 @@ global {
 		
 		write "=== END OF SIMULATION ===";
 		
-		do gatherFlows;
-		do computeOutputs;
 		do gatherOutputsAndParameters;
 		do saveLogOutput;
 		do exportStockFlowsOutputData;

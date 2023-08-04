@@ -8,7 +8,7 @@
 
 model ParamAndOutCentraliser
 
-import "GenerateExportFiles.gaml"
+import "ComputeOutputs.gaml"
 
 global {
 	list parametersList;
@@ -118,6 +118,10 @@ global {
 	];
 	
 	action gatherOutputsAndParameters {
+		
+		do gatherFlows;
+		do computeOutputs;
+		
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
 		float biomassProducingSurface <- length(grazableLandscape) / hectareToCell; // ha

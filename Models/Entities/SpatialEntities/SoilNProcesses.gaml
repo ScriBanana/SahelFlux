@@ -9,11 +9,20 @@
 model SoilNProcesses
 
 import "Landscape.gaml"
-import "../../OutputProcesses/RecordFlows.gaml"
 
 global {
 	
 	//// Global soil N parameters
+	
+	float baseNFromSoilHomefieldsHa <- 27.5 const: true; // kgN/ha const: true; Grillot et al., 2018
+	float baseNFromSoilBushfieldsHa <- 12.0 const: true; // kgN/ha const: true; Grillot et al., 2018
+	float baseNAtmoMicroOrgaHa <- 7.5 const: true; // kgN/ha const: true; Grillot et al., 2018
+	float baseNAtmoGroundnutHa <- 20.0 const: true; // kgN/ha const: true; Grillot et al., 2018
+	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectareToCell const: true; // kgN/cell
+	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectareToCell const: true; // kgN/cell
+	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell const: true; // kgN/cell
+	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell const: true; // kgN/cell
+	float baseNAtmoPerTree <- 4.0 const: true; // kgN const: true; Grillot et al., 2018
 	
 	map<string, list> dungMineraPercentMatrix <- [ // Proportion of N available over the years for : 
 		"HerdsDung"::[0.6, 0.4, 0.0],
