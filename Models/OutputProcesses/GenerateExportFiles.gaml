@@ -27,9 +27,9 @@ global {
 				to: outputDirectory + "SahFl-Log.csv" format: "csv"
 				rewrite: true header: false
 			;
-		} else {
+		} else if enableDebug {
 			matrix logAsMatrix <- matrix(csv_file(outputDirectory + "SahFl-Log.csv"));
-			list logLastRow <- logAsMatrix row_at logAsMatrix.rows - 1;
+			list logLastRow <- logAsMatrix row_at (logAsMatrix.rows - 1);
 			if (logLastRow count (each!= nil)) != (length(parametersStringList) + length(outputsStringList)) {
 				save parametersStringList + outputsStringList
 					to: outputDirectory + "SahFl-Log.csv" format: "csv"
@@ -48,7 +48,7 @@ global {
 	
 	// Saves output to a CSV whenever called during the simulation
 	action saveOutputsDuringSim {
-		do gatherOutputsAndParameters;
+		do gatherOutputsAndParameters(regularOutputNFlowsMap, regularOutputCFlowsMap, regularOutputGHGFlowsMap);
 		
 		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
 		lineToSave <<+ list<float>(outputsList);
@@ -58,6 +58,8 @@ global {
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: false
 		;
+		
+		do resetRegularOutputMap;
 	}
 	
 	// CSV headers

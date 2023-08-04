@@ -74,12 +74,12 @@ global {
 	
 	//// Output computer ////
 	
-	action computeOutputs {
+	action computeOutputs (map NMap, map CMap, map GHGMap) {
 		
 		//// Gather flows
 		
 		// Nitrogen
-		loop poolPair over: NFlowsMap.pairs { // TODO ne marchera pas si gatherflows est call plusieurs fois
+		loop poolPair over: NMap.pairs { // TODO ne marchera pas si gatherflows est call plusieurs fois
 			string poolKey <- poolPair.key;
 			map poolMap <- poolPair.value;
 			loop flowPair over: poolMap.pairs {
@@ -130,7 +130,7 @@ global {
 		
 		
 		// Carbon
-		loop poolPair over: CFlowsMap.pairs {
+		loop poolPair over: CMap.pairs {
 			string poolKey <- poolPair.key;
 			map poolMap <- poolPair.value;
 			loop flowPair over: poolMap.pairs {
@@ -181,10 +181,10 @@ global {
 		}
 		
 		// GHG
-		loop subMap over: GHGFlowsMap.pairs {
+		loop subMap over: GHGMap.pairs {
 			string poolKey <- subMap.key;
-			map GHGMap <- subMap.value;
-			loop flowPair over: GHGMap.pairs {
+			map GHGMapMap <- subMap.value;
+			loop flowPair over: GHGMapMap.pairs {
 				string GHGKey <- flowPair.key;
 				float flowValue <- float(flowPair.value);
 				
@@ -217,6 +217,7 @@ global {
 		// Carbon balance
 		ecosystemGHGBalance <- totalMeanSOCSVariation - totalGHG;
 		
+		// Global ENA indicators (Stark, 2016; Balandier, 2017, Latham, 2006)
 		// TST
 //		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;
 //		float rangeNVarIfNeg <- rangelandNFluxMatrix["periodVarCellNstock"] < 0 ? rangelandNFluxMatrix["periodVarCellNstock"] : 0.0;

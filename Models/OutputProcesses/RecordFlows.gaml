@@ -47,57 +47,103 @@ global {
 	int nbOutflows <- flowsMapTemplate.pairs count (each.key contains "OF-");
 	
 	// Maps of flows for each pool
-	map<string, map> NFlowsMap;
-	map<string, map> CFlowsMap;
+	map<string, map> NFlowsMap <- [
+		"Households"::copy(flowsMapTemplate),
+		"MobileHerds"::copy(flowsMapTemplate),
+		"FattenedAn"::copy(flowsMapTemplate),
+		"ORPHeaps"::copy(flowsMapTemplate),
+		"StrawPiles"::copy(flowsMapTemplate),
+		"HomeFields"::copy(flowsMapTemplate),
+		"BushFields"::copy(flowsMapTemplate),
+		"Rangelands"::copy(flowsMapTemplate),
+		"Millet"::copy(flowsMapTemplate),
+		"Groundnut"::copy(flowsMapTemplate),
+		"FallowVeg"::copy(flowsMapTemplate),
+		"SpontVeg"::copy(flowsMapTemplate),
+		"Weeds"::copy(flowsMapTemplate),
+		"Trees"::copy(flowsMapTemplate)
+	];
+	map<string, map> CFlowsMap <- [ // copy(NFlowsMap) doesn't work because fuck me, I guess
+		"Households"::copy(flowsMapTemplate),
+		"MobileHerds"::copy(flowsMapTemplate),
+		"FattenedAn"::copy(flowsMapTemplate),
+		"ORPHeaps"::copy(flowsMapTemplate),
+		"StrawPiles"::copy(flowsMapTemplate),
+		"HomeFields"::copy(flowsMapTemplate),
+		"BushFields"::copy(flowsMapTemplate),
+		"Rangelands"::copy(flowsMapTemplate),
+		"Millet"::copy(flowsMapTemplate),
+		"Groundnut"::copy(flowsMapTemplate),
+		"FallowVeg"::copy(flowsMapTemplate),
+		"SpontVeg"::copy(flowsMapTemplate),
+		"Weeds"::copy(flowsMapTemplate),
+		"Trees"::copy(flowsMapTemplate)
+	];
 	
-	// Resets values of the flows map to 0.0, after data is gathered in the relevant matrix
-	action resetFlowsMaps {
-		NFlowsMap <- [
-				"Households"::copy(flowsMapTemplate),
-				"MobileHerds"::copy(flowsMapTemplate),
-				"FattenedAn"::copy(flowsMapTemplate),
-				"ORPHeaps"::copy(flowsMapTemplate),
-				"StrawPiles"::copy(flowsMapTemplate),
-				"HomeFields"::copy(flowsMapTemplate),
-				"BushFields"::copy(flowsMapTemplate),
-				"Rangelands"::copy(flowsMapTemplate),
-				"Millet"::copy(flowsMapTemplate),
-				"Groundnut"::copy(flowsMapTemplate),
-				"FallowVeg"::copy(flowsMapTemplate),
-				"SpontVeg"::copy(flowsMapTemplate),
-				"Weeds"::copy(flowsMapTemplate),
-				"Trees"::copy(flowsMapTemplate)
-			];
-		CFlowsMap <- [ // Copy(a template) doesn't work, apparently
-				"Households"::copy(flowsMapTemplate),
-				"MobileHerds"::copy(flowsMapTemplate),
-				"FattenedAn"::copy(flowsMapTemplate),
-				"ORPHeaps"::copy(flowsMapTemplate),
-				"StrawPiles"::copy(flowsMapTemplate),
-				"HomeFields"::copy(flowsMapTemplate),
-				"BushFields"::copy(flowsMapTemplate),
-				"Rangelands"::copy(flowsMapTemplate),
-				"Millet"::copy(flowsMapTemplate),
-				"Groundnut"::copy(flowsMapTemplate),
-				"FallowVeg"::copy(flowsMapTemplate),
-				"SpontVeg"::copy(flowsMapTemplate),
-				"Weeds"::copy(flowsMapTemplate),
-				"Trees"::copy(flowsMapTemplate)
-			];
+	map<string, map> regularOutputNFlowsMap; // Will generate outputs regularly and get reset. Ugly as shit, sorry.
+	map<string, map> regularOutputCFlowsMap;
+	action resetRegularOutputMap {
+		regularOutputNFlowsMap <- [
+			"Households"::copy(flowsMapTemplate),
+			"MobileHerds"::copy(flowsMapTemplate),
+			"FattenedAn"::copy(flowsMapTemplate),
+			"ORPHeaps"::copy(flowsMapTemplate),
+			"StrawPiles"::copy(flowsMapTemplate),
+			"HomeFields"::copy(flowsMapTemplate),
+			"BushFields"::copy(flowsMapTemplate),
+			"Rangelands"::copy(flowsMapTemplate),
+			"Millet"::copy(flowsMapTemplate),
+			"Groundnut"::copy(flowsMapTemplate),
+			"FallowVeg"::copy(flowsMapTemplate),
+			"SpontVeg"::copy(flowsMapTemplate),
+			"Weeds"::copy(flowsMapTemplate),
+			"Trees"::copy(flowsMapTemplate)
+		];
+		regularOutputCFlowsMap <- [
+			"Households"::copy(flowsMapTemplate),
+			"MobileHerds"::copy(flowsMapTemplate),
+			"FattenedAn"::copy(flowsMapTemplate),
+			"ORPHeaps"::copy(flowsMapTemplate),
+			"StrawPiles"::copy(flowsMapTemplate),
+			"HomeFields"::copy(flowsMapTemplate),
+			"BushFields"::copy(flowsMapTemplate),
+			"Rangelands"::copy(flowsMapTemplate),
+			"Millet"::copy(flowsMapTemplate),
+			"Groundnut"::copy(flowsMapTemplate),
+			"FallowVeg"::copy(flowsMapTemplate),
+			"SpontVeg"::copy(flowsMapTemplate),
+			"Weeds"::copy(flowsMapTemplate),
+			"Trees"::copy(flowsMapTemplate)
+		];
+		regularOutputGHGFlowsMap <- [
+			"Households"::copy(GHGFlowsMapTemplate),
+			"MobileHerds"::copy(GHGFlowsMapTemplate),
+			"FattenedAn"::copy(GHGFlowsMapTemplate),
+			"ORPHeaps"::copy(GHGFlowsMapTemplate),
+			"StrawPiles"::copy(GHGFlowsMapTemplate),
+			"HomeFields"::copy(GHGFlowsMapTemplate),
+			"BushFields"::copy(GHGFlowsMapTemplate),
+			"Rangelands"::copy(GHGFlowsMapTemplate),
+			"Millet"::copy(GHGFlowsMapTemplate),
+			"Groundnut"::copy(GHGFlowsMapTemplate),
+			"FallowVeg"::copy(GHGFlowsMapTemplate),
+			"SpontVeg"::copy(GHGFlowsMapTemplate),
+			"Weeds"::copy(GHGFlowsMapTemplate),
+			"Trees"::copy(GHGFlowsMapTemplate)
+	];
 	}
 	
 	// Flows matrix creation
 	matrix<float> NFlowsMatrix <- {nbFlows - nbOutflows, nbFlows - nbInflows} matrix_with 0.0;
 	matrix<float> CFlowsMatrix  <- {nbFlows - nbOutflows, nbFlows - nbInflows} matrix_with 0.0; // I'm scared of copy(NFlowsMatrix) now
 	
-	
 	//// Functions ////
 	
 	// Gather flows saved in the global map into the ENA matrix
 	action gatherFlows {
-		// Could have been a loop over N and C, but nested maps turn into containers somehow, so whatever.
 		
 		// N flows
+		// Could have been a loop over N and C, but nested maps turn into containers somehow, so whatever.
 		int originPoolId <- 0;
 		loop flowsMap over: NFlowsMap.pairs {
 			// Inflows on each column of the pool's row
@@ -137,7 +183,6 @@ global {
 			originPoolId <- originPoolId + 1;
 		}
 		
-//		do resetFlowsMaps;
 	}
 	
 	// Used by agents in ask world statement to save emitted flows in the flows maps
@@ -154,12 +199,12 @@ global {
 		switch flowType {
 			match "C" {
 				CFlowsMap[emittingPool][flowDestination] <- float(CFlowsMap[emittingPool][flowDestination]) + flowValue;
+				regularOutputCFlowsMap[emittingPool][flowDestination] <- float(regularOutputCFlowsMap[emittingPool][flowDestination]) + flowValue;
 			}
 			match "N" {
 				NFlowsMap[emittingPool][flowDestination] <- float(NFlowsMap[emittingPool][flowDestination]) + flowValue;
+				regularOutputNFlowsMap[emittingPool][flowDestination] <- float(regularOutputNFlowsMap[emittingPool][flowDestination]) + flowValue;
 			}
 		}
 	}
-	// Compute global ENA indicators at the end of the simulation (Stark, 2016; Balandier, 2017, Latham, 2006)
-	
 }

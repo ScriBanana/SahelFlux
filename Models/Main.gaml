@@ -69,6 +69,7 @@ global {
 	////			Global init			////
 	////	--------------------------	////
 	init {
+		
 		do inputUnitTests;
 		
 		write "=== RUN " + int(self) + " INITIALISATION ===";
@@ -84,7 +85,7 @@ global {
 		
 		// All init actions defined in related species files.
 		do readInputParameters;
-		do resetFlowsMaps;
+		do resetRegularOutputMap;
 		write "Initialising meteorological conditions.";
 		do updateMeteo;
 		do readLandscapeInputData;
@@ -256,7 +257,8 @@ global {
 		
 		write "=== END OF SIMULATION ===";
 		
-		do gatherOutputsAndParameters;
+		do gatherFlows;
+		do gatherOutputsAndParameters(NFlowsMap, CFlowsMap, GHGFlowsMap);
 		do saveLogOutput;
 		do exportStockFlowsOutputData;
 		

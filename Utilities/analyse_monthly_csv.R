@@ -13,8 +13,7 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-directory <- "../../../BackupSortiesSMA/"
-path <- paste0(directory, "230804-TestReset/")#Monthly/")
+path <- "../../../BackupSortiesSMA/230804-TestReset/"#Monthly/")
 file.names <- list.files(path)
 
 # file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
@@ -24,8 +23,8 @@ data.df <- data.frame()
 for (i in 1:(length(file.names))){
   tmp <- read.csv(paste0(path,file.names[i]))                            ##lecture du premier CSV qui contient un nombre
   # Appliquer la soustraction de chaque ligne avec la valeur précédente
-  tmp1 <- as.data.frame(lapply(tmp[,6:38], function(x) c(x[1], diff(x))))
-  tmp <- cbind(tmp[,1:5],tmp1)
+  # tmp1 <- as.data.frame(lapply(tmp[,6:40], function(x) c(x[1], diff(x))))
+  # tmp <- cbind(tmp[,1:5],tmp1)
   tmp$run <- i      ## extraction du nombre depuis le nom du fichier
   data.df <- rbind(data.df, tmp)                                         ##ajout a data frame général, les données de tmp 
 }
@@ -81,7 +80,7 @@ df_grouped <- df_grouped[,-c(1:2)]
 
 outFilesName <- "Output"
 
-write.csv(df_grouped, file=paste0(directory, outFilesName, ".csv"))
+write.csv(df_grouped, file=paste0(path, outFilesName, ".csv"))
 
 # Conversion du data frame en format long avec la fonction melt()
 df_long <- melt(df_grouped, id.vars = "date")
@@ -134,5 +133,5 @@ ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
-ggsave(paste0(directory, outFilesName, ".png"), height = 14, width = 18)
+ggsave(paste0(path, outFilesName, ".png"), height = 14, width = 18)
 

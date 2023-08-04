@@ -32,6 +32,7 @@ global {
 			"Weeds"::copy(GHGFlowsMapTemplate),
 			"Trees"::copy(GHGFlowsMapTemplate)
 	];
+	map<string, map> regularOutputGHGFlowsMap;
 	
 	action saveGHGFlow (string flowOrigin, string flowType, float flowValue) {
 		if enableDebug {
@@ -40,6 +41,7 @@ global {
 			assert flowOrigin in GHGFlowsMap.keys;
 		}
 		GHGFlowsMap[flowOrigin][flowType] <- float(GHGFlowsMap[flowOrigin][flowType]) + flowValue;
+		regularOutputGHGFlowsMap[flowOrigin][flowType] <- float(regularOutputGHGFlowsMap[flowOrigin][flowType]) + flowValue;
 	}
 	
 }

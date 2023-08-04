@@ -11,6 +11,8 @@ model ParamAndOutCentraliser
 import "ComputeOutputs.gaml"
 
 global {
+	
+	// Headers for parameter and output lists
 	list parametersList;
 	list parametersStringList <- [
 		// Simulation
@@ -121,10 +123,10 @@ global {
 		// Moran
 	];
 	
-	action gatherOutputsAndParameters {
+	
+	action gatherOutputsAndParameters (map NMap, map CMap, map GHGMap)  {
 		
-		do gatherFlows;
-		do computeOutputs;
+		do computeOutputs(NMap, CMap, GHGMap);
 		
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
 		float nbTLUHerdsInArea <- nbTLUHerds;
