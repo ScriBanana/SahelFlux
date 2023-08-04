@@ -137,7 +137,7 @@ global {
 			originPoolId <- originPoolId + 1;
 		}
 		
-//		do resetFlowsMaps; TODO Tester si avoir un gather régulier améliore la perf
+//		do resetFlowsMaps;
 	}
 	
 	// Used by agents in ask world statement to save emitted flows in the flows maps

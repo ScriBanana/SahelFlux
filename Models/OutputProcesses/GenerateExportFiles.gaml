@@ -16,17 +16,29 @@ global {
 	string experimentType;
 	string runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "-";
 	
-	
 	//// LOG
 	
 	// Persistent log of all simulations ran until their conclusion
 	action saveLogOutput {
+		
+		// File or header if need be
 		if !file_exists(outputDirectory + "SahFl-Log.csv") {
 			save parametersStringList + outputsStringList
 				to: outputDirectory + "SahFl-Log.csv" format: "csv"
 				rewrite: true header: false
 			;
+		} else {
+			matrix logAsMatrix <- matrix(csv_file(outputDirectory + "SahFl-Log.csv"));
+			list logLastRow <- logAsMatrix row_at logAsMatrix.rows - 1;
+			if (logLastRow count (each!= nil)) != (length(parametersStringList) + length(outputsStringList)) {
+				save parametersStringList + outputsStringList
+					to: outputDirectory + "SahFl-Log.csv" format: "csv"
+					rewrite: false header: false
+				;
+			}
 		}
+		
+		// Simulation line
 		write "Saving log entry for simulation " + int(self);
 		save parametersList + outputsList to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
 	}

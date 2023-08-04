@@ -11,6 +11,7 @@ import "../Main.gaml"
 
 global {
 	init {
+		generateMonthlySaves <- true; // TODO Shitty workaround
 		parallelHerds <- true;
 	}
 }
@@ -20,6 +21,7 @@ experiment FastAutoRun autorun: true {
 	init {
 		experimentType <- "FastAutoRun";
 		enableDebug <- true;
+		generateMonthlySaves <- false; // TODO Shitty workaround
 	}
 	
 	// 3 month short auto run 
@@ -32,6 +34,11 @@ experiment FastAutoRun autorun: true {
 }
 
 experiment LongRun {
+	
+	init {
+		experimentType <- "LongRun";
+	}
+	
 	// 20 year run that records output matrixes each month
 	parameter "Long run start date" category: "Scenario - Time" var: starting_date;
 	parameter "Long run end date" category: "Scenario - Time" var: endDate <- date([2040, 11, 1, eveningTime + 1, 0, 0]);
@@ -41,10 +48,6 @@ experiment LongRun {
 //	parameter "Number transhuming households" category: "Scenario - Population structure" var: nbTranshumantHh <- 10 min: 0 max: nbHousehold;
 //	parameter "Number fattening households" category: "Scenario - Population structure" var: nbFatteningHh <- 10 min: 0 max: nbHousehold;
 	
-	init {
-		generateMonthlySaves <- true;
-		experimentType <- "LongRun";
-	}
 	
 	
 	output {
@@ -65,10 +68,11 @@ experiment LongRun {
 experiment BenchmarkRun benchmark: true autorun: true {
 	
 	init {
+		experimentType <- "BenchmarkRun";
+		generateMonthlySaves <- false; // TODO Shitty workaround
 		parallelHerds <- false;
 		enableDebug <- false;
 		endDate <- date([2022, 11, 1, eveningTime + 1, 0, 0]);
-		experimentType <- "BenchmarkRun";
 	}
 }
 

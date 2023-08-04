@@ -13,10 +13,11 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "Monthly/"
-file.names <- list.files(paste0(path))
+directory <- "../../../BackupSortiesSMA/"
+path <- paste0(directory, "230804-TestReset/")#Monthly/")
+file.names <- list.files(path)
 
-file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
+# file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
 
 data.df <- data.frame()
 
@@ -36,88 +37,54 @@ for (i in 1:(length(file.names))){
 # Calculer la moyenne par groupe
 df_grouped <- data.df %>%
   group_by(Month, Year) %>%
-  summarize(totalNFlows..kgN. = mean(totalNFlows..kgN.), 
-            totalNInflows..kgN. = mean(totalNInflows..kgN.), 
-            totalNThroughflows..kgN. = mean(totalNThroughflows..kgN.), 
-            totalNOutflows..kgN. = mean(totalNOutflows..kgN.), 
-            totalCFlows..kgC. = mean(totalCFlows..kgC.), 
-            totalCInflows..kgC. = mean(totalCInflows..kgC.), 
-            totalCThroughflows..kgC. = mean(totalCThroughflows..kgC.), 
-            totalCOutflows..kgC. = mean(totalCOutflows..kgC.), 
-            TSTN = mean(TSTN), 
-            ICRN = mean(ICRN), 
-            FinnN = mean(FinnN), 
-            TSTC = mean(TSTC), 
-            ICRC = mean(ICRC), 
-            FinnC = mean(FinnC), 
-            totalCO2..kgCO2. = mean(totalCO2..kgCO2.), 
-            totalCH4..kgCH4. = mean(totalCH4..kgCH4.), 
-            totalN2O..kgN2O. = mean(totalN2O..kgN2O.), 
-            totalGHG..kgCO2eq. = mean(totalGHG..kgCO2eq.), 
-            ecosystemCBalance = mean(ecosystemCBalance), 
-            ecosystemCO2Balance..kgCO2. = mean(ecosystemCO2Balance..kgCO2.), 
-            ecosystemGHGBalance..kgCO2eq. = mean(ecosystemGHGBalance..kgCO2eq.), 
-            SCS = mean(SCS), 
-            CFootprint = mean(CFootprint), 
-            averageCroplandBiomass..kgDM. = mean(averageCroplandBiomass..kgDM.), 
-            averageRangelandBiomass..kgDM. = mean(averageRangelandBiomass..kgDM.), 
-            meanHomefieldsSOCS..kgC. = mean(meanHomefieldsSOCS..kgC.), 
-            meanBushfieldsSOCS..kgC. = mean(meanBushfieldsSOCS..kgC.), 
-            meanRangelandSOCS..kgC. = mean(meanRangelandSOCS..kgC.), 
-            totalMeanSOCS..kgC. = mean(totalMeanSOCS..kgC.), 
-            meanHomefieldsSOCSVariation..kgC. = mean(meanHomefieldsSOCSVariation..kgC.), 
-            meanBushfieldsSOCSVariation..kgC. = mean(meanBushfieldsSOCSVariation..kgC.), 
-            meanRangelandSOCSVariation..kgC. = mean(meanRangelandSOCSVariation..kgC.), 
-            totalMeanSOCSVariation..kgC. = mean(totalMeanSOCSVariation..kgC.), 
-            .groups = 'drop'
-            )
+  summarize(
+    totalNFlows..kgN. = mean(totalNFlows..kgN.),
+    totalNInflows..kgN. = mean(totalNInflows..kgN.),
+    totalNThroughflows..kgN. = mean(totalNThroughflows..kgN.),
+    totalNOutflows..kgN. = mean(totalNOutflows..kgN.),
+    totalCFlows..kgC. = mean(totalCFlows..kgC.),
+    totalCInflows..kgC. = mean(totalCInflows..kgC.),
+    totalCThroughflows..kgC. = mean(totalCThroughflows..kgC.),
+    totalCOutflows..kgC. = mean(totalCOutflows..kgC.),
+    TSTN = mean(TSTN),
+    ICRN = mean(ICRN),
+    FinnN = mean(FinnN),
+    TSTC = mean(TSTC),
+    ICRC = mean(ICRC),
+    FinnC = mean(FinnC),
+    totalCO2..kgCO2. = mean(totalCO2..kgCO2.),
+    totalCH4..kgCH4. = mean(totalCH4..kgCH4.),
+    totalN2O..kgN2O. = mean(totalN2O..kgN2O.),
+    totalGHG..kgCO2eq. = mean(totalGHG..kgCO2eq.),
+    ecosystemCBalance = mean(ecosystemCBalance),
+    ecosystemCO2Balance..kgCO2. = mean(ecosystemCO2Balance..kgCO2.),
+    ecosystemGHGBalance..kgCO2eq. = mean(ecosystemGHGBalance..kgCO2eq.),
+    SCS = mean(SCS),
+    CFootprint = mean(CFootprint),
+    nbTLUHerdsInArea = mean(nbTLUHerdsInArea),
+    nbTLUFattened = mean(nbTLUFattened),
+    averageCroplandBiomass..kgDM. = mean(averageCroplandBiomass..kgDM.),
+    averageRangelandBiomass..kgDM. = mean(averageRangelandBiomass..kgDM.),
+    meanHomefieldsSOCS..kgC. = mean(meanHomefieldsSOCS..kgC.),
+    meanBushfieldsSOCS..kgC. = mean(meanBushfieldsSOCS..kgC.),
+    meanRangelandSOCS..kgC. = mean(meanRangelandSOCS..kgC.),
+    totalMeanSOCS..kgC. = mean(totalMeanSOCS..kgC.),
+    meanHomefieldsSOCSVariation..kgC. = mean(meanHomefieldsSOCSVariation..kgC.),
+    meanBushfieldsSOCSVariation..kgC. = mean(meanBushfieldsSOCSVariation..kgC.),
+    meanRangelandSOCSVariation..kgC. = mean(meanRangelandSOCSVariation..kgC.),
+    totalMeanSOCSVariation..kgC. = mean(totalMeanSOCSVariation..kgC.),
+    .groups = 'drop'
+    )
 
 df_grouped$date <- as.Date(paste(df_grouped$Year, sprintf("%02d", df_grouped$Month), "01", sep = "-"), format = "%Y-%m-%d")
 df_grouped <- df_grouped[,-c(1:2)]
 
-df_grouped_diff <- data.frame(
-    diff(df_grouped$totalNFlows..kgN.),
-    diff(df_grouped$totalNInflows..kgN.),
-    diff(df_grouped$totalNThroughflows..kgN.),
-    diff(df_grouped$totalNOutflows..kgN.),
-    diff(df_grouped$totalCFlows..kgC.),
-    diff(df_grouped$totalCInflows..kgC.),
-    diff(df_grouped$totalCThroughflows..kgC.),
-    diff(df_grouped$totalCOutflows..kgC.),
-    diff(df_grouped$TSTN),
-    diff(df_grouped$ICRN),
-    diff(df_grouped$FinnN),
-    diff(df_grouped$TSTC),
-    diff(df_grouped$ICRC),
-    diff(df_grouped$FinnC),
-    diff(df_grouped$totalCO2..kgCO2.),
-    diff(df_grouped$totalCH4..kgCH4.),
-    diff(df_grouped$totalN2O..kgN2O.),
-    diff(df_grouped$totalGHG..kgCO2eq.),
-    diff(df_grouped$ecosystemCBalance),
-    diff(df_grouped$ecosystemCO2Balance..kgCO2.),
-    diff(df_grouped$ecosystemGHGBalance..kgCO2eq.),
-    diff(df_grouped$SCS),
-    diff(df_grouped$CFootprint),
-    diff(df_grouped$averageCroplandBiomass..kgDM.),
-    diff(df_grouped$averageRangelandBiomass..kgDM.),
-    diff(df_grouped$meanHomefieldsSOCS..kgC.),
-    diff(df_grouped$meanBushfieldsSOCS..kgC.),
-    diff(df_grouped$meanRangelandSOCS..kgC.),
-    diff(df_grouped$totalMeanSOCS..kgC.),
-    diff(df_grouped$meanHomefieldsSOCSVariation..kgC.),
-    diff(df_grouped$meanBushfieldsSOCSVariation..kgC.),
-    diff(df_grouped$meanRangelandSOCSVariation..kgC.),
-    diff(df_grouped$totalMeanSOCSVariation..kgC.)
-  )
-df_grouped_diff$date <- df_grouped$date[-1]
+outFilesName <- "Output"
 
-outFilesName <- "230803-Whole"
-
-write.csv(df_grouped_diff, file=paste0(outFilesName, ".csv"))
+write.csv(df_grouped, file=paste0(directory, outFilesName, ".csv"))
 
 # Conversion du data frame en format long avec la fonction melt()
-df_long <- melt(df_grouped_diff, id.vars = "date")
+df_long <- melt(df_grouped, id.vars = "date")
 levels(df_long$variable) <- c(
     "totalNFlows (kgN)",
     "totalNInflows (kgN)",
@@ -126,7 +93,6 @@ levels(df_long$variable) <- c(
     "totalCFlows (kgC)",
     "totalCInflows (kgC)",
     "totalCThroughflows (kgC)",
-    "totalCOutflows (kgC)",
     "totalCOutflows (kgC)",
     "TSTN",
     "ICRN",
@@ -138,13 +104,16 @@ levels(df_long$variable) <- c(
     "totalCH4 (kgCH4)",
     "totalN2O (kgN2O)",
     "totalGHG (kgCO2eq)",
-    "ecosystemCBalance",
+    "ecosystemCBalance (kgC)",
     "ecosystemCO2Balance (kgCO2)",
     "ecosystemGHGBalance (kgCO2eq)",
     "SCS",
     "CFootprint",
+    "nbTLUHerdsInArea",
+    "nbTLUFattened",
     "averageCroplandBiomass (kgDM)",
     "averageRangelandBiomass (kgDM)",
+    "meanHomefieldsSOCS (kgC)",
     "meanBushfieldsSOCS (kgC)",
     "meanRangelandSOCS (kgC)",
     "totalMeanSOCS (kgC)",
@@ -157,12 +126,13 @@ levels(df_long$variable) <- c(
 # Création du graphique en utilisant ggplot2 et facet_grid()
 ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
-  geom_smooth(span = 0.25)+
+  geom_smooth(span = 0.25) +
   facet_wrap(. ~ variable, scales = "free_y") +
-  labs(title = "Moyenne de 52 réplications de 2020 à 2040")+
-  theme_bw()+
-  ylim(c(-38816740.21,24804845.397))+
+  labs(title = "Moyenne de 52 réplications de 2020 à 2030") +
+  theme_bw() +
+  # ylim(c(-38816740.21,24804845.397)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
-ggsave(paste0(outFilesName, ".png"), height = 14, width = 18)
+ggsave(paste0(directory, outFilesName, ".png"), height = 14, width = 18)
+

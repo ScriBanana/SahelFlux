@@ -100,6 +100,10 @@ global {
 		"SCS",
 		"CFootprint",
 		
+		// Animal density
+		"nbTLUHerdsInArea",
+		"nbTLUFattened",
+		
 		// Biomass
 		"averageCroplandBiomass (kgDM)",
 		"averageRangelandBiomass (kgDM)",
@@ -123,7 +127,9 @@ global {
 		do computeOutputs;
 		
 		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
+		float nbTLUHerdsInArea <- nbTLUHerds;
 		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
+		float nbTLUFattened <- fattenedAnimal sum_of each.groupSize;
 		float biomassProducingSurface <- length(grazableLandscape) / hectareToCell; // ha
 		float rangelandSurface <- (grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell; // ha
 		float bushfieldsSurface <- (grazableLandscape count (each.cellLU = "Cropland" and (each.myParcel = nil or !each.myParcel.homeField ))) / hectareToCell; // ha
@@ -223,6 +229,10 @@ global {
 			ecosystemGHGBalance, // kgCO2eq, SOCS accumulation - GHG emissions
 			SCS,
 			CFootprint,
+			
+			// Animal density
+			nbTLUHerdsInArea,
+			nbTLUFattened,
 			
 			// Biomass
 			averageCroplandBiomass,

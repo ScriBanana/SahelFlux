@@ -105,6 +105,13 @@ experiment BMDispRun parent: Run {
 				data "Available standard deviation" value: biomassContentSD / hectareToCell color: #sienna;
 			}
 		}
+		
+		display animalDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Animals in the simulated area" type: series {
+				data "Mobile herds (TLU)" value: mobileHerd sum_of each.herdSize color: #blue;
+				data "Fattened animals (TLU)" value: fattenedAnimal sum_of each.groupSize color: #orange;
+			}
+		}
 	}
 }
 
@@ -189,7 +196,7 @@ experiment Dashboard parent: BMDispRun {
 	}
 	
 	output {
-		layout vertical([0::3333,1::3333, horizontal([2::5000,3::5000])::3334]);
+		layout vertical([0::2500, 1::2500, 2::2500, horizontal([3::5000,4::5000])::2500]);
 		
 		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
 			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
@@ -206,6 +213,13 @@ experiment Dashboard parent: BMDispRun {
 				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
 				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
 				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
+			}
+		}
+		
+		display animalDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Animals in the simulated area" type: series {
+				data "Mobile herds (TLU)" value: mobileHerd sum_of each.herdSize color: #blue;
+				data "Fattened animals (TLU)" value: fattenedAnimal sum_of each.groupSize color: #orange;
 			}
 		}
 		

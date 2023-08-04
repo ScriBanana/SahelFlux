@@ -102,7 +102,7 @@ global {
 		meanRangelandSOCSInit <- meanRangelandSOCS;
 		totalMeanSOCSInit <- totalMeanSOCS;
 		if generateMonthlySaves { do initOutputsDuringSim;}
-		
+
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
 		runTime <- (machine_time - startTimeReal) / 60000;
 		write "=== MODEL INITIALISED (" + (runTime * 60) with_precision 2 + " s) ===";
