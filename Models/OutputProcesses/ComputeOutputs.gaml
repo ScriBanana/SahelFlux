@@ -26,11 +26,11 @@ global {
 	
 	// Circularity (ENA framework)
 	float TSTN;
+	float pathLengthN;
 	float ICRN;
-	float FinnN;
 	float TSTC;
+	float pathLengthC;
 	float ICRC;
-	float FinnC;
 	
 	// GHG
 	float totalCO2; // kgCO2
@@ -72,6 +72,24 @@ global {
 		"Atmosphere"::[0.0, 0.0, 0.0]
 	];
 	
+	// Derivative of each pools N and C contents (see Finn, 1980)
+	map<string, list> poolsDerivativeMap <- [ // [string::pool :: [float::NFlowDerivative, float::CFlowDerivative]]
+		"Households"::[0.0, 0.0],
+		"MobileHerds"::[0.0, 0.0],
+		"FattenedAn"::[0.0, 0.0],
+		"ORPHeaps"::[0.0, 0.0],
+		"StrawPiles"::[0.0, 0.0],
+		"HomeFields"::[0.0, 0.0],
+		"BushFields"::[0.0, 0.0],
+		"Rangelands"::[0.0, 0.0],
+		"Millet"::[0.0, 0.0],
+		"Groundnut"::[0.0, 0.0],
+		"FallowVeg"::[0.0, 0.0],
+		"SpontVeg"::[0.0, 0.0],
+		"Weeds"::[0.0, 0.0],
+		"Trees"::[0.0, 0.0]
+	];
+	
 	//// Output computer ////
 	
 	action computeOutputs (map NMap, map CMap, map GHGMap) {
@@ -79,7 +97,7 @@ global {
 		//// Gather flows
 		
 		// Nitrogen
-		loop poolPair over: NMap.pairs { // TODO ne marchera pas si gatherflows est call plusieurs fois
+		loop poolPair over: NMap.pairs {
 			string poolKey <- poolPair.key;
 			map poolMap <- poolPair.value;
 			loop flowPair over: poolMap.pairs {
@@ -92,6 +110,7 @@ global {
 					
 					totalNInflows <- totalNInflows + flowValue;
 					TSTN <- TSTN + flowValue;
+					poolsDerivativeMap[poolKey][0] <- float(poolsDerivativeMap[poolKey][0]) + flowValue;
 					
 					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) + flowValue;
 					switch flowKey {
@@ -106,6 +125,7 @@ global {
 				} else if flowKey contains "OF-" {
 					
 					totalNOutflows <- totalNOutflows + flowValue;
+					poolsDerivativeMap[poolKey][0] <- float(poolsDerivativeMap[poolKey][0]) - flowValue;
 					
 					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) - flowValue;
 					switch flowKey {
@@ -121,6 +141,8 @@ global {
 					
 					totalNThroughflows <- totalNThroughflows + flowValue;
 					TSTN <- TSTN + flowValue;
+					poolsDerivativeMap[poolKey][0] <- float(poolsDerivativeMap[poolKey][0]) - flowValue;
+					poolsDerivativeMap[flowPool][0] <- float(poolsDerivativeMap[flowPool][0]) + flowValue;
 					
 					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) - flowValue;
 					poolFlowsMap[flowPool][1] <- float(poolFlowsMap[flowPool][1]) + flowValue;
@@ -142,6 +164,8 @@ global {
 				if flowKey contains "IF-" {
 					
 					totalCInflows <- totalCInflows + flowValue;
+					TSTC <- TSTC + flowValue;
+					poolsDerivativeMap[poolKey][1] <- float(poolsDerivativeMap[poolKey][1]) + flowValue;
 					ecosystemCBalance <- ecosystemCBalance + flowValue;
 					
 					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) + flowValue;
@@ -158,6 +182,7 @@ global {
 				} else if flowKey contains "OF-" {
 					
 					totalCOutflows <- totalCOutflows + flowValue;
+					poolsDerivativeMap[poolKey][1] <- float(poolsDerivativeMap[poolKey][1]) - flowValue;
 					ecosystemCBalance <- ecosystemCBalance - flowValue;
 					
 					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) - flowValue;
@@ -173,6 +198,9 @@ global {
 				} else if flowKey contains "TF-" {
 					
 					totalCThroughflows <- totalCThroughflows + flowValue;
+					TSTC <- TSTC + flowValue;
+					poolsDerivativeMap[poolKey][1] <- float(poolsDerivativeMap[poolKey][1]) - flowValue;
+					poolsDerivativeMap[flowPool][1] <- float(poolsDerivativeMap[flowPool][1]) + flowValue;
 					
 					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) - flowValue;
 					poolFlowsMap[flowPool][0] <- float(poolFlowsMap[flowPool][0]) + flowValue;
@@ -217,20 +245,28 @@ global {
 		// Carbon balance
 		ecosystemGHGBalance <- totalMeanSOCSVariation - totalGHG;
 		
-		// Global ENA indicators (Stark, 2016; Balandier, 2017, Latham, 2006)
+		// Global ENA indicators (Finn, 1980; Stark, 2016; Balandier, 2017; Latham, 2006)
+		float negNDerivatives <- poolsDerivativeMap.values sum_of (float(each[0]) < 0.0 ?  float(each[0]) : 0.0);
+		float posNDerivatives <- poolsDerivativeMap.values sum_of (float(each[0]) > 0.0 ?  float(each[0]) : 0.0);
+		float negCDerivatives <- poolsDerivativeMap.values sum_of (float(each[1]) < 0.0 ?  float(each[1]) : 0.0);
+		float posCDerivatives <- poolsDerivativeMap.values sum_of (float(each[1]) > 0.0 ?  float(each[1]) : 0.0);
+		
+		if enableDebug {
+			assert totalNInflows - negNDerivatives = totalNOutflows + posNDerivatives;
+			assert totalCInflows - negCDerivatives = totalCOutflows + posCDerivatives;
+		}
+		
 		// TST
-//		float cropNVarIfNeg <- croplandNFluxMatrix["periodVarCellNstock"] < 0 ? croplandNFluxMatrix["periodVarCellNstock"] : 0.0;
-//		float rangeNVarIfNeg <- rangelandNFluxMatrix["periodVarCellNstock"] < 0 ? rangelandNFluxMatrix["periodVarCellNstock"] : 0.0;
-//		float herdsNVarIfNeg <- float(NFluxMap["herds"]["varHerdsNStock"]) < 0 ? float(NFluxMap["herds"]["varHerdsNStock"]) : 0.0;
-//		TST <- TT + croplandNFluxMatrix["periodAtmoNFix"] + rangelandNFluxMatrix["periodAtmoNFix"] - cropNVarIfNeg - rangeNVarIfNeg - herdsNVarIfNeg;
-
+		TSTN <- TSTN - negNDerivatives;
+		TSTC <- TSTC - negCDerivatives;
+		
+		// PL
+		pathLengthN <- totalNInflows - negNDerivatives != 0.0 ? TSTN / (totalNInflows - negNDerivatives) : 0.0;
+		pathLengthC <- totalCInflows - negCDerivatives != 0.0 ? TSTC / (totalCInflows - negCDerivatives) : 0.0;
+		
 		// ICR
-		if TSTN != 0 {
-			ICRN <- totalNThroughflows / TSTN;
-		}
-		if TSTC != 0 {
-			ICRC <- totalCThroughflows / TSTC;
-		}
+		ICRN <- TSTN != 0.0 ? totalNThroughflows / TSTN : 0.0;
+		ICRC <- TSTC != 0.0 ? totalCThroughflows / TSTC : 0.0;
 		
 	}
 	

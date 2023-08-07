@@ -52,9 +52,10 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 //	}
 }
 
-experiment BatchLongRuns autorun: true type: batch repeat: 52 until: endSimu {
+experiment BatchLongRuns autorun: true type: batch repeat: 1 until: endSimu {
 	
-	parameter "Simulation length (years)" var: lengthSimu <- 20.0;
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
+	parameter "Simulation length (years)" var: lengthSimu <- 0.2;
 	
 	init {
 		generateMonthlySaves <- true;

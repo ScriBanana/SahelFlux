@@ -84,10 +84,8 @@ global {
 		// Circularity (ENA framework)
 		"TSTN",
 		"ICRN",
-		"FinnN",
 		"TSTC",
 		"ICRC",
-		"FinnC",
 		
 		// GHG
 		"totalCO2 (kgCO2)",
@@ -218,10 +216,8 @@ global {
 			// Circularity (ENA framework)
 			TSTN,
 			ICRN,
-			FinnN,
 			TSTC,
 			ICRC,
-			FinnC,
 			
 			// GHG
 			totalCO2, // kgCO2
