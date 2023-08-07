@@ -27,7 +27,7 @@ global {
 				to: outputDirectory + "SahFl-Log.csv" format: "csv"
 				rewrite: true header: false
 			;
-		} else if enableDebug {
+		} else if enableDebug { // Doesn't work with parallel runs
 			matrix logAsMatrix <- matrix(csv_file(outputDirectory + "SahFl-Log.csv"));
 			list logLastRow <- logAsMatrix row_at (logAsMatrix.rows - 1);
 			if (logLastRow count (each!= nil)) != (length(parametersStringList) + length(outputsStringList)) {

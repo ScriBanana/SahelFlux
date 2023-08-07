@@ -103,7 +103,8 @@ global {
 		meanRangelandSOCSInit <- meanRangelandSOCS;
 		totalMeanSOCSInit <- totalMeanSOCS;
 		if generateMonthlySaves { do initOutputsDuringSim;}
-
+		
+		write "Village layout : " + villageName;
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
 		runTime <- (machine_time - startTimeReal) / 60000;
 		write "=== MODEL INITIALISED (" + (runTime * 60) with_precision 2 + " s) ===";
@@ -147,17 +148,17 @@ global {
 				
 				do captureRemainingTranshumants;
 				
-				if fallowEnabled {
-					write "	Restricting herd movement to fallows";
-					do transitionToFallows;
-				}
-				
 				ask SOCStock { do emitRSSoilCH4;}
 				ask ORPHeap { do emitRSHeapsCH4;}
 				write "	Burning remaining biomass and computing future plant biomass production.";
 				ask grazableLandscape {
 					do burnAndIncorporateResidualBiomass;
 					do computeYearlyBiomassProduction;
+				}
+				
+				if fallowEnabled {
+					write "	Restricting herd movement to fallows";
+					do transitionToFallows;
 				}
 				
 			}

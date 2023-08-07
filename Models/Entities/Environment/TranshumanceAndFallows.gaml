@@ -33,8 +33,10 @@ global {
 		write "Restrincting remaining herds to fallows and contiguous rangelands.";
 		
 		// Restrict grazable area
-		grazableLandscape <- landscape where (each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.nextRSCover = "Fallow")));
-		targetableCellsForChangingSite <- landscape where (each.myParcel != nil and each.myParcel.nextRSCover = "Fallow");
+		walkableLandscape <- nonEmptyLandscape where (
+			each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.nextRSCover = "Fallow"))
+		);
+		targetableCellsForChangingSite <- walkableLandscape where (each.myParcel != nil and each.myParcel.nextRSCover = "Fallow");
 		
 		// Moving herds
 		list<parcel> fallowParcelsNotPaddockedList <- listAllBushParcels where (each.nextRSCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
@@ -77,8 +79,8 @@ global {
 	
 	action transitionFromFallows {
 		// Unrestrict grazable area
-		grazableLandscape <- landscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
-		targetableCellsForChangingSite <- landscape where (each.cellLU = "Rangeland");
+		walkableLandscape <- nonEmptyLandscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
+		do updateTargetableCellsForChangingSiteInDS;
 		
 		ask mobileHerd where !(each.myHousehold.isTranshumant) {
 			// Set paddocking variable to those of the last dry season

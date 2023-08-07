@@ -58,6 +58,7 @@ global {
 	// Cells categories
 	list<landscape> nonEmptyLandscape;
 	list<landscape> grazableLandscape;
+	list<landscape> walkableLandscape;
 	list<landscape> targetableCellsForChangingSite;
 	
 	//// Global landscape functions
@@ -71,6 +72,7 @@ global {
 				cellLU <- "NonGrazable";
 			} else {
 				grazableLandscape <+ self;
+				walkableLandscape <+ self;
 				
 				if cellLUId in [2, 3, 9] {
 					cellLU <- "Cropland";
@@ -116,11 +118,11 @@ global {
 	
 	// Updates mobile herds changing site potential targets
 	action updateTargetableCellsForChangingSiteInDS {
-		targetableCellsForChangingSite <- grazableLandscape where (
+		targetableCellsForChangingSite <- walkableLandscape where (
 			(each.biomassContent >= meanBiomassContent + biomassContentSD)
 		);
 		if empty(targetableCellsForChangingSite) {
-			targetableCellsForChangingSite <- grazableLandscape where (
+			targetableCellsForChangingSite <- walkableLandscape where (
 				(each.biomassContent >= meanBiomassContent)
 			);
 		}
