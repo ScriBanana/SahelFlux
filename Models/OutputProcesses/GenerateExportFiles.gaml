@@ -53,7 +53,7 @@ global {
 		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
 		lineToSave <<+ list<float>(outputsList);
 		save lineToSave
-			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-Sim" + int(self) + ".csv"
+			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: false
@@ -68,7 +68,7 @@ global {
 		inSimHeader <<+ list<string>(outputsStringList);
 		
 		save inSimHeader
-			to: outputDirectory + "Monthly/" + runPrefix + "Out-MnthSv-Sim" + int(self) + ".csv"
+			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
 			rewrite: true
 			header: false

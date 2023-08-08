@@ -240,6 +240,8 @@ global {
 		meanRangelandSOCSVariation <- meanRangelandSOCS - meanRangelandSOCSInit; // kgC
 		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
 		
+//		matrix moranWeightMatrix <- getMoranWeights();
+		
 		//// Compute derivated outputs
 		
 		// Carbon balance
@@ -269,5 +271,11 @@ global {
 		ICRC <- TSTC != 0.0 ? totalCThroughflows / TSTC : 0.0;
 		
 	}
+	
+//	action getMoranWeights {
+//		matrix moranWeightsMatrix <- 0.0 as_matrix {1,2};
+//		
+//		return moranWeightsMatrix;
+//	}
 	
 }

@@ -17,7 +17,7 @@ global {
 	}
 }
 
-experiment Run type: gui parent: ParamGatherer {
+experiment Run type: gui {
 	
 	init { experimentType <- "GUIRun";}
 	
@@ -48,6 +48,9 @@ experiment Run type: gui parent: ParamGatherer {
 	parameter "Parcels borders as" category: "Display options" var: parcelsAspect <- "Owner" among: ["Owner", "Cover"];
 	
 	output {
+		layout #split consoles: true editors: false navigator: false
+			tray: false tabs: true toolbars: false controls: true;
+		
 		display mainDisplay type: java2D {
 			grid landscape;
 			species parcel;
@@ -56,17 +59,120 @@ experiment Run type: gui parent: ParamGatherer {
 	}
 }
 
-experiment FallowtoRun parent: Run autorun: true {
+experiment Dashboard type: gui autorun: true {
 	
-	init { experimentType <- "FallowtoRun";}
+	init {
+		experimentType <- "Dashboard";
+	}
 	
-	// Auto run for the fallow period only
-	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold <- 20 min: 0;
-	parameter "Number transhuming households" category: "Scenario - Population structure" var: propTranshumantHh <- 0.5 min: 0.0 max: 1.0;
-	parameter "Short run start date" var: starting_date <- date([2020, 6, 10, eveningTime + 1, 0, 0]);
-	parameter "Short run end date" var: endDate <- date([2020, 12, 30, eveningTime + 1, 0, 0]);
-	parameter "Parcels borders as" category: "Display options" var: parcelsAspect <- "Cover" among: ["Owner", "Cover"];
-	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- true;
+	int nbSleepGoers;
+	int nbSleepers;
+	int nbSpotChangers;
+	int nbGrazers;
+	int nbResters;
+	int totalSleepGoers;
+	int totalSleepers;
+	int totalSpotChangers;
+	int totalGrazers;
+	int totalResters;
+	
+	float meanTLU <- 1.0;
+	list<float> TLUList;
+	
+	reflex {
+		nbSleepGoers <- mobileHerd count (each.state = "isGoingToSleepSpot");
+		nbSleepers <- mobileHerd count (each.state = "isSleepingInPaddock");
+		nbSpotChangers <- mobileHerd count (each.state = "isChangingSite");
+		nbGrazers <- mobileHerd count (each.state = "isGrazing");
+		nbResters <- mobileHerd count (each.state = "isResting");
+		totalSleepGoers <- totalSleepGoers + nbSleepGoers;
+		totalSleepers <- totalSleepers + nbSleepers;
+		totalSpotChangers <- totalSpotChangers + nbSpotChangers;
+		totalGrazers <- totalGrazers + nbGrazers;
+		totalResters <- totalResters + nbResters;
+		
+		if updateTimeOfDay {
+			TLUList <+ float(mobileHerd sum_of each.herdSize);
+			
+			if current_date != (starting_date add_hours 1) and current_date.day = 1 {
+				meanTLU <- mean(TLUList);
+				write TLUList;
+				write meanTLU;
+				write herdsIntakeFlow;
+				write herdsExcretionsFlow;
+				TLUList <- [];
+				herdsIntakeFlow <- 0.0;
+				herdsExcretionsFlow <- 0.0;
+			}
+		}
+	}
+	
+	output {
+//		layout #split;
+		layout horizontal([
+				vertical([0::1667, 1::1667, 2::1667])::1000,
+				vertical([3::2500, 4::2500])::2000,
+				vertical([5::2500, 6::2500])::2000
+			])
+			consoles: true editors: false navigator: false tray: false
+			tabs: true toolbars: false controls: true
+		;
+		
+		
+		display mainDisplay type: java2D {
+			grid landscape;
+			species parcel;
+			species mobileHerd;
+		}
+		
+		display carbonDisplay type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
+			grid landscape;
+			species SOCStock;
+		}
+		
+		display stateMeter type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
+			chart "State meter" type: pie {
+				data "isGoingToSleepSpot" value: totalSleepGoers color: #blue;
+				data "isSleepingInPaddock" value: totalSleepers color: #darkblue;
+				data "isChangingSite" value: totalSpotChangers color: #red;
+				data "isGrazing" value: totalGrazers color: #green;
+				data "isResting" value: totalResters color: #yellow;
+			}
+		}
+		
+		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
+				data "Biomass cropland" value: (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell color: #olive;
+				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
+			}
+		}
+		
+		display SOCCompartiments type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
+			chart "Average SOC per compartment (kgC/ha)" type: series {
+				data "Labile C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
+				data "Stable C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
+				data "Labile C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
+				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
+				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
+				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
+			}
+		}
+		
+		display animalDisplay type: java2D refresh: current_date != (starting_date add_hours 1) and current_date.day = 1 and updateTimeOfDay {
+			chart "Animals in the simulated area" type: series {
+				data "Mobile herds (TLU)" value: meanTLU color: #blue;
+				data "Fattened animals (TLU)" value: fattenedAnimal sum_of each.groupSize color: #orange;
+			}
+		}
+		
+		display digestionDisplay type: java2D refresh: current_date != (starting_date add_hours 1) and current_date.day = 1 and updateTimeOfDay {
+			chart "Intake and excretion flows" type: series {
+				data "Mobile herds intake (kgDM/TLU)" value: herdsIntakeFlow / meanTLU color: #greenyellow;
+				data "Mobile herds excretions (kgDM VSE/TLU)" value: herdsExcretionsFlow / meanTLU color: #darkgoldenrod;
+			}
+		}
+		
+	}
 }
 
 experiment SOCDispRun parent: Run {
@@ -87,29 +193,6 @@ experiment SOCDispRun parent: Run {
 				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
 				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
 				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
-			}
-		}
-	}
-}
-
-experiment BMDispRun parent: Run {
-	
-	init { experimentType <- "BMDispRun";}
-	
-	output {
-		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
-			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
-				data "Biomass cropland" value: (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell color: #olive;
-				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
-				data "Mean available biomass" value: meanBiomassContent / hectareToCell color: #brown;
-				data "Available standard deviation" value: biomassContentSD / hectareToCell color: #sienna;
-			}
-		}
-		
-		display animalDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
-			chart "Animals in the simulated area" type: series {
-				data "Mobile herds (TLU)" value: mobileHerd sum_of each.herdSize color: #blue;
-				data "Fattened animals (TLU)" value: fattenedAnimal sum_of each.groupSize color: #orange;
 			}
 		}
 	}
@@ -167,78 +250,3 @@ experiment StateObserver parent: Run {
 		}
 	}
 }
-
-experiment Dashboard parent: BMDispRun {
-	
-	init { experimentType <- "Dashboard";}
-	
-	int nbSleepGoers;
-	int nbSleepers;
-	int nbSpotChangers;
-	int nbGrazers;
-	int nbResters;
-	int totalSleepGoers;
-	int totalSleepers;
-	int totalSpotChangers;
-	int totalGrazers;
-	int totalResters;
-	reflex {
-		nbSleepGoers <- mobileHerd count (each.state = "isGoingToSleepSpot");
-		nbSleepers <- mobileHerd count (each.state = "isSleepingInPaddock");
-		nbSpotChangers <- mobileHerd count (each.state = "isChangingSite");
-		nbGrazers <- mobileHerd count (each.state = "isGrazing");
-		nbResters <- mobileHerd count (each.state = "isResting");
-		totalSleepGoers <- totalSleepGoers + nbSleepGoers;
-		totalSleepers <- totalSleepers + nbSleepers;
-		totalSpotChangers <- totalSpotChangers + nbSpotChangers;
-		totalGrazers <- totalGrazers + nbGrazers;
-		totalResters <- totalResters + nbResters;
-	}
-	
-	output {
-		layout vertical([0::2500, 1::2500, 2::2500, horizontal([3::5000,4::5000])::2500]);
-		
-		display biomassDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
-			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
-				data "Biomass cropland" value: (grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent) / hectareToCell color: #olive;
-				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
-			}
-		}
-		
-		display SOCCompartiments type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
-			chart "Average SOC per compartment (kgC/ha)" type: series {
-				data "Labile C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland") mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
-				data "Stable C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.stableCPool) / hectareToCell color: #olive;
-				data "Labile C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
-				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
-				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
-				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
-			}
-		}
-		
-		display animalDisplay type: java2D refresh:  current_date.day = 1 and updateTimeOfDay {
-			chart "Animals in the simulated area" type: series {
-				data "Mobile herds (TLU)" value: mobileHerd sum_of each.herdSize color: #blue;
-				data "Fattened animals (TLU)" value: fattenedAnimal sum_of each.groupSize color: #orange;
-			}
-		}
-		
-		display carbonDisplay type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
-			grid landscape;
-			species SOCStock;
-		}
-		
-		display stateMeter type: java2D refresh: current_date.day = 1 and updateTimeOfDay {
-			chart "State meter" type: pie {
-				data "isGoingToSleepSpot" value: totalSleepGoers color: #blue;
-				data "isSleepingInPaddock" value: totalSleepers color: #darkblue;
-				data "isChangingSite" value: totalSpotChangers color: #red;
-				data "isGrazing" value: totalGrazers color: #green;
-				data "isResting" value: totalResters color: #yellow;
-			}
-		}
-		
-		
-	}
-}
-

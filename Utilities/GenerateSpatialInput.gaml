@@ -15,7 +15,7 @@ global {
 	float startTimeReal <- machine_time;
 	bool endSimu <- false;
 	
-	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m
+	int cellSize <- 50; // max LU shapefile pixelsize : 1.5 m
 	float cellHeight <- cellSize #m;
 	float cellWidth <- cellSize #m;
 	

@@ -13,18 +13,18 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "../../../BackupSortiesSMA/230804-TestReset/"#Monthly/")
+path <- "../../../BackupSortiesSMA/230808-3Vil/Monthly/Diohine/"
 file.names <- list.files(path)
 
-# file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
+file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
 
 data.df <- data.frame()
 
 for (i in 1:(length(file.names))){
   tmp <- read.csv(paste0(path,file.names[i]))                            ##lecture du premier CSV qui contient un nombre
   # Appliquer la soustraction de chaque ligne avec la valeur précédente
-  # tmp1 <- as.data.frame(lapply(tmp[,6:40], function(x) c(x[1], diff(x))))
-  # tmp <- cbind(tmp[,1:5],tmp1)
+  tmp1 <- as.data.frame(lapply(tmp[,6:44], function(x) c(x[1], diff(x))))
+  tmp <- cbind(tmp[,1:5],tmp1)
   tmp$run <- i      ## extraction du nombre depuis le nom du fichier
   data.df <- rbind(data.df, tmp)                                         ##ajout a data frame général, les données de tmp 
 }
@@ -62,10 +62,10 @@ df_grouped <- data.df %>%
     CFootprint = mean(CFootprint),
     nbTLUHerdsInArea = mean(nbTLUHerdsInArea),
     nbTLUFattened = mean(nbTLUFattened),
-    herdsIntakeFlow = mean(herdsIntakeFlow),
-    herdsExcretionsFlow = mean(herdsExcretionsFlow),
-    totalHerdsIntakeFlow = mean(totalHerdsIntakeFlow),
-    totalHerdsExcretionsFlow = mean(totalHerdsExcretionsFlow),
+    herdsIntakeFlow..kgDM. = mean(herdsIntakeFlow..kgDM.),
+    herdsExcretionsFlow..kgDM.VSE. = mean(herdsExcretionsFlow..kgDM.VSE.),
+    totalHerdsIntakeFlow..kgDM. = mean(totalHerdsIntakeFlow..kgDM.),
+    totalHerdsExcretionsFlow..kgDM.VSE. = mean(totalHerdsExcretionsFlow..kgDM.VSE.),
     averageCroplandBiomass..kgDM. = mean(averageCroplandBiomass..kgDM.),
     averageRangelandBiomass..kgDM. = mean(averageRangelandBiomass..kgDM.),
     meanHomefieldsSOCS..kgC. = mean(meanHomefieldsSOCS..kgC.),
@@ -135,11 +135,11 @@ ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
   geom_smooth(span = 0.25) +
   facet_wrap(. ~ variable, scales = "free_y") +
-  labs(title = "Moyenne de 52 réplications de 2020 à 2030") +
+  labs(title = "Diohine - Moyenne de 8 réplications de 2020 à 2030") +
   theme_bw() +
   # ylim(c(-38816740.21,24804845.397)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         legend.position = "none")
 
-ggsave(paste0(path, outFilesName, ".png"), height = 14, width = 18)
+ggsave(paste0(path, outFilesName, ".png"), height = 10, width = 18)
 

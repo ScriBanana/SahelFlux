@@ -83,8 +83,10 @@ global {
 		
 		// Circularity (ENA framework)
 		"TSTN",
+		"pathLengthN",
 		"ICRN",
 		"TSTC",
+		"pathLengthC",
 		"ICRC",
 		
 		// GHG
@@ -215,8 +217,10 @@ global {
 			
 			// Circularity (ENA framework)
 			TSTN,
+			pathLengthN,
 			ICRN,
 			TSTC,
+			pathLengthC,
 			ICRC,
 			
 			// GHG
@@ -260,7 +264,9 @@ global {
 		herdsIntakeFlow <- 0.0;
 		herdsExcretionsFlow <- 0.0;
 		
-		assert length(outputsList) = length(outputsStringList);
-		assert length(parametersList) = length(parametersStringList);
+		if enableDebug {
+			assert length(outputsList) = length(outputsStringList);
+			assert length(parametersList) = length(parametersStringList);
+		}
 	}
 }
