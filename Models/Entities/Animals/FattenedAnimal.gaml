@@ -6,7 +6,7 @@
 */
 
 
-model FattenedAnimal
+model SahelFlux
 
 import "AnimalGroup.gaml"
 

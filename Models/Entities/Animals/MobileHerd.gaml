@@ -6,7 +6,7 @@
 */
 
 
-model MobileHerd
+model SahelFlux
 
 import "AnimalGroup.gaml"
 

@@ -6,7 +6,7 @@
 */
 
 
-model SOCStock
+model SahelFlux
 
 import "Landscape.gaml"
 

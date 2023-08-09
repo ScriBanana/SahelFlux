@@ -5,7 +5,8 @@
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-model TranshumanceAndFallows
+
+model SahelFlux
 
 import "../../Main.gaml"
 

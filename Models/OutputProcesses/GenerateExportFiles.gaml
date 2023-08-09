@@ -6,7 +6,7 @@
 */
 
 
-model GenerateExportFiles
+model SahelFlux
 
 import "ParamAndOutCentraliser.gaml"
 

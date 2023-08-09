@@ -6,7 +6,7 @@
 */
 
 
-model GenerateSpatialInput
+model SahelFlux
 
 global {
 	string inPath <- "../InputFiles/SpatialInputs/";

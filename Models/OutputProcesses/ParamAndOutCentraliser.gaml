@@ -6,7 +6,7 @@
 */
 
 
-model ParamAndOutCentraliser
+model SahelFlux
 
 import "ComputeOutputs.gaml"
 

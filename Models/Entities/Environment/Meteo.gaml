@@ -6,7 +6,7 @@
 */
 
 
-model Meteo
+model SahelFlux
 
 global {
 	

@@ -5,20 +5,13 @@
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-model BatchRuns
+model SahelFlux
 
-import "../Main.gaml"
+import "CoreExperiment.gaml"
 
 global {
-	
-	float lengthSimu <- 4.0;
-	float simuDuration;
-	float lengthYear <- 31536000.0; // seconds in a year
-	
 	init {
 		batchOn <- true;
-		simuDuration <- lengthYear * lengthSimu;
-		endDate <- starting_date + simuDuration;
 	}
 }
 
@@ -26,10 +19,9 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 	
 	init{
 		experimentType <- "SimpleBatch";
-		fallowEnabled <- true;
-	}
 		
-	parameter "Simulation length (years)" var: lengthSimu <- 0.1;
+		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
+	}
 	
 //	reflex saveResults { // Redundant with saveBatchRunOutput, but backuping is good
 //		write "End of batch, backing up outputs.";
@@ -52,24 +44,14 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 //	}
 }
 
-experiment BatchLongRuns autorun: true type: batch repeat: 1 until: endSimu {
-	
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
-	parameter "Simulation length (years)" var: lengthSimu <- 0.2;
-	
-	init {
-		generateMonthlySaves <- true;
-		fallowEnabled <- true;
-		experimentType <- "BatchLongRuns";
-	}
-}
-
 experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 	
 	init {
-		SOCxSONOn <- false;
-		lengthSimu <- 20.0;
 		experimentType <- "SOCxSON";
+		
+		SOCxSONOn <- false;
+		
+		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}
 	
 	reflex saveResults {
@@ -96,7 +78,8 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 				int(self),
 				meanSOCS[0], meanSOCS[1], meanSOCS[2],
 				meanLastNFromSoils[0], meanLastNFromSoils[1], meanLastNFromSoils[2]
-			] to: outputDirectory + "SOCxSON/"+ runPrefix + "SOCxSON_raw.csv" format:"csv" rewrite: (int(self) = 0) ? true : false header: true;
+			] to: outputDirectory + "SOCxSON/"+ runPrefix + "SOCxSON_raw.csv"
+				format:"csv" rewrite: (int(self) = 0) ? true : false header: true;
 			
 		}
 		
@@ -141,8 +124,9 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
 	
 	init {
-		lengthSimu <- 10.0;
 		experimentType <- "Morris";
+		
+		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}
 	
 	method morris

@@ -6,7 +6,7 @@
 */
 
 
-model RecordGHG
+model SahelFlux
 
 import "../Main.gaml"
 

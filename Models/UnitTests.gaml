@@ -6,7 +6,7 @@
 */
 
 
-model UnitTests
+model SahelFlux
 
 import "Main.gaml"
 

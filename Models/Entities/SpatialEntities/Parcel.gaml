@@ -4,7 +4,9 @@
 * Parcels
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
-model Parcel
+
+
+model SahelFlux
 
 import "Landscape.gaml"
 

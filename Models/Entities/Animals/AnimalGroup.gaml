@@ -6,7 +6,7 @@
 */
 
 
-model AnimalGroup
+model SahelFlux
 
 import "../../Main.gaml"
 

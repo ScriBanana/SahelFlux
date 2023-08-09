@@ -6,7 +6,7 @@
 */
 
 
-model BiophysicalParameters
+model SahelFlux
 
 global {
 	

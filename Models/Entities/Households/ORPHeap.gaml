@@ -6,7 +6,7 @@
 */
 
 
-model ORPHeap
+model SahelFlux
 
 import "Household.gaml"
 

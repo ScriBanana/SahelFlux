@@ -6,7 +6,7 @@
 */
 
 
-model ImportInputData
+model SahelFlux
 
 import "../Main.gaml"
 

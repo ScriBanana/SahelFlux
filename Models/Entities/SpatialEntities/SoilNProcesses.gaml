@@ -6,7 +6,7 @@
 */
 
 
-model SoilNProcesses
+model SahelFlux
 
 import "Landscape.gaml"
 

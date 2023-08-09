@@ -6,7 +6,7 @@
 */
 
 
-model ComputeOutputs
+model SahelFlux
 
 import "../Main.gaml"
 

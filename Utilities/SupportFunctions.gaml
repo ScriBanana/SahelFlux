@@ -5,7 +5,8 @@
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-model SupportFunctions
+
+model SahelFlux
 
 global {
 	rgb eucliClosestColour (rgb colourToCompare, list<rgb> colourPalette) {
