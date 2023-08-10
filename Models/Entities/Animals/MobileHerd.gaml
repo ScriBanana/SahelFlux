@@ -69,9 +69,8 @@ global {
 			}
 		}
 		if enableDebug {assert mobileHerd min_of each.herdSize > 0;}
-		write "	Done. " + length(mobileHerd) + " mobile herds. Total cheptel : " + mobileHerd sum_of each.herdSize + " TLU.";
+		write "	Done. " + length(mobileHerd) + " mobile herds. Total cheptel : " + int(mobileHerd sum_of each.herdSize) + " TLU.";
 	}
-		
 }
 
 species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: parallelHerds {

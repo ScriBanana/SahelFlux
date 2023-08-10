@@ -31,10 +31,10 @@ experiment LongRun parent: AnimalsAbstract {
 		layout #split consoles: true editors: false navigator: false
 			tray: false tabs: true toolbars: false controls: true;
 		
-		display "Biomass" parent: biomassDisplay {}
-		display "SOC evolution" parent: SOCCompartiments {}
-		display "Animal density" parent: animalDisplay {}
-		display "Animal digestion" parent: digestionDisplay {}
+		display "Biomass" parent: biomassChart {}
+		display "SOC evolution" parent: SOCChart {}
+		display "Animal density" parent: animalChart {}
+		display "Animal digestion" parent: digestionChart {}
 	}
 }
 

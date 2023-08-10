@@ -24,19 +24,19 @@ experiment Run type: gui parent: CoreWithParameters {
 	
 	output {
 		layout tabs: false navigator: false;
-		display "Main" parent: mainDisplay {}
+		display "Main" parent: SpatialMainDisplay {}
 	}
 }
 
-experiment SOC parent: CoreExperiment {
+experiment SOC type: gui parent: CoreExperiment {
 	
 	init { experimentType <- "SOCDispRun";}
 	
 	output {
 		layout vertical([horizontal([0::1, 1::1])::1, 2::1]) navigator: false;
-		display "Main" parent: mainDisplay {}
-		display "Carbon repartition" parent: carbonDisplay {}
-		display "SOC evolution" parent: SOCCompartiments {}
+		display "Main" parent: SpatialMainDisplay {}
+		display "CarbonRepartition" parent: SpatialCarbonDisplay {}
+		display "SOCEvolution" parent: SOCChart {}
 	}
 }
 
@@ -47,7 +47,7 @@ experiment States parent: StatesAbstract {
 	output {
 		layout vertical([horizontal([0::1, 1::1])::1, 2::1])  tabs: true navigator: false;
 		
-		display "Main" parent: mainDisplay {}
+		display "Main" parent: SpatialMainDisplay {}
 		display "Whole simulation" parent: stateMeter {}
 		display "Real time" parent: stateFollower {}
 	}
@@ -59,20 +59,20 @@ experiment Dashboard parent: AnimalsAbstract {
 	
 	output {
 		layout horizontal([
-				vertical([0::1667, 1::1667, 2::1667])::1000,
-				vertical([3::2500, 4::2500])::2000,
-				vertical([5::2500, 6::2500])::2000
+				vertical([0::1, 1::1])::1,
+				vertical([2::2500, 3::2500])::2,
+				vertical([4::2500, 5::2500])::2
 			])
 			consoles: true editors: false navigator: false tray: false
 			tabs: true toolbars: false controls: true
 		;
 		
-		display "Main" parent: mainDisplay {}
-		display "Carbon repartition" parent: carbonDisplay {}
+		display "Main" parent: SpatialMainDisplay {}
+		display "CarbonRepartition" parent: SpatialCarbonDisplay {}
 //		display "Whole simulation" parent: stateMeter {}
-		display "Biomass" parent: biomassDisplay {}
-		display "SOC evolution" parent: SOCCompartiments {}
-		display "Animal density" parent: animalDisplay {}
-		display "Animal digestion" parent: digestionDisplay {}
+		display "Biomass" parent: biomassChart {}
+		display "SOCEvolution" parent: SOCChart {}
+		display "AnimalDensity" parent: animalChart {}
+		display "AnimalDigestion" parent: digestionChart {}
 	}
 }

@@ -67,7 +67,7 @@ global {
 		"bushfieldsSOChaInit",
 		"rangelandSOChaInit"
 	];
-		
+	
 	list outputsList;
 	list outputsStringList <- [
 		

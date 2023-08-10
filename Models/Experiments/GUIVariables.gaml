@@ -12,37 +12,18 @@ import "CoreExperiment.gaml"
 
 experiment AnimalsAbstract parent: CoreExperiment virtual: true {
 	
-	float meanTLU <- 1.0;
-	list<float> TLUList;
-	
-	reflex when: updateTimeOfDay {
-	
-		TLUList <+ float(mobileHerd sum_of each.herdSize);
-		
-		if current_date != (starting_date add_hours 1) and current_date.day = 1 {
-			meanTLU <- mean(TLUList);
-			write TLUList;
-			write meanTLU;
-			write herdsIntakeFlow;
-			write herdsExcretionsFlow;
-			TLUList <- [];
-			herdsIntakeFlow <- 0.0;
-			herdsExcretionsFlow <- 0.0;
-		}
-	}
-	
 	output synchronized: false {
-		display animalDisplay type: java2D virtual: true refresh: current_date != (starting_date add_hours 1) and current_date.day = 1 and updateTimeOfDay {
+		display animalChart type: java2D virtual: true refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "Animals in the simulated area" type: series {
-				data "Mobile herds (TLU)" value: meanTLU color: #blue;
-				data "Fattened animals (TLU)" value: fattenedAnimal sum_of each.groupSize color: #orange;
+				data "Mobile herds (TLU/ha cropland)" value: (mobileHerd sum_of each.herdSize) color: #blue;// / ((grazableLandscape count (each.cellLU = "Cropland")) / hectareToCell) color: #blue;
+				data "Fattened animals (TLU/fattening household)" value: (fattenedAnimal sum_of each.groupSize) color: #orange;// / nbFatteningHh color: #orange;
 			}
 		}
 		
-		display digestionDisplay type: java2D virtual: true refresh: current_date != (starting_date add_hours 1) and current_date.day = 1 and updateTimeOfDay {
+		display digestionChart type: java2D virtual: true refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "Intake and excretion flows" type: series {
-				data "Mobile herds intake (kgDM/TLU)" value: herdsIntakeFlow / meanTLU color: #greenyellow;
-				data "Mobile herds excretions (kgDM VSE/TLU)" value: herdsExcretionsFlow / meanTLU color: #darkgoldenrod;
+				data "Mobile herds intake (kgDM/TLU)" value: herdsIntakeFlow / mobileHerd sum_of each.herdSize color: #greenyellow;
+				data "Mobile herds excretions (kgDM VSE/TLU)" value: herdsExcretionsFlow / mobileHerd sum_of each.herdSize color: #darkgoldenrod;
 			}
 		}
 	}
