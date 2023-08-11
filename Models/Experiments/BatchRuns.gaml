@@ -116,23 +116,24 @@ experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
 
 experiment MorrisBatch type: batch autorun: true until: endSimu {
 	
+	parameter "Village" var: villageName among: villageNamesList;
 	parameter "Number households and mobile herds" var: nbHousehold min: 20 max: 150;
 	parameter "Number transhuming households" var: propTranshumantHh min: 0.0 max: 1.0;
 	parameter "Number fattening households" var: propFatteningHh min: 0.0 max: 1.0;
-	parameter "Fallow on" var: fallowEnabled <- false among: [true, false];
-	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 10.0;
+	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 20.0;
 	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
 	
 	init {
+		write villageName;
 		experimentType <- "Morris";
 		
-		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
+		endDate <- date([2020, 12, 1, eveningTime + 1, 0, 0]);
 	}
 	
 	method morris
 		levels: 4
-		outputs: ["totalNFlows", "TT", "totalCFlows", "CThroughflow"]
-		sample: 52
+		outputs: ["TSTN", "TSTC", "ecosystemCBalance", "ecosystemGHGBalance"]
+		sample: 1
 		report: outputDirectory + "Morris/"+ runPrefix + "morris.txt"
 		results: outputDirectory + "Morris/"+ runPrefix + "morris_raw.csv"
 	;
