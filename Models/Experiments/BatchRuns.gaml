@@ -124,8 +124,8 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
 	
 	init {
-		write villageName;
 		experimentType <- "Morris";
+		isExplo <- true;
 		
 		endDate <- date([2020, 12, 1, eveningTime + 1, 0, 0]);
 	}

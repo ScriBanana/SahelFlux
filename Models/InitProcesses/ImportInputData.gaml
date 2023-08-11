@@ -11,6 +11,8 @@ model SahelFlux
 import "../Main.gaml"
 
 global {
+	bool isExplo <- false;
+	
 	action readInputParameters {
 		csv_file inputDataFile <- csv_file("../InputFiles/SahelFlux_ScenarioInputData.csv");
 		// Watch for character formatting (i.e. e.g. 1,5 instead of 1.5)

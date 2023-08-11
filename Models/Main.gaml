@@ -85,7 +85,6 @@ global {
 		
 		// All init actions defined in related species files.
 		do readInputParameters;
-		write villageName;
 		do resetRegularOutputMap;
 		write "Initialising meteorological conditions.";
 		do updateMeteo;
