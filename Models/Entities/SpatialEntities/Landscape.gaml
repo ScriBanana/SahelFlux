@@ -165,6 +165,8 @@ grid landscape
 	float yearlyWeedsBiomassToBeProduced <- 0.0; // As of now, no weed in the simulation
 	float weedProportionInBiomass <- 0.0; // As of now, no weed in the simulation
 	
+	float moranValue; // To be set with whichever variable to compute Moran I on.
+	
 	//// Functions
 	
 	action computeYearlyBiomassProduction {

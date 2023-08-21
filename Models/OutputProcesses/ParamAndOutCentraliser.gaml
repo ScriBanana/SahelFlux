@@ -122,9 +122,14 @@ global {
 		"meanHomefieldsSOCSVariation (kgC)",
 		"meanBushfieldsSOCSVariation (kgC)",
 		"meanRangelandSOCSVariation (kgC)",
-		"totalMeanSOCSVariation (kgC)"
+		"totalMeanSOCSVariation (kgC)",
 		
 		// Moran
+		"homefieldsSOCMoran",
+		"bushfieldsSOCMoran",
+		"croplandSOCMoran",
+		"rangelandSOCMoran",
+		"globalSOCMoran"
 	];
 	
 	
@@ -256,7 +261,14 @@ global {
 			meanHomefieldsSOCSVariation, // kgC
 			meanBushfieldsSOCSVariation, // kgC
 			meanRangelandSOCSVariation, // kgC
-			totalMeanSOCSVariation // kgC
+			totalMeanSOCSVariation, // kgC
+			
+			// Moran
+			homefieldsSOCMoran,
+			bushfieldsSOCMoran,
+			croplandSOCMoran,
+			rangelandSOCMoran,
+			globalSOCMoran
 		];
 		
 		totalHerdsIntakeFlow <- totalHerdsIntakeFlow + herdsIntakeFlow;

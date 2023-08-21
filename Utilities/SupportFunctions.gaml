@@ -10,7 +10,8 @@ model SahelFlux
 
 global {
 	rgb eucliClosestColour (rgb colourToCompare, list<rgb> colourPalette) {
-	// Compares a colour (rgb) to those of a list of colours and returns the index in the list of the closest colour (euclidian distance)
+	// Compares a colour (rgb) to those of a list of colours
+	// and returns the index in the list of the closest colour (euclidian distance)
 		rgb closestColour;
 		float shortestDist <- 3 ^ (1 / 2) * 255.0;
 		loop refColour over: colourPalette {
@@ -23,6 +24,14 @@ global {
 		}
 
 		return closestColour;
+	}
+	
+	action progressionPrompt (int increment, int target, int promptIncrement) {
+		// Insert in a loop or ask statement to display progress in the console
+		// promptIncrement should be between 0 and 100 %
+		if mod(increment, target / (100 / promptIncrement)) = 0 {
+			write "	" + int(ceil(increment / target * 100)) + " %";
+		}
 	}
 
 }

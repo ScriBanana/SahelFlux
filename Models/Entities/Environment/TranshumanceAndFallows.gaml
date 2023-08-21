@@ -33,7 +33,7 @@ global {
 		
 		write "Restrincting remaining herds to fallows and contiguous rangelands.";
 		
-		// Restrict grazable area
+		// Restrict walkable area
 		walkableLandscape <- nonEmptyLandscape where (
 			each.cellLU = "Rangeland" or (each.cellLU = "Cropland" and (each.myParcel = nil or each.myParcel.nextRSCover = "Fallow"))
 		);
@@ -79,7 +79,7 @@ global {
 	}
 	
 	action transitionFromFallows {
-		// Unrestrict grazable area
+		// Unrestrict walkable area
 		walkableLandscape <- nonEmptyLandscape where (each.cellLU = "Cropland" or each.cellLU = "Rangeland");
 		do updateTargetableCellsForChangingSiteInDS;
 		

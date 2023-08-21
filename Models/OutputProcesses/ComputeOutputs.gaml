@@ -9,6 +9,7 @@
 model SahelFlux
 
 import "../Main.gaml"
+import "ComputeMoranI.gaml"
 
 global {
 	
@@ -50,6 +51,13 @@ global {
 	float meanBushfieldsSOCSVariation; // kgC
 	float meanRangelandSOCSVariation; // kgC
 	float totalMeanSOCSVariation; // kgC
+	
+	// SOC Moran Is
+	float homefieldsSOCMoran;
+	float bushfieldsSOCMoran;
+	float croplandSOCMoran;
+	float rangelandSOCMoran;
+	float globalSOCMoran;
 	
 	// Flow balance gatherer
 	map<string, list> poolFlowsMap <- [ // [string::pool :: [float::Cbalance(kgC), float::Nbalance(kgN), float::GHG(kgCO2eq)]]
@@ -240,7 +248,15 @@ global {
 		meanRangelandSOCSVariation <- meanRangelandSOCS - meanRangelandSOCSInit; // kgC
 		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
 		
-//		matrix moranWeightMatrix <- getMoranWeights();
+		// SOC moran indexes
+		ask grazableLandscape {
+			self.moranValue <- self.mySOCstock.totalSOC;
+		}
+		homefieldsSOCMoran <- computeMoran(grazableLandscape where (each.homefieldCell));
+		bushfieldsSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell));
+		croplandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland"));
+		rangelandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Rangeland"));
+		globalSOCMoran <- computeMoran(grazableLandscape);
 		
 		//// Compute derivated outputs
 		
@@ -271,11 +287,5 @@ global {
 		ICRC <- TSTC != 0.0 ? totalCThroughflows / TSTC : 0.0;
 		
 	}
-	
-//	action getMoranWeights {
-//		matrix moranWeightsMatrix <- 0.0 as_matrix {1,2};
-//		
-//		return moranWeightsMatrix;
-//	}
 	
 }

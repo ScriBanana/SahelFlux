@@ -58,6 +58,7 @@ global {
 		write "Getting grid info from overlapping polygons";
 		int cellCount <- 1;
 		ask cellGrid parallel: true {
+//			do progressionPrompt (cellCount, length(cellGrid), 10);
 			if mod(cellCount, length(cellGrid) / 10) = 0 {
 				write "	" + int(ceil(cellCount / length(cellGrid) * 100)) + " %";
 			}
