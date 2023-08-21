@@ -47,9 +47,6 @@ global {
 	float CFootprint;
 	
 	// SOC
-	float meanHomefieldsSOCSVariation; // kgC
-	float meanBushfieldsSOCSVariation; // kgC
-	float meanRangelandSOCSVariation; // kgC
 	float totalMeanSOCSVariation; // kgC
 	
 	// SOC Moran Is
@@ -158,7 +155,6 @@ global {
 			}
 		}
 		
-		
 		// Carbon
 		loop poolPair over: CMap.pairs {
 			string poolKey <- poolPair.key;
@@ -243,25 +239,15 @@ global {
 		
 		// SOC		
 		do getMeanSOCS;
-		meanHomefieldsSOCSVariation <- meanHomefieldsSOCS - meanHomefieldsSOCSInit; // kgC
-		meanBushfieldsSOCSVariation <- meanBushfieldsSOCS - meanBushfieldsSOCSInit; // kgC
-		meanRangelandSOCSVariation <- meanRangelandSOCS - meanRangelandSOCSInit; // kgC
 		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
-		
-		// SOC moran indexes
-		ask grazableLandscape {
-			self.moranValue <- self.mySOCstock.totalSOC;
-		}
-		homefieldsSOCMoran <- computeMoran(grazableLandscape where (each.homefieldCell));
-		bushfieldsSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell));
-		croplandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland"));
-		rangelandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Rangeland"));
-		globalSOCMoran <- computeMoran(grazableLandscape);
 		
 		//// Compute derivated outputs
 		
 		// Carbon balance
 		ecosystemGHGBalance <- totalMeanSOCSVariation - totalGHG;
+		
+		// SOC moran indexes
+		do getMoranSOCS;
 		
 		// Global ENA indicators (Finn, 1980; Stark, 2016; Balandier, 2017; Latham, 2006)
 		float negNDerivatives <- poolsDerivativeMap.values sum_of (float(each[0]) < 0.0 ?  float(each[0]) : 0.0);

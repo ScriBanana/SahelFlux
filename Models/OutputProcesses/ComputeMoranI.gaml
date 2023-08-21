@@ -11,6 +11,19 @@ import "../Main.gaml"
 
 global {
 	
+	action getMoranSOCS {
+		ask grazableLandscape {
+			self.moranValue <- self.mySOCstock.totalSOC;
+		}
+		homefieldsSOCMoran <- computeMoran(grazableLandscape where (each.homefieldCell));
+		bushfieldsSOCMoran <- computeMoran(
+			grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell)
+		);
+		croplandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland"));
+		rangelandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Rangeland"));
+		globalSOCMoran <- computeMoran(grazableLandscape);
+	}
+	
 	float computeMoran (list<landscape> inputGridList) {
 		// Thought about storing the matrix for each case, but generating the neighbour one is fast enough
 		matrix<float> moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);

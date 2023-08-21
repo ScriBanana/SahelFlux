@@ -69,9 +69,6 @@ global {
 	float meanBushfieldsSOCS; // kgC
 	float meanRangelandSOCS; // kgC
 	float totalMeanSOCS; // kgC
-	float meanHomefieldsSOCSInit; // kgC
-	float meanBushfieldsSOCSInit; // kgC
-	float meanRangelandSOCSInit; // kgC
 	float totalMeanSOCSInit; // kgC
 	
 	action getMeanSOCS {

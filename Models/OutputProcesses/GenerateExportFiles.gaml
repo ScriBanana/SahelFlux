@@ -23,15 +23,15 @@ global {
 		
 		// File or header if need be
 		if !file_exists(outputDirectory + "SahFl-Log.csv") {
-			save parametersStringList + outputsStringList
+			save parametersMap.keys + differentialOutputsMap.keys
 				to: outputDirectory + "SahFl-Log.csv" format: "csv"
 				rewrite: true header: false
 			;
 		} else if enableDebug { // Doesn't work with parallel runs
 			matrix logAsMatrix <- matrix(csv_file(outputDirectory + "SahFl-Log.csv"));
 			list logLastRow <- logAsMatrix row_at (logAsMatrix.rows - 1);
-			if (logLastRow count (each!= nil)) != (length(parametersStringList) + length(outputsStringList)) {
-				save parametersStringList + outputsStringList
+			if (logLastRow count (each!= nil)) != (length(parametersMap) + length(differentialOutputsMap)) {
+				save parametersMap.keys + differentialOutputsMap.keys
 					to: outputDirectory + "SahFl-Log.csv" format: "csv"
 					rewrite: false header: false
 				;
@@ -40,7 +40,8 @@ global {
 		
 		// Simulation line
 		write "Saving log entry for simulation " + int(self);
-		save parametersList + outputsList to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
+		save parametersMap.values + differentialOutputsMap.values
+			to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
 	}
 	
 	
@@ -48,10 +49,10 @@ global {
 	
 	// Saves output to a CSV whenever called during the simulation
 	action saveOutputsDuringSim {
-		do gatherOutputsAndParameters(regularOutputNFlowsMap, regularOutputCFlowsMap, regularOutputGHGFlowsMap);
+		do gatherRegularOutputs(regularOutputNFlowsMap, regularOutputCFlowsMap, regularOutputGHGFlowsMap);
 		
 		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
-		lineToSave <<+ list<float>(outputsList);
+		lineToSave <<+ list<float>(variableOutputsMap.values);
 		save lineToSave
 			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
@@ -65,7 +66,7 @@ global {
 	// CSV headers
 	action initOutputsDuringSim {
 		list<string> inSimHeader <-  ["Year", "Month", "Cycle", "Machine time", "Runtime"];
-		inSimHeader <<+ list<string>(outputsStringList);
+		inSimHeader <<+ list<string>(variableOutputsMap.keys);
 		
 		save inSimHeader
 			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
@@ -87,7 +88,7 @@ global {
 		write "Saving data in " + outputDirectory;
 		// Saving a matrix to a csv doesn't work. Issue raised on github. Fix coming up in Gama 1.9.0 (commit a4d2a56)
 		
-		runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "-";
+		runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "/" + runPrefix;
 		
 		// Variables
 		float durationSimu <- (current_date - starting_date)/#year;
@@ -98,6 +99,7 @@ global {
 		outputCSVheader <<+ NFlowsMap.keys;
 		
 		do exportParameterData;
+		do exportOutputData;
 		do exportGHGMat;
 		do exportBalanceMat;
 		
@@ -113,8 +115,15 @@ global {
 	// Gathers and saves parameters
 	action exportParameterData { // Redundant with log.
 		string pathParameters <-  outputDirectory + "Single/" + runPrefix + "Param.csv";
-		save parametersStringList to: pathParameters format: csv rewrite: true header: false;
-		save parametersList to: pathParameters format: csv rewrite: false header: false;
+		save parametersMap.keys to: pathParameters format: csv rewrite: true header: false;
+		save parametersMap.values to: pathParameters format: csv rewrite: false header: false;
+	}
+	
+	// Gathers and saves global outputs
+	action exportOutputData { // Redundant with log.
+		string pathOutputs <-  outputDirectory + "Single/" + runPrefix + "Outputs.csv";
+		save differentialOutputsMap.keys to: pathOutputs format: csv rewrite: true header: false;
+		save differentialOutputsMap.values to: pathOutputs format: csv rewrite: false header: false;
 	}
 	
 	// Gathers and saves pool GHG

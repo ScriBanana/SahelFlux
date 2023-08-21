@@ -97,11 +97,7 @@ global {
 		create transhumance;
 		do initiateRotations;
 		do initSOCStocks;
-		do getMeanSOCS;
-		meanHomefieldsSOCSInit <- meanHomefieldsSOCS;
-		meanBushfieldsSOCSInit <- meanBushfieldsSOCS;
-		meanRangelandSOCSInit <- meanRangelandSOCS;
-		totalMeanSOCSInit <- totalMeanSOCS;
+		do gatherInitState;
 		if generateMonthlySaves { do initOutputsDuringSim;}
 		
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
@@ -257,8 +253,9 @@ global {
 		
 		write "=== END OF SIMULATION ===";
 		
+		do gatherParameters;
 		do gatherFlows;
-		do gatherOutputsAndParameters(NFlowsMap, CFlowsMap, GHGFlowsMap);
+		do gatherFinalOutputs(NFlowsMap, CFlowsMap, GHGFlowsMap);
 		do saveLogOutput;
 		do exportStockFlowsOutputData;
 		
