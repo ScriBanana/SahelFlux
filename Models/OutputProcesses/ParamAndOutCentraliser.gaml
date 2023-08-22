@@ -93,11 +93,8 @@ global {
 	}
 	
 	action gatherInitState (map NMap, map CMap, map GHGMap)  {
+		// For output values to be compared with init state
 		
-		float nbTLUHerds <- float(mobileHerd sum_of each.herdSize);
-		float nbTLUHerdsInArea <- nbTLUHerds;
-		ask transhumance {	nbTLUHerds <- nbTLUHerds + transhumingHerd sum_of each.herdSize;}
-		float nbTLUFattened <- fattenedAnimal sum_of each.groupSize;
 		float averageCroplandBiomass <- (
 			grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent
 		) / hectareToCell; // kgDM/ha
@@ -109,43 +106,6 @@ global {
 		do getMoranSOCS;
 		
 		initialOutputsMap <- [
-			
-			// Global C&N flows
-			"totalNFlows (kgN)"::0.0,
-			"totalNInflows (kgN)"::0.0,
-			"totalNThroughflows (kgN)"::0.0,
-			"totalNOutflows (kgN)"::0.0,
-			"totalCFlows (kgC)"::0.0,
-			"totalCInflows (kgC)"::0.0,
-			"totalCThroughflows (kgC)"::0.0,
-			"totalCOutflows (kgC)"::0.0,
-			
-			// Circularity (ENA framework)
-			"TSTN"::0.0,
-			"pathLengthN"::0.0,
-			"ICRN"::0.0,
-			"TSTC"::0.0,
-			"pathLengthC"::0.0,
-			"ICRC"::0.0,
-			
-			// GHG
-			"totalCO2 (kgCO2)"::0.0,
-			"totalCH4 (kgCH4)"::0.0,
-			"totalN2O (kgN2O)"::0.0,
-			"totalGHG (kgCO2eq)"::0.0,
-			
-			// Carbon balance
-			"ecosystemCBalance"::0.0,
-			"ecosystemCO2Balance (kgCO2)"::0.0,
-			"ecosystemGHGBalance (kgCO2eq)"::0.0,
-			"SCS"::0.0,
-			"CFootprint"::0.0,
-			
-			// Animal density
-			"nbTLUHerdsInArea"::nbTLUHerdsInArea,
-			"nbTLUFattened"::nbTLUFattened,
-			"herdsIntakeFlow (kgDM)"::0.0,
-			"herdsExcretionsFlow (kgDM VSE)"::0.0,
 			
 			// Biomass
 			"averageCroplandBiomass (kgDM)"::averageCroplandBiomass,
@@ -243,9 +203,10 @@ global {
 	
 	action gatherFinalOutputs (map NMap, map CMap, map GHGMap)  {
 		do gatherRegularOutputs(NMap, CMap, GHGMap);
-		loop outputItem over: variableOutputsMap.keys {
-			differentialOutputsMap[outputItem] <-
-				variableOutputsMap[outputItem] - initialOutputsMap[outputItem];
+		loop outputItem over: initialOutputsMap.pairs {
+			differentialOutputsMap <+
+				("Delta_" + outputItem.key) ::
+				variableOutputsMap[outputItem.key] - initialOutputsMap[outputItem.key];
 		}
 	}
 	

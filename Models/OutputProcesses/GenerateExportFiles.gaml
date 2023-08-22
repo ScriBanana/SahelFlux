@@ -23,7 +23,7 @@ global {
 		
 		// File or header if need be
 		if !file_exists(outputDirectory + "SahFl-Log.csv") {
-			save parametersMap.keys + differentialOutputsMap.keys
+			save parametersMap.keys + variableOutputsMap.keys + differentialOutputsMap.keys
 				to: outputDirectory + "SahFl-Log.csv" format: "csv"
 				rewrite: true header: false
 			;
@@ -31,7 +31,7 @@ global {
 			matrix logAsMatrix <- matrix(csv_file(outputDirectory + "SahFl-Log.csv"));
 			list logLastRow <- logAsMatrix row_at (logAsMatrix.rows - 1);
 			if (logLastRow count (each!= nil)) != (length(parametersMap) + length(differentialOutputsMap)) {
-				save parametersMap.keys + differentialOutputsMap.keys
+				save parametersMap.keys + variableOutputsMap.keys + differentialOutputsMap.keys
 					to: outputDirectory + "SahFl-Log.csv" format: "csv"
 					rewrite: false header: false
 				;
@@ -40,7 +40,7 @@ global {
 		
 		// Simulation line
 		write "Saving log entry for simulation " + int(self);
-		save parametersMap.values + differentialOutputsMap.values
+		save parametersMap.values + variableOutputsMap.values + differentialOutputsMap.values
 			to: outputDirectory + "SahFl-Log.csv" format: "csv" rewrite: false header: false;
 	}
 	
@@ -52,7 +52,7 @@ global {
 		do gatherRegularOutputs(regularOutputNFlowsMap, regularOutputCFlowsMap, regularOutputGHGFlowsMap);
 		
 		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
-		lineToSave <<+ list<float>(variableOutputsMap.values);
+		lineToSave <<+ list<float>(variableOutputsMap.values + differentialOutputsMap.values);
 		save lineToSave
 			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
@@ -66,7 +66,7 @@ global {
 	// CSV headers
 	action initOutputsDuringSim {
 		list<string> inSimHeader <-  ["Year", "Month", "Cycle", "Machine time", "Runtime"];
-		inSimHeader <<+ list<string>(variableOutputsMap.keys);
+		inSimHeader <<+ list<string>(variableOutputsMap.keys + differentialOutputsMap.keys);
 		
 		save inSimHeader
 			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"

@@ -191,7 +191,9 @@ global {
 		if enableDebug {
 			// Tests for typo
 			assert flowType in ["C", "N"];
-			assert (emittingPool in NFlowsMap.keys) or (emittingPool in map(flowsMapTemplate.pairs where (each.key contains "IF-")).keys);
+			assert (emittingPool in NFlowsMap.keys) or (
+				emittingPool in map(flowsMapTemplate.pairs where (each.key contains "IF-")).keys
+			);
 			assert flowDestination in flowsMapTemplate.keys;
 		}
 		
