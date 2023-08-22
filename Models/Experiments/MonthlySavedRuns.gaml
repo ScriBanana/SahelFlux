@@ -38,9 +38,9 @@ experiment LongRun parent: AnimalsAbstract {
 	}
 }
 
-experiment BatchLongRuns autorun: true type: batch repeat: 8 until: endSimu {
+experiment BatchLongRuns autorun: true type: batch repeat: 3 until: endSimu {
 	
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"];//villageNamesList;
 	
 	init {
 		experimentType <- "BatchLongRuns";

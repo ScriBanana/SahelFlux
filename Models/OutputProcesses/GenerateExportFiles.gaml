@@ -8,7 +8,7 @@
 
 model SahelFlux
 
-import "ParamAndOutCentraliser.gaml"
+import "OutputVariablesGatherer.gaml"
 
 global {
 	string outputDirectory <- "../../OutputFiles/";
@@ -30,7 +30,7 @@ global {
 		} else if enableDebug { // Doesn't work with parallel runs
 			matrix logAsMatrix <- matrix(csv_file(outputDirectory + "SahFl-Log.csv"));
 			list logLastRow <- logAsMatrix row_at (logAsMatrix.rows - 1);
-			if (logLastRow count (each!= nil)) != (length(parametersMap) + length(differentialOutputsMap)) {
+			if (logLastRow count (each!= nil)) != (length(parametersMap) + length(variableOutputsMap) + length(differentialOutputsMap)) {
 				save parametersMap.keys + variableOutputsMap.keys + differentialOutputsMap.keys
 					to: outputDirectory + "SahFl-Log.csv" format: "csv"
 					rewrite: false header: false

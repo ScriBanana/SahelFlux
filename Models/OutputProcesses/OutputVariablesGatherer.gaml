@@ -1,6 +1,6 @@
 /**
 * In: SahelFlux
-* Name: ParamAndOutCentraliser
+* Name: OutputVariablesGatherer
 * Centralises in one place parameters and outputs to save, and varibale parameters and input data
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
@@ -172,8 +172,11 @@ global {
 			"totalN2O (kgN2O)"::totalN2O,
 			"totalGHG (kgCO2eq)"::totalGHG,
 			
-			// Carbon balance
+			// Carbon and nitrogen balance
 			"ecosystemCBalance"::ecosystemCBalance,
+			"ecosystemNBalance"::ecosystemNBalance,
+			"ecosystemApparentCBalance"::ecosystemApparentCBalance,
+			"ecosystemApparentNBalance"::ecosystemApparentNBalance,
 			"ecosystemCO2Balance (kgCO2)"::ecosystemCO2Balance,
 			"ecosystemGHGBalance (kgCO2eq)"::ecosystemGHGBalance,
 			"SCS"::SCS,

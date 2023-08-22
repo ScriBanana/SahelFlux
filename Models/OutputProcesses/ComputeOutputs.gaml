@@ -39,8 +39,11 @@ global {
 	float totalN2O; // kgN2O
 	float totalGHG; // kgCO2eq
 	
-	// Carbon balance
-	float ecosystemCBalance; // Tout système  entrées - sorties
+	// Carbon and nitrogen balance
+	float ecosystemCBalance; // Whole system : inputs - outputs
+	float ecosystemNBalance;
+	float ecosystemApparentCBalance; // Balance with no gas fixation nor emissions - human driven flows only
+	float ecosystemApparentNBalance;
 	float ecosystemCO2Balance; // kgCO2; atmo fix - CO2 emissions; used for validation
 	float ecosystemGHGBalance; // kgCO2eq; SOCS accumulation - GHG emissions
 	float SCS; // Meme que GHG, en fait, redondant.
@@ -116,6 +119,8 @@ global {
 					totalNInflows <- totalNInflows + flowValue;
 					TSTN <- TSTN + flowValue;
 					poolsDerivativeMap[poolKey][0] <- float(poolsDerivativeMap[poolKey][0]) + flowValue;
+					ecosystemNBalance <- ecosystemNBalance + flowValue;
+					ecosystemApparentNBalance <- ecosystemApparentNBalance + flowValue;
 					
 					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) + flowValue;
 					switch flowKey {
@@ -125,12 +130,15 @@ global {
 							poolFlowsMap["Transhumance"][1] <- float(poolFlowsMap["Transhumance"][1]) - flowValue;
 						} match "IF-FromAtmo" {
 							poolFlowsMap["Atmosphere"][1] <- float(poolFlowsMap["Atmosphere"][1]) - flowValue;
+							ecosystemApparentNBalance <- ecosystemApparentNBalance - flowValue;
 						}
 					}
 				} else if flowKey contains "OF-" {
 					
 					totalNOutflows <- totalNOutflows + flowValue;
 					poolsDerivativeMap[poolKey][0] <- float(poolsDerivativeMap[poolKey][0]) - flowValue;
+					ecosystemNBalance <- ecosystemNBalance - flowValue;
+					ecosystemApparentNBalance <- ecosystemApparentNBalance - flowValue;
 					
 					poolFlowsMap[poolKey][1] <- float(poolFlowsMap[poolKey][1]) - flowValue;
 					switch flowKey {
@@ -140,6 +148,7 @@ global {
 							poolFlowsMap["Transhumance"][1] <- float(poolFlowsMap["Transhumance"][1]) + flowValue;
 						} match_one ["OF-GHG", "OF-AtmoLosses"] {
 							poolFlowsMap["Atmosphere"][1] <- float(poolFlowsMap["Atmosphere"][1]) + flowValue;
+							ecosystemApparentNBalance <- ecosystemApparentNBalance - flowValue;
 						}
 					}
 				} else if flowKey contains "TF-" {
@@ -171,6 +180,7 @@ global {
 					TSTC <- TSTC + flowValue;
 					poolsDerivativeMap[poolKey][1] <- float(poolsDerivativeMap[poolKey][1]) + flowValue;
 					ecosystemCBalance <- ecosystemCBalance + flowValue;
+					ecosystemApparentCBalance <- ecosystemApparentCBalance + flowValue;
 					
 					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) + flowValue;
 					switch flowKey {
@@ -181,6 +191,7 @@ global {
 						} match "IF-FromAtmo" {
 							ecosystemCO2Balance <- ecosystemCO2Balance + flowValue / coefCO2ToC;
 							poolFlowsMap["Atmosphere"][0] <- float(poolFlowsMap["Atmosphere"][0]) - flowValue;
+							ecosystemApparentCBalance <- ecosystemApparentCBalance - flowValue;
 						}
 					}
 				} else if flowKey contains "OF-" {
@@ -188,6 +199,7 @@ global {
 					totalCOutflows <- totalCOutflows + flowValue;
 					poolsDerivativeMap[poolKey][1] <- float(poolsDerivativeMap[poolKey][1]) - flowValue;
 					ecosystemCBalance <- ecosystemCBalance - flowValue;
+					ecosystemApparentCBalance <- ecosystemApparentCBalance - flowValue;
 					
 					poolFlowsMap[poolKey][0] <- float(poolFlowsMap[poolKey][0]) - flowValue;
 					switch flowKey {
@@ -197,6 +209,7 @@ global {
 							poolFlowsMap["Transhumance"][0] <- float(poolFlowsMap["Transhumance"][0]) + flowValue;
 						} match_one ["OF-GHG", "OF-AtmoLosses"] {
 							poolFlowsMap["Atmosphere"][0] <- float(poolFlowsMap["Atmosphere"][0]) + flowValue;
+							ecosystemApparentCBalance <- ecosystemApparentCBalance + flowValue;
 						}
 					}
 				} else if flowKey contains "TF-" {
