@@ -11,6 +11,8 @@ import "../Main.gaml"
 
 global {
 	
+	map<list<landscape>, matrix<float>> moranWeightsMatrixStorageMap;
+	
 	action getMoranSOCS {
 		ask grazableLandscape {
 			self.moranValue <- self.mySOCstock.totalSOC;
@@ -25,8 +27,13 @@ global {
 	}
 	
 	float computeMoran (list<landscape> inputGridList) {
-		// Thought about storing the matrix for each case, but generating the neighbour one is fast enough
-		matrix<float> moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
+		matrix<float> moranWeightsMatrix;
+		if moranWeightsMatrixStorageMap[inputGridList] = nil {
+			moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
+			moranWeightsMatrixStorageMap <+ inputGridList::moranWeightsMatrix;
+		} else {
+			moranWeightsMatrix <- moranWeightsMatrixStorageMap[inputGridList];
+		}
 		return moran(inputGridList collect each.moranValue, moranWeightsMatrix);
 	}
 	

@@ -95,6 +95,8 @@ global {
 	action gatherInitState (map NMap, map CMap, map GHGMap)  {
 		// For output values to be compared with init state
 		
+		write "Storing simulation initial state.";
+		
 		float averageCroplandBiomass <- (
 			grazableLandscape where (each.cellLU = "Cropland") mean_of each.biomassContent
 		) / hectareToCell; // kgDM/ha
@@ -124,6 +126,8 @@ global {
 			"rangelandSOCMoran"::rangelandSOCMoran,
 			"globalSOCMoran"::globalSOCMoran
 		];
+		
+		write "	Done.";
 		
 	}
 	
