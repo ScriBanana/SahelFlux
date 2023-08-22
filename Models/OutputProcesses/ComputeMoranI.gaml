@@ -11,29 +11,32 @@ import "../Main.gaml"
 
 global {
 	
-	map<list<landscape>, matrix<float>> moranWeightsMatrixStorageMap;
+	map<string, matrix<float>> moranWeightsMatrixStorageMap;
 	
 	action getMoranSOCS {
 		ask grazableLandscape {
 			self.moranValue <- self.mySOCstock.totalSOC;
 		}
-		homefieldsSOCMoran <- computeMoran(grazableLandscape where (each.homefieldCell));
+		homefieldsSOCMoran <- computeMoran(grazableLandscape where (each.homefieldCell), villageName + cellSize + "-Homefields");
 		bushfieldsSOCMoran <- computeMoran(
-			grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell)
+			grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell), villageName + cellSize + "-Bushfields"
 		);
-		croplandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland"));
-		rangelandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Rangeland"));
-		globalSOCMoran <- computeMoran(grazableLandscape);
+		croplandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Cropland"), villageName + cellSize + "-Cropland");
+		rangelandSOCMoran <- computeMoran(grazableLandscape where (each.cellLU = "Rangeland"), villageName + cellSize + "-Rangeland");
+		globalSOCMoran <- computeMoran(grazableLandscape, villageName + cellSize + "-Global");
 	}
 	
-	float computeMoran (list<landscape> inputGridList) {
+	float computeMoran (list<landscape> inputGridList, string moranMatrixId) {
 		matrix<float> moranWeightsMatrix;
-		if moranWeightsMatrixStorageMap[inputGridList] = nil {
-			moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
-			moranWeightsMatrixStorageMap <+ inputGridList::moranWeightsMatrix;
+		
+		if moranWeightsMatrixStorageMap[moranMatrixId] != nil {
+			// Storing in a permanent CSV is slower and map<string, matrix<float>> is light enough in RAM
+			moranWeightsMatrix <- moranWeightsMatrixStorageMap[moranMatrixId];
 		} else {
-			moranWeightsMatrix <- moranWeightsMatrixStorageMap[inputGridList];
+			moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
+			moranWeightsMatrixStorageMap <+ moranMatrixId::moranWeightsMatrix;
 		}
+		
 		return moran(inputGridList collect each.moranValue, moranWeightsMatrix);
 	}
 	

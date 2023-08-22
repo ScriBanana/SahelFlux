@@ -17,8 +17,8 @@ global {
 	float cellWidth <- cellSize #m;
 	float hectareToCell <- cellWidth * cellHeight / 10000 #m2; // cell/ha
 	
-	string filePath <- "../InputFiles/GridInputs/";
-	file gridData <- file(filePath + "LU&ParcGrid" + villageName + cellSize + ".asc");
+	string zoningFilesPath <- "../InputFiles/GridInputs/";
+	file gridData <- file(zoningFilesPath + "LU&ParcGrid" + villageName + cellSize + ".asc");
 	geometry shape <- envelope(gridData);
 	float totalAreaHa <- shape.area / 10000 #m2;
 	
