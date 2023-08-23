@@ -185,8 +185,8 @@ global {
 			// Animal density
 			"nbTLUHerdsInArea"::nbTLUHerdsInArea,
 			"nbTLUFattened"::nbTLUFattened,
-			"herdsIntakeFlow (kgDM)"::herdsIntakeFlow,
-			"herdsExcretionsFlow (kgDM VSE)"::herdsExcretionsFlow,
+			"totalIntakeFlow (kgDM)"::(herdsIntakeFlow + fattenedsIntakeFlow),
+			"herdsExcretionsFlow (kgDM VSE)"::(herdsExcretionsFlow + fattenedExcretionsFlow),
 			
 			// Biomass
 			"averageCroplandBiomass (kgDM)"::averageCroplandBiomass,

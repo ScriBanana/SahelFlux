@@ -38,8 +38,6 @@ global {
 	bool restTime;
 	float herdsIntakeFlow;
 	float herdsExcretionsFlow;
-	float totalHerdsIntakeFlow;
-	float totalHerdsExcretionsFlow;
 	
 	reflex herdsInternalClock { // Unsure if time is gained over updates.
 		sleepTime <- !(

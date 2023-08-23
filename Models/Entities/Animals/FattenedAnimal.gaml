@@ -12,7 +12,7 @@ import "AnimalGroup.gaml"
 
 global {
 	
-	//// Global fattening parameters
+	//// Global fattening parameters and variables
 	
 	float meanFattenedGroupSize; // TLU
 	
@@ -23,6 +23,10 @@ global {
 	float ratioWeightSoldOnBought <- weightWhenSold / weightTLU;
 	
 	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increase in chance to aquire a new one. Arbitrary value
+	
+	// Variables
+	float fattenedsIntakeFlow;
+	float fattenedExcretionsFlow;
 	
 }
 
@@ -37,6 +41,9 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 	action eat {
 		float eatenQuantity <- fattenedTLUDailyIntake * groupSize;
 		float eatenStraw <- strawInFattenedTLUDailyRation * groupSize;
+		
+		// Follows global grazing rate
+		fattenedsIntakeFlow <- fattenedsIntakeFlow + eatenQuantity;
 		
 		// Metabolise and prepare for excretion
 		do emitMetaboIntake("FattenedRation", eatenQuantity);
@@ -63,6 +70,9 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 			loop while: !empty(chymeChunksList)  {
 				map excretaOutputs <- excrete(first(chymeChunksList)[1]);
 				chymeChunksList >- first(chymeChunksList);
+				
+				// Follows global grazing rate
+				fattenedExcretionsFlow <- fattenedExcretionsFlow + float(excretaOutputs["volatileSolidExcreted"]);
 				
 				myHousehold.myORPHeap.heapFattenedInput <+ [
 					excretaOutputs["volatileSolidExcreted"],
