@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Experiment_plan>
-	<Simulation id="1" sourcePath="./Models/Experiments/HeadlessRuns.gaml" finalStep="36000" experiment="FastAutoRun">
+	<Simulation id="1" sourcePath="../Models/Experiments/HeadlessRuns.gaml" finalStep="36000" experiment="FastAutoRun">
 	  <Parameters>
 	  </Parameters>
 	  <Outputs>

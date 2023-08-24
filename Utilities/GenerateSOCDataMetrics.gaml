@@ -15,6 +15,10 @@ global {
 	string filePath <- "../InputFiles/FieldData/SOCFieldData.csv";
 	matrix inputData <- matrix(csv_file(filePath));
 	
+	string inPath <- "../InputFiles/SpatialInputs/";
+	list<shape_file> villageLimits;
+	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;
+	
 	geometry shape <- envelope(list<geometry>(columns_list(inputData)[0]));
 	point pointZero <- {float(min(columns_list(inputData)[2])), float(min(columns_list(inputData)[3]))};
 	float maxSOC <- float(max(columns_list(inputData)[10]));
@@ -49,6 +53,10 @@ global {
 		write "Sob : " + computeMoran(parcelsSob);
 		write "Diohine : " + computeMoran(parcelsDiohine);
 		write "Barry : " + computeMoran(parcelsBarry);
+		
+		loop villageName over: villageNamesList {
+			villageLimits <+ shape_file(inPath + "Limi" + villageName + ".shp");
+		}
 		
 	}
 	
@@ -104,7 +112,7 @@ species fieldParcel parallel: false {
 	rgb myColor;
 	
 	aspect default {
-		draw shape color: myColor border: #black;
+		draw shape color: myColor border: (Site = "Sob" ? #dimgrey : (Site = "Diohine" ? #darkslategray : #saddlebrown));
 	}
 }
 
@@ -113,6 +121,11 @@ experiment Run type: gui {
 		layout tabs: false navigator: false;
 		display "Main" type: java2D {
 			species fieldParcel;
+	        graphics "Village borders" {
+	        	loop villageLimit over: villageLimits {
+	        		draw villageLimit color: #transparent border: #black;
+	        	}
+	        }
 		}
 	}
 }

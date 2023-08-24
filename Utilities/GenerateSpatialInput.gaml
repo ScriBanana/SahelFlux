@@ -214,7 +214,7 @@ experiment GenerateOne type: gui {
 //	        species parcelsShapes aspect: default;
 //	        species ocuSolShapes aspect: default;
 	        species parcel;
-	        graphics "sf" {
+	        graphics "Village borders" {
 	        	draw villageArea color: #transparent border: #black;
 //	        	draw croplandArea color: #transparent border: #brown;
 	        }
