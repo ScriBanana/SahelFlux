@@ -94,7 +94,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 	action excrete (pair someChyme) {
 		
 		string chymeNature <- someChyme.key;
-		float ingestedMS <- float(someChyme.value);
+		float ingestedDM <- float(someChyme.value);
 		
 		// Ration type specific variables
 		float ingestedNContent; // kgN/kgDM
@@ -140,22 +140,27 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		
 		// Compute outputs, used in other processes :
 		// In CH4 from soils
-		float volatileSolidExcreted <- ingestedMS * ( 1 - faecesAshContent) * (1 - ingestedDigestibility + urineEnergyFactor); // kgDM
+		float volatileSolidExcreted <- ingestedDM * ( 1 - faecesAshContent) * (1 - ingestedDigestibility + urineEnergyFactor); // kgDM
 		// In nitrogen available for plant growth and N2O and N gases losses from soil
-		float excretedNitrogen <- ingestedMS * ingestedNContent * ratioNExcretedOnIngested; // kgN
+		float excretedNitrogen <- ingestedDM * ingestedNContent * ratioNExcretedOnIngested; // kgN
 		float faecesNitrogen <- excretedNitrogen * (1 - ratioNUrineOnFaeces); // kgN
 		float urineNirogen <- excretedNitrogen * ratioNUrineOnFaeces; // kgN
 		 // In soil carbon model
-		float excretedCarbon <- ingestedMS * ingestedCContent * ratioCExcretedOnIngested; // kgC
+		float excretedCarbon <- ingestedDM * ingestedCContent * ratioCExcretedOnIngested; // kgC
+		// As a tracker for global outputs
+		float excretedDM <- ingestedDM * (1 - ingestedDigestibility + urineEnergyFactor);
 		
-		assert excretedCarbon >= volatileSolidExcreted * ingestedCContent * ratioCExcretedOnIngested;
+		if enableDebug {
+			assert excretedCarbon >= volatileSolidExcreted * ingestedCContent * ratioCExcretedOnIngested;
+		}
 		
 		// Return outputs
 		map<string, float> digestatCharacteristics<- [
 			"volatileSolidExcreted"::volatileSolidExcreted,
 			"faecesNitrogen"::faecesNitrogen,
 			"urineNirogen"::urineNirogen,
-			"excretedCarbon"::excretedCarbon
+			"excretedCarbon"::excretedCarbon,
+			"excretedDM"::excretedDM
 		];
 		return digestatCharacteristics;
 

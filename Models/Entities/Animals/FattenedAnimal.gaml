@@ -72,7 +72,7 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 				chymeChunksList >- first(chymeChunksList);
 				
 				// Follows global grazing rate
-				fattenedExcretionsFlow <- fattenedExcretionsFlow + float(excretaOutputs["volatileSolidExcreted"]);
+				fattenedExcretionsFlow <- fattenedExcretionsFlow + float(excretaOutputs["excretedDM"]);
 				
 				myHousehold.myORPHeap.heapFattenedInput <+ [
 					excretaOutputs["volatileSolidExcreted"],

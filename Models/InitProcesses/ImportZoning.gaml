@@ -18,12 +18,13 @@ global {
 	float hectareToCell <- cellWidth * cellHeight / 10000 #m2; // cell/ha
 	
 	string zoningFilesPath <- "../InputFiles/GridInputs/";
-	file gridData <- file(zoningFilesPath + "LU&ParcGrid" + villageName + cellSize + ".asc");
+	string zoningFileName <- "LU&ParcGrid" + villageName + cellSize + ".asc";
+	file gridData <- file(zoningFilesPath + zoningFileName);
 	geometry shape <- envelope(gridData);
 	float totalAreaHa <- shape.area / 10000 #m2;
 	
 	action readLandscapeInputData {
-		write "Reading grid data from " + "LU&ParcGrid" + villageName + cellSize + ".asc.";
+		write "Reading grid data from " + zoningFileName;
 		nonEmptyLandscape <- list(landscape);
 		ask landscape {
 			if grid_value = 0.0 {
@@ -43,7 +44,7 @@ global {
 		}
 		parcelsIDList <- remove_duplicates(parcelsIDList);
 		parcelsIDList >- 0;
-		write "	Done. Village: " + villageName + ", cell size: " + cellSize + " m.";
+		write "	Done. Cell size: " + cellSize + " m, village: " + villageName + ".";
 	}
 }
 

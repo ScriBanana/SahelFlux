@@ -72,13 +72,13 @@ global {
 	float totalMeanSOCSInit; // kgC
 	
 	action getMeanSOCS {
-		meanHomefieldsSOCS <- (SOCStock where (each.myCell.homefieldCell)) mean_of each.stableCPool;
+		meanHomefieldsSOCS <- (SOCStock where (each.myCell.homefieldCell)) mean_of each.totalSOC;
 		meanBushfieldsSOCS <- (
 			SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell)
-		) mean_of each.stableCPool;
+		) mean_of each.totalSOC;
 		meanRangelandSOCS <- (
 			SOCStock where (each.myCell.cellLU = "Rangeland")
-		) mean_of each.stableCPool;
+		) mean_of each.totalSOC;
 		// TODO Unoptimised triple loop
 		totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
 	}

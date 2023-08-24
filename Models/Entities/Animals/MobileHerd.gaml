@@ -284,7 +284,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 		;
 		
 		// Follows global excretion rate
-		herdsExcretionsFlow <- herdsExcretionsFlow + currentVSE;
+		herdsExcretionsFlow <- herdsExcretionsFlow + float(excretaOutputs["excretedDM"]);
 		
 		// Save flows to flows map
 		string receivingPool <- currentCell.cellLU = "Rangeland" ? "TF-ToRangelands" : (
@@ -294,7 +294,7 @@ species mobileHerd parent: animalGroup control: fsm skills: [moving] parallel: p
 			currentCell.homefieldCell ? "HomeFields" : "BushFields"
 		);
 		ask world {	do saveFlowInMap("C", "MobileHerds", receivingPool,
-			float(excretaOutputs["excretedCarbon"])
+			currentCFlow
 		);}
 		ask world {	do saveFlowInMap("N", emissionsEmittingPool, "OF-GHG" ,
 			mobileHerdNDirectFaecesN2OEmissions + mobileHerdNDirectUrineN2OEmissions

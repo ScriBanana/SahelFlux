@@ -86,8 +86,6 @@ global {
 		// All init actions defined in related species files.
 		do readInputParameters;
 		do resetRegularOutputMap;
-		write "Initialising meteorological conditions.";
-		do updateMeteo;
 		do readLandscapeInputData;
 		do initGrid;
 		do placeParcels;
@@ -95,6 +93,8 @@ global {
 		do designateHomeFields;
 		do createMobileHerds;
 		create transhumance;
+		write "Initialising meteorological conditions.";
+		do updateMeteo;
 		do initiateRotations;
 		do initSOCStocks;
 		do gatherInitState;
