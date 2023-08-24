@@ -47,7 +47,7 @@ global {
 			"endDate"::endDate,
 			"cycle"::cycle,
 			"run length (years)"::(current_date - starting_date)/#year,
-			"runTime"::runTime,
+			"runTime (min)"::runTime,
 			
 			// Landscape structure
 			"villageName"::villageName,
@@ -185,8 +185,11 @@ global {
 			// Animal density
 			"nbTLUHerdsInArea"::nbTLUHerdsInArea,
 			"nbTLUFattened"::nbTLUFattened,
-			"totalIntakeFlow (kgDM)"::(herdsIntakeFlow + fattenedsIntakeFlow),
-			"herdsExcretionsFlow (kgDM VSE)"::(herdsExcretionsFlow + fattenedExcretionsFlow),
+			"herdsIntakeFlow (kgDM)"::herdsIntakeFlow,
+			"fattenedIntakeFlow (kgDM)"::fattenedIntakeFlow,
+			"herdsExcretionsFlow (kgDM)"::herdsExcretionsFlow,
+			"fattenedExcretionsFlow (kgDM)"::fattenedExcretionsFlow,
+			"complementsInflow (kgDM)"::complementsInflow,
 			
 			// Biomass
 			"averageCroplandBiomass (kgDM)"::averageCroplandBiomass,

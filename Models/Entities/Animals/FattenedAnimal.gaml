@@ -25,8 +25,9 @@ global {
 	float increaseNbTLUBoughtPerTLUSold <- 0.5; // For each TLU sold last season, increase in chance to aquire a new one. Arbitrary value
 	
 	// Variables
-	float fattenedsIntakeFlow;
+	float fattenedIntakeFlow;
 	float fattenedExcretionsFlow;
+	float complementsInflow;
 	
 }
 
@@ -38,12 +39,12 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 	
 	//// Functions
 	
-	action eat {
+	action fattenedEat {
 		float eatenQuantity <- fattenedTLUDailyIntake * groupSize;
 		float eatenStraw <- strawInFattenedTLUDailyRation * groupSize;
 		
 		// Follows global grazing rate
-		fattenedsIntakeFlow <- fattenedsIntakeFlow + eatenQuantity;
+		fattenedIntakeFlow <- fattenedIntakeFlow + eatenQuantity;
 		
 		// Metabolise and prepare for excretion
 		do emitMetaboIntake("FattenedRation", eatenQuantity);
@@ -62,6 +63,8 @@ species fattenedAnimal parent: animalGroup schedules: [] {
 		
 		ask world {	do saveFlowInMap("C", "FattenedAn", "IF-FromMarket", (eatenQuantity - eatenStraw) * fattenedComplementsNContent);}
 		ask world {	do saveFlowInMap("N", "FattenedAn", "IF-FromMarket", (eatenQuantity - eatenStraw) * fattenedComplementsCContent);}
+		
+		complementsInflow <- complementsInflow + eatenQuantity - eatenStraw;
 	}
 	
 	action fattenedDigest {

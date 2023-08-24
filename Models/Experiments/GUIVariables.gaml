@@ -22,8 +22,12 @@ experiment AnimalsAbstract parent: CoreExperiment virtual: true {
 		
 		display digestionChart type: java2D virtual: true refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "Intake and excretion flows" type: series {
-				data "Mobile herds intake (kgDM/TLU)" value: herdsIntakeFlow / mobileHerd sum_of each.herdSize color: #greenyellow;
-				data "Mobile herds excretions (kgDM VSE/TLU)" value: herdsExcretionsFlow / mobileHerd sum_of each.herdSize color: #darkgoldenrod;
+				float nbFattened <- fattenedAnimal sum_of each.groupSize;
+				data "Mobile herds intake (kgDM/TLU_MH)" value: herdsIntakeFlow / mobileHerd sum_of each.herdSize color: #forestgreen;
+				data "Mobile herds excretions (kgDM VSE/TLU_MH)" value: herdsExcretionsFlow / mobileHerd sum_of each.herdSize color: #darkslategrey;
+				data "Fattened animals intake (kgDM/TLU_FA)" value: nbFattened = 0 ? 0 : (fattenedIntakeFlow / nbFattened) color: #lightsalmon;
+				data "Fattened animals excretions (kgDM VSE/TLU_FA)" value: nbFattened = 0 ? 0 : (fattenedExcretionsFlow / nbFattened) color: #darkgoldenrod;
+				data "Complements inflows (kgDM/TLU_FA)" value: nbFattened = 0 ? 0 : (complementsInflow / nbFattened) color: #gamablue;
 			}
 		}
 	}

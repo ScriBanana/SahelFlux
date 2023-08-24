@@ -234,9 +234,9 @@ global {
 			}
 		}
 		
-		ask fattenedAnimal { // Could be someting else than daily.
+		ask fattenedAnimal { // Could be someting else than daily. Intake rate tied to it, though.
 			do fattenedDigest;
-			do eat;
+			do fattenedEat;
 		}
 		
 		dayInDS <- dayInDS + 1;
@@ -247,7 +247,7 @@ global {
 	////	--------------------------		////
 	
 	bool endSimu <- false;
-	float runTime; // seconds
+	float runTime; // minutes
 	reflex endSim when: current_date = endDate {
 		runTime <- (machine_time - startTimeReal) / 60000;
 		
