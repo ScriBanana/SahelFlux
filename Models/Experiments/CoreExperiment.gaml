@@ -55,6 +55,7 @@ experiment CoreWithParameters parent: CoreExperiment virtual: true {
 	parameter "End date" category: "Scenario - Time" var: endDate min: starting_date;
 	
 	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName;
+	parameter "Square grid size (m)" category: "Scenario - Spatial layout" var: cellSize;
 	parameter "Enable fallow (3-years rotation)" category: "Scenario - Spatial layout" var: fallowEnabled <- false;
 	
 	parameter "Number households and mobile herds" category: "Scenario - Population structure" var: nbHousehold min: 0;

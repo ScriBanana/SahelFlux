@@ -62,6 +62,10 @@ global {
 				if empty(fallowParcelsNotPaddockedList) {
 					// Reset availiable parcels if need be. Several herds can end up in the same paddock.
 					fallowParcelsNotPaddockedList <- listAllBushParcels where (each.nextRSCover = "Fallow" and (each.myOwner = nil or each.myOwner.isTranshumant));
+					if empty(fallowParcelsNotPaddockedList) {
+						// Such big is Diohine.
+						fallowParcelsNotPaddockedList <- listAllBushParcels where (each.nextRSCover = "Fallow");
+					}
 				}
 				loop times: maxNbFallowPaddock - length(myPaddockList) {
 					myPaddockList <+ one_of(fallowParcelsNotPaddockedList);

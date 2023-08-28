@@ -44,12 +44,14 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 //	}
 }
 
-experiment SOCxSON type: batch autorun: true repeat: 52 until: endSimu {
+experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
+	
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
 	
 	init {
 		experimentType <- "SOCxSON";
 		
-		SOCxSONOn <- false;
+		SOCxSONOn <- true;
 		
 		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}

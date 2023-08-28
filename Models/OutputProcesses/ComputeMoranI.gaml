@@ -28,8 +28,6 @@ global {
 	
 	float computeMoran (list<landscape> inputGridList, string moranMatrixId) {
 		matrix<float> moranWeightsMatrix;
-		string dirPath <- "../../InputFiles/MoranWeights/Neighbours/";
-		string filePath <- dirPath + moranMatrixId + ".csv";
 		
 		// Stores weight matrix in a map for single runs (faster, but requires too much RAM for batches) or in a CSV for batches
 		if !batchOn {
@@ -39,7 +37,11 @@ global {
 				moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
 				moranWeightsMatrixStorageMap <+ moranMatrixId::moranWeightsMatrix;
 			}
+			
 		} else {
+			string dirPath <- "../../InputFiles/MoranWeights/Neighbours/";
+			string filePath <- dirPath + moranMatrixId + ".csv";
+			
 			if file_exists(filePath) {
 				moranWeightsMatrix <- matrix<float>(csv_file(filePath));
 			} else {
