@@ -47,6 +47,7 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 	
 	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
+	parameter "Square grid size (m)" category: "Scenario - Spatial layout" var: cellSize <- 50;
 	
 	init {
 		experimentType <- "SOCxSON";

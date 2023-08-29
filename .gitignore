@@ -1,4 +1,7 @@
+# Field data confidential
 /InputFiles/FieldData/
+# Weight CSV too large for github
+/InputFiles/MoranWeights/
 /OutputFiles/
 /RScripts/.Rhistory
 /Models/Experiments/benchmarks/
