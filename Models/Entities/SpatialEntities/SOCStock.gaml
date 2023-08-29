@@ -81,6 +81,8 @@ global {
 		) mean_of each.totalSOC;
 		// TODO Unoptimised triple loop
 		totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
+		
+		return [meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS];
 	}
 	
 }

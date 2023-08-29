@@ -59,6 +59,7 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 	
 	reflex saveResults {
 		
+		string SOCxSONOutputDirectory <- "../../OutputFiles/";
 		list<float> listMeanHomefieldsSOCS;
 		list<float> listMeanBushfieldsSOCS;
 		list<float> listMeanRangelandSOCS;
