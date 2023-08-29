@@ -52,7 +52,7 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 	init {
 		experimentType <- "SOCxSON";
 		
-		SOCxSONOn <- true;
+		SOCxSONOn <- false;
 		
 		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}
@@ -66,6 +66,8 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 		list<float> listMeanHomefieldsNFromSoils;
 		list<float> listMeanBushfieldsNFromSoils;
 		list<float> listMeanRangelandNFromSoils;
+		list<float> listAlpha;
+		list<float> listBeta;
 		
 		ask simulations {
 			list<float> meanSOCS <- getMeanSOCS();
@@ -78,10 +80,21 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 			listMeanBushfieldsNFromSoils <+ meanLastNFromSoils[1];
 			listMeanRangelandNFromSoils <+ meanLastNFromSoils[2];
 			
+			float SOCxSONAlphaOutput <- (
+					meanLastNFromSoils[1] - meanLastNFromSoils[0]
+				) / (meanSOCS[1] - meanSOCS[0]);
+			float SOCxSONBetaOutput <- (
+					meanSOCS[1] * meanLastNFromSoils[0] - meanSOCS[0] * meanLastNFromSoils[1]
+				) / (meanSOCS[1] - meanSOCS[0]);
+				
+			listAlpha <+ SOCxSONAlphaOutput;
+			listBeta <+ SOCxSONBetaOutput;
+		
 			save [
 				int(self),
 				meanSOCS[0], meanSOCS[1], meanSOCS[2],
-				meanLastNFromSoils[0], meanLastNFromSoils[1], meanLastNFromSoils[2]
+				meanLastNFromSoils[0], meanLastNFromSoils[1], meanLastNFromSoils[2],
+				SOCxSONAlphaOutput, SOCxSONBetaOutput
 			] to: outputDirectory + "SOCxSON/"+ runPrefix + "SOCxSON_raw.csv"
 				format:"csv" rewrite: (int(self) = 0) ? true : false header: true;
 			
@@ -93,25 +106,27 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 		float meanMeanHomefieldsLastNFromSoil <- mean(listMeanHomefieldsNFromSoils);
 		float meanMeanBushfieldsLastNFromSoil <- mean(listMeanBushfieldsNFromSoils);
 		float meanMeanRangelandLastNFromSoil <- mean(listMeanRangelandNFromSoils);
+		float meanSOCxSONAlphaOutput <- mean(listAlpha);
+		float meanSOCxSONBetaOutput <- mean(listBeta);
 		
 //		meanMeanBushfieldsSOCS <- mean([meanMeanBushfieldsSOCS, meanMeanRangelandSOCS]);
 //		meanMeanBushfieldsLastNFromSoil <- mean([meanMeanBushfieldsLastNFromSoil, meanMeanRangelandLastNFromSoil]);
 		// TODO Remove if an Nsoil value for rangeland is found
 		
-		float SOCxSONAlphaOutput <- (
-			meanMeanBushfieldsLastNFromSoil - meanMeanHomefieldsLastNFromSoil
-		) / (meanMeanBushfieldsSOCS - meanMeanHomefieldsSOCS);
-		float SOCxSONBetaOutput <- (
-			meanMeanBushfieldsSOCS * meanMeanHomefieldsLastNFromSoil - meanMeanHomefieldsSOCS * meanMeanBushfieldsLastNFromSoil
-		) / (meanMeanBushfieldsSOCS - meanMeanHomefieldsSOCS);
+//		float meanSOCxSONAlphaOutput <- (
+//			meanMeanBushfieldsLastNFromSoil - meanMeanHomefieldsLastNFromSoil
+//		) / (meanMeanBushfieldsSOCS - meanMeanHomefieldsSOCS);
+//		float meanSOCxSONBetaOutput <- (
+//			meanMeanBushfieldsSOCS * meanMeanHomefieldsLastNFromSoil - meanMeanHomefieldsSOCS * meanMeanBushfieldsLastNFromSoil
+//		) / (meanMeanBushfieldsSOCS - meanMeanHomefieldsSOCS);
 		
-		write "Alpha : " + SOCxSONAlphaOutput;
-		write "Beta : " + SOCxSONBetaOutput;
+		write "Alpha : " + meanSOCxSONAlphaOutput;
+		write "Beta : " + meanSOCxSONBetaOutput;
 		
 		save [
 			meanMeanHomefieldsSOCS, meanMeanBushfieldsSOCS,
 			meanMeanHomefieldsLastNFromSoil, meanMeanBushfieldsLastNFromSoil,
-			SOCxSONAlphaOutput, SOCxSONBetaOutput
+			meanSOCxSONAlphaOutput, meanSOCxSONBetaOutput
 		] to: outputDirectory + "SOCxSON/"+ runPrefix + "SOCxSON_AlphaBeta.csv" format:"csv" rewrite: true header: true;
 		
 	}
