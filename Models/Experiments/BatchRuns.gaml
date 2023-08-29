@@ -44,9 +44,9 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 //	}
 }
 
-experiment SOCxSON type: batch autorun: true repeat: 2 until: endSimu {
+experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 	
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob"];
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
 	parameter "Square grid size (m)" category: "Scenario - Spatial layout" var: cellSize <- 50;
 	
 	init {
@@ -54,7 +54,7 @@ experiment SOCxSON type: batch autorun: true repeat: 2 until: endSimu {
 		
 		SOCxSONOn <- false;
 		
-		endDate <- date([2021, 11, 1, eveningTime + 1, 0, 0]);
+		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}
 	
 	reflex saveResults {
@@ -89,7 +89,7 @@ experiment SOCxSON type: batch autorun: true repeat: 2 until: endSimu {
 				
 			listAlpha <+ SOCxSONAlphaOutput;
 			listBeta <+ SOCxSONBetaOutput;
-		
+			
 			save [
 				int(self),
 				meanSOCS[0], meanSOCS[1], meanSOCS[2],
