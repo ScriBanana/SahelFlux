@@ -3,7 +3,8 @@
 # Weight CSV too large for github
 /InputFiles/MoranWeights/
 /OutputFiles/
-/RScripts/.Rhistory
+/Utilities/.Rhistory
+/Utilities/.RData
 /Models/Experiments/benchmarks/
 /Models/Experiments/snapshots/
 /.settings
