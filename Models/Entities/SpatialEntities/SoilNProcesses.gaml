@@ -32,9 +32,11 @@ global {
 	] const: true;
 	
 	// SOC on available N model parameters
-	bool SOCxSONOn <- false;
-	float SOCxSONAlpha <- 7.55607226546866; //TODO Base alpha. Recompute twice
-	float SOCxSONBeta <- -15.7224306428423;
+	bool SOCxSONOn <- true;
+	map<string, float> SOCxSONAlphaMap <- [ // Results 
+		"Sob"::0.00429341487873358, "Barry"::-0.0167503557994896, "Diohine"::0.00197924761695453];
+	map<string, float> SOCxSONBetaMap <- [
+		"Sob"::-9.93564377647462, "Barry"::68.592209925106, "Diohine"::-2.93033048272559];
 	
 	// Gather NFrom soils for SOCxSON calibration
 	list<float> gatherNFromSoils {
@@ -93,7 +95,7 @@ species soilNProcesses parallel: true schedules: [] {
 			// Will return the value for bushfields in cropland not part of a parcel and rangeland.
 			// TODO Value for rangeland? Nothing in Grillot.
 		} else {
-			NFromSoil <- SOCxSONAlpha * myCell.mySOCstock.stableCPool + SOCxSONBeta;
+			NFromSoil <- SOCxSONAlphaMap[villageName] * myCell.mySOCstock.stableCPool + SOCxSONBetaMap[villageName];
 		}
 		
 		return NFromSoil;

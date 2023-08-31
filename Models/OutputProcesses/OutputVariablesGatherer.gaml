@@ -83,8 +83,8 @@ global {
 			
 			// Biophysical
 			"SOCxSONOn"::SOCxSONOn,
-			"SOCxSONAlpha"::SOCxSONAlpha,
-			"SOCxSONBeta"::SOCxSONBeta,
+			"SOCxSONAlpha"::(SOCxSONAlphaMap[villageName]),
+			"SOCxSONBeta"::(SOCxSONBetaMap[villageName]),
 			"homefieldsSOChaInit"::homefieldsSOChaInit,
 			"bushfieldsSOChaInit"::bushfieldsSOChaInit,
 			"rangelandSOChaInit"::rangelandSOChaInit

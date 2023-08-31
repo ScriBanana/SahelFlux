@@ -52,7 +52,7 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 	init {
 		experimentType <- "SOCxSON";
 		
-		SOCxSONOn <- false;
+		SOCxSONOn <- true;
 		
 		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}
