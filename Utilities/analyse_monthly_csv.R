@@ -13,7 +13,7 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "../../../BackupSortiesSMA/230808-3Vil/Monthly/Diohine/"
+path <- "/home/scriban/Bureau/"
 file.names <- list.files(path)
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
@@ -23,7 +23,7 @@ data.df <- data.frame()
 for (i in 1:(length(file.names))){
   tmp <- read.csv(paste0(path,file.names[i]))                            ##lecture du premier CSV qui contient un nombre
   # Appliquer la soustraction de chaque ligne avec la valeur précédente
-  tmp1 <- as.data.frame(lapply(tmp[,6:44], function(x) c(x[1], diff(x))))
+  tmp1 <- as.data.frame(lapply(tmp[,6:49], function(x) c(x[1], diff(x))))
   tmp <- cbind(tmp[,1:5],tmp1)
   tmp$run <- i      ## extraction du nombre depuis le nom du fichier
   data.df <- rbind(data.df, tmp)                                         ##ajout a data frame général, les données de tmp 
@@ -46,16 +46,19 @@ df_grouped <- data.df %>%
     totalCThroughflows..kgC. = mean(totalCThroughflows..kgC.),
     totalCOutflows..kgC. = mean(totalCOutflows..kgC.),
     TSTN = mean(TSTN),
+    pathLengthN = mean(pathLengthN),
     ICRN = mean(ICRN),
-    FinnN = mean(FinnN),
     TSTC = mean(TSTC),
+    pathLengthC = mean(pathLengthC),
     ICRC = mean(ICRC),
-    FinnC = mean(FinnC),
     totalCO2..kgCO2. = mean(totalCO2..kgCO2.),
     totalCH4..kgCH4. = mean(totalCH4..kgCH4.),
     totalN2O..kgN2O. = mean(totalN2O..kgN2O.),
     totalGHG..kgCO2eq. = mean(totalGHG..kgCO2eq.),
     ecosystemCBalance = mean(ecosystemCBalance),
+    ecosystemNBalance = mean(ecosystemNBalance),
+    ecosystemApparentCBalance = mean(ecosystemApparentCBalance),
+    ecosystemApparentNBalance = mean(ecosystemApparentNBalance),
     ecosystemCO2Balance..kgCO2. = mean(ecosystemCO2Balance..kgCO2.),
     ecosystemGHGBalance..kgCO2eq. = mean(ecosystemGHGBalance..kgCO2eq.),
     SCS = mean(SCS),
@@ -63,79 +66,87 @@ df_grouped <- data.df %>%
     nbTLUHerdsInArea = mean(nbTLUHerdsInArea),
     nbTLUFattened = mean(nbTLUFattened),
     herdsIntakeFlow..kgDM. = mean(herdsIntakeFlow..kgDM.),
-    herdsExcretionsFlow..kgDM.VSE. = mean(herdsExcretionsFlow..kgDM.VSE.),
-    totalHerdsIntakeFlow..kgDM. = mean(totalHerdsIntakeFlow..kgDM.),
-    totalHerdsExcretionsFlow..kgDM.VSE. = mean(totalHerdsExcretionsFlow..kgDM.VSE.),
+    fattenedIntakeFlow..kgDM. = mean(fattenedIntakeFlow..kgDM.),
+    herdsExcretionsFlow..kgDM. = mean(herdsExcretionsFlow..kgDM.),
+    fattenedExcretionsFlow..kgDM. = mean(fattenedExcretionsFlow..kgDM.),
+    complementsInflow..kgDM. = mean(complementsInflow..kgDM.),
     averageCroplandBiomass..kgDM. = mean(averageCroplandBiomass..kgDM.),
     averageRangelandBiomass..kgDM. = mean(averageRangelandBiomass..kgDM.),
     meanHomefieldsSOCS..kgC. = mean(meanHomefieldsSOCS..kgC.),
     meanBushfieldsSOCS..kgC. = mean(meanBushfieldsSOCS..kgC.),
     meanRangelandSOCS..kgC. = mean(meanRangelandSOCS..kgC.),
     totalMeanSOCS..kgC. = mean(totalMeanSOCS..kgC.),
-    meanHomefieldsSOCSVariation..kgC. = mean(meanHomefieldsSOCSVariation..kgC.),
-    meanBushfieldsSOCSVariation..kgC. = mean(meanBushfieldsSOCSVariation..kgC.),
-    meanRangelandSOCSVariation..kgC. = mean(meanRangelandSOCSVariation..kgC.),
-    totalMeanSOCSVariation..kgC. = mean(totalMeanSOCSVariation..kgC.),
+    homefieldsSOCMoran = mean(homefieldsSOCMoran),
+    bushfieldsSOCMoran = mean(bushfieldsSOCMoran),
+    croplandSOCMoran = mean(croplandSOCMoran),
+    rangelandSOCMoran = mean(rangelandSOCMoran),
+    globalSOCMoran = mean(globalSOCMoran),
     .groups = 'drop'
     )
 
-df_grouped$date <- as.Date(paste(df_grouped$Year, sprintf("%02d", df_grouped$Month), "01", sep = "-"), format = "%Y-%m-%d")
+df_grouped$date <- as.Date(paste(
+  df_grouped$Year, sprintf("%02d", df_grouped$Month), "01", sep = "-"), format = "%Y-%m-%d")
 df_grouped <- df_grouped[,-c(1:2)]
 
 outFilesName <- "Output"
 
-write.csv(df_grouped, file=paste0(path, outFilesName, ".csv"))
+write.csv(df_grouped, file=paste0(path, "/", outFilesName, ".csv"))
 
 # Conversion du data frame en format long avec la fonction melt()
 df_long <- melt(df_grouped, id.vars = "date")
 levels(df_long$variable) <- c(
-    "totalNFlows (kgN)",
-    "totalNInflows (kgN)",
-    "totalNThroughflows (kgN)",
-    "totalNOutflows (kgN)",
-    "totalCFlows (kgC)",
-    "totalCInflows (kgC)",
-    "totalCThroughflows (kgC)",
-    "totalCOutflows (kgC)",
-    "TSTN",
-    "ICRN",
-    "FinnN",
-    "TSTC",
-    "ICRC",
-    "FinnC",
-    "totalCO2 (kgCO2)",
-    "totalCH4 (kgCH4)",
-    "totalN2O (kgN2O)",
-    "totalGHG (kgCO2eq)",
-    "ecosystemCBalance (kgC)",
-    "ecosystemCO2Balance (kgCO2)",
-    "ecosystemGHGBalance (kgCO2eq)",
-    "SCS",
-    "CFootprint",
-    "nbTLUHerdsInArea",
-    "nbTLUFattened",
-    "herdsIntakeFlow (kgDM)",
-    "herdsExcretionsFlow (kgDM VSE)",
-    "totalHerdsIntakeFlow (kgDM)",
-    "totalHerdsExcretionsFlow (kgDM VSE)",
-    "averageCroplandBiomass (kgDM)",
-    "averageRangelandBiomass (kgDM)",
-    "meanHomefieldsSOCS (kgC)",
-    "meanBushfieldsSOCS (kgC)",
-    "meanRangelandSOCS (kgC)",
-    "totalMeanSOCS (kgC)",
-    "meanHomefieldsSOCSVariation (kgC)",
-    "meanBushfieldsSOCSVariation (kgC)",
-    "meanRangelandSOCSVariation (kgC)",
-    "totalMeanSOCSVariation (kgC)"
-  )
+  "totalNFlows..kgN.",
+  "totalNInflows..kgN.",
+  "totalNThroughflows..kgN.",
+  "totalNOutflows..kgN.",
+  "totalCFlows..kgC.",
+  "totalCInflows..kgC.",
+  "totalCThroughflows..kgC.",
+  "totalCOutflows..kgC.",
+  "TSTN",
+  "pathLengthN",
+  "ICRN",
+  "TSTC",
+  "pathLengthC",
+  "ICRC",
+  "totalCO2..kgCO2.",
+  "totalCH4..kgCH4.",
+  "totalN2O..kgN2O.",
+  "totalGHG..kgCO2eq.",
+  "ecosystemCBalance",
+  "ecosystemNBalance",
+  "ecosystemApparentCBalance",
+  "ecosystemApparentNBalance",
+  "ecosystemCO2Balance..kgCO2.",
+  "ecosystemGHGBalance..kgCO2eq.",
+  "SCS",
+  "CFootprint",
+  "nbTLUHerdsInArea",
+  "nbTLUFattened",
+  "herdsIntakeFlow..kgDM.",
+  "fattenedIntakeFlow..kgDM.",
+  "herdsExcretionsFlow..kgDM.",
+  "fattenedExcretionsFlow..kgDM.",
+  "complementsInflow..kgDM.",
+  "averageCroplandBiomass..kgDM.",
+  "averageRangelandBiomass..kgDM.",
+  "meanHomefieldsSOCS..kgC.",
+  "meanBushfieldsSOCS..kgC.",
+  "meanRangelandSOCS..kgC.",
+  "totalMeanSOCS..kgC.",
+  "homefieldsSOCMoran",
+  "bushfieldsSOCMoran",
+  "croplandSOCMoran",
+  "rangelandSOCMoran",
+  "globalSOCMoran"
+)
 
 # Création du graphique en utilisant ggplot2 et facet_grid()
 ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
   geom_smooth(span = 0.25) +
   facet_wrap(. ~ variable, scales = "free_y") +
-  labs(title = "Diohine - Moyenne de 8 réplications de 2020 à 2030") +
+  labs(title = "Sob - Moyenne de 10 réplications de 2020 à 2030") +
   theme_bw() +
   # ylim(c(-38816740.21,24804845.397)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 

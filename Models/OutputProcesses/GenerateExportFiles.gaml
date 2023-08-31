@@ -52,7 +52,7 @@ global {
 		do gatherRegularOutputs(regularOutputNFlowsMap, regularOutputCFlowsMap, regularOutputGHGFlowsMap);
 		
 		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
-		lineToSave <<+ list<float>(variableOutputsMap.values + differentialOutputsMap.values);
+		lineToSave <<+ list<float>(variableOutputsMap.values);
 		save lineToSave
 			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
@@ -65,8 +65,10 @@ global {
 	
 	// CSV headers
 	action initOutputsDuringSim {
+		do setVariableOutputMap(0.0, 0.0, 0.0, 0.0);
+		
 		list<string> inSimHeader <-  ["Year", "Month", "Cycle", "Machine time", "Runtime"];
-		inSimHeader <<+ list<string>(variableOutputsMap.keys + differentialOutputsMap.keys);
+		inSimHeader <<+ list<string>(variableOutputsMap.keys);
 		
 		save inSimHeader
 			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"

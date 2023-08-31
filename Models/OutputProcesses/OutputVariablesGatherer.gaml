@@ -146,6 +146,27 @@ global {
 		
 		do computeOutputs(NMap, CMap, GHGMap);
 		
+		do setVariableOutputMap(
+			nbTLUHerdsInArea, nbTLUFattened,
+			averageCroplandBiomass, averageRangelandBiomass
+		);
+		
+	}
+	
+	action gatherFinalOutputs (map NMap, map CMap, map GHGMap)  {
+		do gatherRegularOutputs(NMap, CMap, GHGMap);
+		loop outputItem over: initialOutputsMap.pairs {
+			differentialOutputsMap <+
+				("Delta_" + outputItem.key) ::
+				variableOutputsMap[outputItem.key] - initialOutputsMap[outputItem.key];
+		}
+	}
+	
+	action setVariableOutputMap (
+		float nbTLUHerdsInArea, float nbTLUFattened,
+		float averageCroplandBiomass, float averageRangelandBiomass
+	) {
+		
 		variableOutputsMap <- [
 			
 			// Global C&N flows
@@ -207,17 +228,6 @@ global {
 			"croplandSOCMoran"::croplandSOCMoran,
 			"rangelandSOCMoran"::rangelandSOCMoran,
 			"globalSOCMoran"::globalSOCMoran
-		];
-		
+		];	
 	}
-	
-	action gatherFinalOutputs (map NMap, map CMap, map GHGMap)  {
-		do gatherRegularOutputs(NMap, CMap, GHGMap);
-		loop outputItem over: initialOutputsMap.pairs {
-			differentialOutputsMap <+
-				("Delta_" + outputItem.key) ::
-				variableOutputsMap[outputItem.key] - initialOutputsMap[outputItem.key];
-		}
-	}
-	
 }
