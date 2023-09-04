@@ -23,9 +23,9 @@ global {
 	int nbTreesInitRangeland <- 15 const: true; // Grillot, 2018
 	
 	// Yield model parameters
-	float milletMaxYw <- 3775.0 const: true; // Grillot, 2018
-	float spontVegMaxYw <- 1498.0 const: true; // Grillot, 2018
-	float groundnutBaseYield <- 450.0 const: true; // Grillot, 2018
+	float milletMaxYw <- 3775.0 const: true; // kgDM/ha Grillot, 2018
+	float spontVegMaxYw <- 1498.0 const: true; // kgDM/ha Grillot, 2018
+	float groundnutBaseYield <- 450.0 const: true; // kgDM/ha Grillot, 2018
 	// See the rest in the code. Purely copied off Grillot anyway.
 	
 	// Roots production

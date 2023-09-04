@@ -33,10 +33,14 @@ global {
 	
 	// SOC on available N model parameters
 	bool SOCxSONOn <- true;
-	map<string, float> SOCxSONAlphaMap <- [ // Results 
-		"Sob"::0.00429341487873358, "Barry"::-0.0167503557994896, "Diohine"::0.00197924761695453];
+//	map<string, float> SOCxSONAlphaMap <- [ // 1st calibration round
+//		"Sob"::0.00429341487873358, "Barry"::-0.0167503557994896, "Diohine"::0.00197924761695453];
+//	map<string, float> SOCxSONBetaMap <- [
+//		"Sob"::-9.93564377647462, "Barry"::68.592209925106, "Diohine"::-2.93033048272559];
+	map<string, float> SOCxSONAlphaMap <- [ // 2nd calibration round
+		"Sob"::0.00393670691864012, "Barry"::-0.0179790523581975, "Diohine"::0.00203086538002018];
 	map<string, float> SOCxSONBetaMap <- [
-		"Sob"::-9.93564377647462, "Barry"::68.592209925106, "Diohine"::-2.93033048272559];
+		"Sob"::-10.81169022076, "Barry"::82.0259434379524, "Diohine"::-4.37532708560456];
 	
 	// Gather NFrom soils for SOCxSON calibration
 	list<float> gatherNFromSoils {

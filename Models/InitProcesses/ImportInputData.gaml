@@ -11,7 +11,12 @@ model SahelFlux
 import "../Main.gaml"
 
 global {
-	bool isExplo <- false;
+	
+	float propTranshumantHhExplo <- -1.0;
+	float propFatteningHhExplo <- -1.0;
+	float meanHerdSizeExplo <- -1.0;
+	float meanFattenedGroupSizeExplo <- -1.0;
+	float homeFieldsProportionExplo <- -1.0;
 	
 	action readInputParameters {
 		csv_file inputDataFile <- csv_file("../InputFiles/SahelFlux_ScenarioInputData.csv");
@@ -34,10 +39,19 @@ global {
 		bushfieldsSOChaInit <- float((inputData column_at scenarioIndex)[13]);
 		rangelandSOChaInit <- float((inputData column_at scenarioIndex)[14]);
 		
+		if isExplo {
+			propTranshumantHh <- propTranshumantHhExplo = -1.0 ? propTranshumantHh : propTranshumantHhExplo;
+			propFatteningHh <- propFatteningHhExplo = -1.0 ? propFatteningHh : propFatteningHhExplo;
+			meanHerdSize <- meanHerdSizeExplo = -1.0 ? meanHerdSize : meanHerdSizeExplo;
+			meanFattenedGroupSize <- meanFattenedGroupSizeExplo = -1.0 ? meanFattenedGroupSize : meanFattenedGroupSizeExplo;
+			homeFieldsProportion <- homeFieldsProportionExplo = -1.0 ? homeFieldsProportion : homeFieldsProportionExplo;
+		}
+		
 		nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
 		nbFatteningHh <- round(propFatteningHh * nbHousehold);
 		homefieldsSOCInit <- homefieldsSOChaInit * hectareToCell; // kgC/cell
 		bushfieldsSOCInit <- bushfieldsSOChaInit * hectareToCell; // kgC/cell
 		rangelandSOCInit <- rangelandSOChaInit * hectareToCell; // kgC/cell
+		
 	}
 }

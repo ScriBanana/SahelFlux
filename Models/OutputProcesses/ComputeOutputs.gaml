@@ -240,12 +240,12 @@ global {
 					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue;
 				} else if GHGKey = "CH4" {
 					totalCH4 <- totalCH4 + flowValue;
-					totalGHG <- totalGHG + flowValue * PRGCH4;
-					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue * PRGCH4;
+					totalGHG <- totalGHG + flowValue * GWPCH4;
+					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue * GWPCH4;
 				} else if GHGKey = "N2O" {
 					totalN2O <- totalN2O + flowValue;
-					totalGHG <- totalGHG + flowValue * PRGN2O;
-					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue * PRGN2O;
+					totalGHG <- totalGHG + flowValue * GWPN2O;
+					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue * GWPN2O;
 				}
 			}
 		}

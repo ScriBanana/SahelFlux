@@ -135,25 +135,30 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 
 experiment MorrisBatch type: batch autorun: true until: endSimu {
 	
-	parameter "Village" var: villageName among: villageNamesList;
-	parameter "Number households and mobile herds" var: nbHousehold min: 20 max: 150;
-	parameter "Number transhuming households" var: propTranshumantHh min: 0.0 max: 1.0;
-	parameter "Number fattening households" var: propFatteningHh min: 0.0 max: 1.0;
-	parameter "HerdSize average" var: meanHerdSize min: 1.0 max: 20.0;
-	parameter "FattenedGroupSize average" var: meanFattenedGroupSize min: 0.5 max: 5.0;
+	string batchId <- "Morris"; // !!! machine_time doesn't work; NO INDIVIDUAL BATCH ID; BACKUP RESULTS
+		
+//	parameter "Village ID" var: villageFloat min: 0.0 max: 2.999999999999999;
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"];// villageNamesList;
+	
+	parameter "Proportion transhuming households" var: propTranshumantHhExplo min: 0.0 max: 1.0;
+	parameter "Proportion fattening households" var: propFatteningHhExplo min: 0.0 max: 1.0;
+	parameter "HerdSize average" var: meanHerdSizeExplo min: 1.0 max: 20.0;
+	parameter "FattenedGroupSize average" var: meanFattenedGroupSizeExplo min: 0.5 max: 5.0;
+	parameter "Home fields proportion" var: homeFieldsProportionExplo min: 0.0 max: 1.0;
 	
 	init {
+		write batchId;
 		experimentType <- "Morris";
 		isExplo <- true;
 		
-		endDate <- date([2020, 12, 1, eveningTime + 1, 0, 0]);
+		endDate <- date([2023, 11, 1, eveningTime + 1, 0, 0]);
 	}
 	
 	method morris
-		levels: 4
+		levels: 8
 		outputs: ["TSTN", "TSTC", "ecosystemCBalance", "ecosystemGHGBalance"]
-		sample: 1
-		report: outputDirectory + "Morris/"+ runPrefix + "morris.txt"
-		results: outputDirectory + "Morris/"+ runPrefix + "morris_raw.csv"
+		sample: 40
+		report: outputDirectory + "Morris/"+ batchId + ".txt"
+		results: outputDirectory + "Morris/"+ batchId + "_raw.csv"
 	;
 }

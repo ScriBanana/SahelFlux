@@ -11,7 +11,7 @@ import "../Main.gaml"
 
 global {
 	
-	//// Global world grid parameters
+	//// Global world grid variables
 	
 	float cellHeight <- cellSize #m;
 	float cellWidth <- cellSize #m;

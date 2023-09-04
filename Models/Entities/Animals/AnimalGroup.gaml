@@ -27,7 +27,6 @@ global {
 	float ratioCExcretedOnIngested <- 0.45 const: true; // Lecomte 2002
 	float ratioNUrineOnFaeces <- 0.25 const: true; // Wade 2016
 	float urineEnergyFactor <- 0.04 const: true; // IPCC 2019; default value for cattle
-	float dietaryEnergyConversionFactor <- 18.45 const: true;
 	
 	// Feed nutritional values
 	float milletResiduesEnergyContent <- 17.17 const: true; // MJ/kgDM INRA 2018

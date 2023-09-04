@@ -33,13 +33,15 @@ global {
 	bool batchOn <- false;
 	bool enabledGUI <- false;
 	bool enableDebug <- false;
+	bool isExplo <- false;
 	
 	// Village choice
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;
-	string villageName <- "Sob" among: villageNamesList;
+	float villageFloat <- 1.0 min: 0.0 max: 2.999999999999999; // Used in explo, where float input are needed
+	string villageName <- villageNamesList[floor(villageFloat)] among: villageNamesList;
 	
 	// Space related parameter
-	int cellSize <- 40; // max LU shapefile pixelsize : 1.5 m
+	int cellSize <- 50; // max LU shapefile pixelsize : 1.5 m
 	
 	// Time and calendar parameters
 	float step <- 30.0 #minutes;
@@ -69,8 +71,7 @@ global {
 	////			Global init			////
 	////	--------------------------	////
 	init {
-		
-		do inputUnitTests;
+		if enableDebug {do inputUnitTests;}
 		
 		write "=== RUN " + int(self) + " INITIALISATION ===";
 		

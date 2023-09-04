@@ -86,8 +86,8 @@ global {
 	float coefN2OToN <- 0.6365 const: true; // Proportion of N in the mass of N2O
 	float coefNOxToN <- 0.3045 const: true; // Proportion of N in the mass of NO2 (default)
 	
-	// PRG
-	float PRGCH4 <- 25.0 const: true; // Over 100 years, as recommended by IPCC
-	float PRGN2O <- 298.0 const: true;
+	// GWP
+	float GWPCH4 <- 25.0 const: true; // Over 100 years, as recommended by IPCC
+	float GWPN2O <- 298.0 const: true;
 	
 }
