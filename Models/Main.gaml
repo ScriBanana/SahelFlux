@@ -53,7 +53,7 @@ global {
 	int ORPSpreadingFrequency <- 3; // days between ORP Spreads during spreading period TODO DUMMY
 	int startHour <- wakeUpTime - 1;
 	date starting_date <- date([2020, 11, 2, startHour, 0, 0]); // First day of DS, before herds leave paddock. Change initial FSM state upon modification.
-	date endDate <- date([2022, 11, 1, eveningTime + 1, 0, 0]);
+	date endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	int lengthRainySeason <- int(milliseconds_between(
 		date([2020, rainySeasonFirstMonth, 1, 0, 0]), date([2020, drySeasonFirstMonth, 1, 0, 0])
 	) / 86400000.0); // days. Weird, but hard to find better

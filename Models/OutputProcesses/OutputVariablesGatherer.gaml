@@ -30,11 +30,11 @@ global {
 			grazableLandscape count (each.cellLU = "Cropland" and (each.homefieldCell ))
 		) / hectareToCell; // ha
 		int nbHomefieldsParcelsTotal <- parcel count (each.homeField);
-		int nbRangelandParcelsTotal <- parcel count (!each.homeField);
-		float bushfieldsSurfacePerHh <- household mean_of (each.myHomeParcelsList sum_of each.parcelSurface);
-		float homefieldsSurfacePerHh <- household mean_of (each.myBushParcelsList sum_of each.parcelSurface);
+		int nbBushfieldsParcelsTotal <- parcel count (!each.homeField);
+		float homefieldsSurfacePerHh <- household mean_of (each.myHomeParcelsList sum_of each.parcelSurface);
+		float bushfieldsSurfacePerHh <- household mean_of (each.myBushParcelsList sum_of each.parcelSurface);
 		float averageNbHomefieldsPerHh <- household mean_of (length(each.myHomeParcelsList));
-		float averageNbRangelandsPerHh <- household mean_of (length(each.myBushParcelsList));
+		float averageNbBushfieldsPerHh <- household mean_of (length(each.myBushParcelsList));
 		
 		parametersMap <- [
 			// Simulation
@@ -60,14 +60,14 @@ global {
 			"bushfieldsSurface"::bushfieldsSurface,
 			"homefieldsSurface"::homefieldsSurface,
 			"nbHomefieldsParcelsTotal"::nbHomefieldsParcelsTotal,
-			"nbRangelandParcelsTotal"::nbRangelandParcelsTotal,
+			"nbBushfieldsParcelsTotal"::nbBushfieldsParcelsTotal,
 			
 			// Population
 			"nbHousehold"::nbHousehold,
 			"meanHerdSize"::meanHerdSize,
 			"nbTLUHerds"::nbTLUHerds,
 			"homeFieldsProportion"::homeFieldsProportion,
-			"averageNbRangelandsPerHh"::averageNbRangelandsPerHh,
+			"averageNbBushfieldsPerHh"::averageNbBushfieldsPerHh,
 			"averageNbHomefieldsPerHh"::averageNbHomefieldsPerHh,
 			"bushfieldsSurfacePerHh"::bushfieldsSurfacePerHh,
 			"homefieldsSurfacePerHh"::homefieldsSurfacePerHh,
@@ -105,19 +105,20 @@ global {
 		) / hectareToCell; // kgDM/ha
 		
 		do getMeanSOCS;
+		totalMeanSOCInit <- globalMeanSOC;
 		do getMoranSOCS;
 		
 		initialOutputsMap <- [
 			
 			// Biomass
-			"averageCroplandBiomass (kgDM)"::averageCroplandBiomass,
-			"averageRangelandBiomass (kgDM)"::averageRangelandBiomass,
+			"averageCroplandBiomass (kgDM/ha)"::averageCroplandBiomass,
+			"averageRangelandBiomass (kgDM/ha)"::averageRangelandBiomass,
 			
 			// SOC
-			"meanHomefieldsSOCS (kgC)"::meanHomefieldsSOCS,
-			"meanBushfieldsSOCS (kgC)"::meanBushfieldsSOCS,
-			"meanRangelandSOCS (kgC)"::meanRangelandSOCS,
-			"totalMeanSOCS (kgC)"::totalMeanSOCS,
+			"meanHomefieldsSOCS (kgC/ha)"::(meanHomefieldsSOC * hectareToCell),
+			"meanBushfieldsSOCS (kgC/ha)"::(meanBushfieldsSOC * hectareToCell),
+			"meanRangelandSOCS (kgC/ha)"::(meanRangelandSOC * hectareToCell),
+			"globalMeanSOC (kgC/ha)"::(globalMeanSOC * hectareToCell),
 			
 			// Moran
 			"homefieldsSOCMoran"::homefieldsSOCMoran,
@@ -217,10 +218,10 @@ global {
 			"averageRangelandBiomass (kgDM)"::averageRangelandBiomass,
 			
 			// SOC
-			"meanHomefieldsSOCS (kgC)"::meanHomefieldsSOCS,
-			"meanBushfieldsSOCS (kgC)"::meanBushfieldsSOCS,
-			"meanRangelandSOCS (kgC)"::meanRangelandSOCS,
-			"totalMeanSOCS (kgC)"::totalMeanSOCS,
+			"meanHomefieldsSOCS (kgC/ha)"::(meanHomefieldsSOC * hectareToCell),
+			"meanBushfieldsSOCS (kgC/ha)"::(meanBushfieldsSOC * hectareToCell),
+			"meanRangelandSOCS (kgC/ha)"::(meanRangelandSOC * hectareToCell),
+			"globalMeanSOC (kgC/ha)"::(globalMeanSOC * hectareToCell),
 			
 			// Moran
 			"homefieldsSOCMoran"::homefieldsSOCMoran,

@@ -50,7 +50,7 @@ global {
 	float CFootprint;
 	
 	// SOC
-	float totalMeanSOCSVariation; // kgC
+	float totalMeanSOCVariation; // kgC
 	
 	// SOC Moran Is
 	float homefieldsSOCMoran;
@@ -252,12 +252,12 @@ global {
 		
 		// SOC		
 		do getMeanSOCS;
-		totalMeanSOCSVariation <- totalMeanSOCS - totalMeanSOCSInit; // kgC
+		totalMeanSOCVariation <- globalMeanSOC - totalMeanSOCInit; // kgC
 		
 		//// Compute derivated outputs
 		
 		// Carbon balance
-		ecosystemGHGBalance <- totalMeanSOCSVariation - totalGHG;
+		ecosystemGHGBalance <- totalMeanSOCVariation - totalGHG; // = SCS
 		
 		// SOC moran indexes
 		do getMoranSOCS;

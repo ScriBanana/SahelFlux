@@ -13,7 +13,14 @@ rm(list = ls())
 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de travail
 
-path <- "/home/scriban/Bureau/"
+## PARAMETERS
+vilName <- "Barry"
+dir <- "/home/scriban/Dropbox/Thèse/DonneesEtSauvegardes/BackupSortiesSMA/230904-LongRun/Monthly/"
+nbRep <- 8
+runLength <- 10 # years
+##
+
+path <- paste0(dir, vilName, "/")
 file.names <- list.files(path)
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
@@ -88,7 +95,7 @@ df_grouped$date <- as.Date(paste(
   df_grouped$Year, sprintf("%02d", df_grouped$Month), "01", sep = "-"), format = "%Y-%m-%d")
 df_grouped <- df_grouped[,-c(1:2)]
 
-outFilesName <- "Output"
+outFilesName <- paste0(vilName, "Output")
 
 write.csv(df_grouped, file=paste0(path, "/", outFilesName, ".csv"))
 
@@ -144,9 +151,9 @@ levels(df_long$variable) <- c(
 # Création du graphique en utilisant ggplot2 et facet_grid()
 ggplot(df_long, aes(x = date, y = value, group = variable, color = variable)) +
   geom_line() +
-  geom_smooth(span = 0.25) +
+#  geom_smooth(span = 0.25) +
   facet_wrap(. ~ variable, scales = "free_y") +
-  labs(title = "Sob - Moyenne de 10 réplications de 2020 à 2030") +
+  labs(title = paste0(vilName, " - ", runLength, " years - ", nbRep, " replications")) +
   theme_bw() +
   # ylim(c(-38816740.21,24804845.397)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 

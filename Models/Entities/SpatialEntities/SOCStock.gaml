@@ -65,24 +65,24 @@ global {
 	}
 	
 	// Mean SOCS computation
-	float meanHomefieldsSOCS; // kgC
-	float meanBushfieldsSOCS; // kgC
-	float meanRangelandSOCS; // kgC
-	float totalMeanSOCS; // kgC
-	float totalMeanSOCSInit; // kgC
+	float meanHomefieldsSOC; // kgC
+	float meanBushfieldsSOC; // kgC
+	float meanRangelandSOC; // kgC
+	float globalMeanSOC; // kgC
+	float totalMeanSOCInit; // kgC
 	
 	action getMeanSOCS {
-		meanHomefieldsSOCS <- (SOCStock where (each.myCell.homefieldCell)) mean_of each.totalSOC;
-		meanBushfieldsSOCS <- (
+		meanHomefieldsSOC <- (SOCStock where (each.myCell.homefieldCell)) mean_of each.totalSOC;
+		meanBushfieldsSOC <- (
 			SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell)
 		) mean_of each.totalSOC;
-		meanRangelandSOCS <- (
+		meanRangelandSOC <- (
 			SOCStock where (each.myCell.cellLU = "Rangeland")
 		) mean_of each.totalSOC;
 		// TODO Unoptimised triple loop
-		totalMeanSOCS <- meanHomefieldsSOCS + meanBushfieldsSOCS + meanRangelandSOCS;
+		globalMeanSOC <- mean(meanHomefieldsSOC, meanBushfieldsSOC, meanRangelandSOC);
 		
-		return [meanHomefieldsSOCS, meanBushfieldsSOCS, meanRangelandSOCS];
+		return [meanHomefieldsSOC, meanBushfieldsSOC, meanRangelandSOC];
 	}
 	
 }

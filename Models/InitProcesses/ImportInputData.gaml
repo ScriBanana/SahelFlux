@@ -43,6 +43,7 @@ global {
 			propTranshumantHh <- propTranshumantHhExplo = -1.0 ? propTranshumantHh : propTranshumantHhExplo;
 			propFatteningHh <- propFatteningHhExplo = -1.0 ? propFatteningHh : propFatteningHhExplo;
 			meanHerdSize <- meanHerdSizeExplo = -1.0 ? meanHerdSize : meanHerdSizeExplo;
+			SDHerdSize <- 0.4 * meanHerdSize;
 			meanFattenedGroupSize <- meanFattenedGroupSizeExplo = -1.0 ? meanFattenedGroupSize : meanFattenedGroupSizeExplo;
 			homeFieldsProportion <- homeFieldsProportionExplo = -1.0 ? homeFieldsProportion : homeFieldsProportionExplo;
 		}
