@@ -46,7 +46,6 @@ global {
 	float ecosystemApparentNBalance;
 	float ecosystemCO2Balance; // kgCO2; atmo fix - CO2 emissions; used for validation
 	float ecosystemGHGBalance; // kgCO2eq; SOCS accumulation - GHG emissions
-	float SCS; // Meme que GHG, en fait, redondant.
 	float CFootprint;
 	
 	// SOC
@@ -257,7 +256,7 @@ global {
 		//// Compute derivated outputs
 		
 		// Carbon balance
-		ecosystemGHGBalance <- totalMeanSOCVariation - totalGHG; // = SCS
+		ecosystemGHGBalance <- totalMeanSOCVariation - totalGHG;
 		
 		// SOC moran indexes
 		do getMoranSOCS;

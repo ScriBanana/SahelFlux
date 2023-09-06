@@ -201,7 +201,6 @@ global {
 			"ecosystemApparentNBalance"::ecosystemApparentNBalance,
 			"ecosystemCO2Balance (kgCO2)"::ecosystemCO2Balance,
 			"ecosystemGHGBalance (kgCO2eq)"::ecosystemGHGBalance,
-			"SCS"::SCS,
 			"CFootprint"::CFootprint,
 			
 			// Animal density
