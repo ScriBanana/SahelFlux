@@ -106,7 +106,7 @@ global {
 		
 		do getMeanSOCS;
 		totalMeanSOCInit <- globalMeanSOC;
-		do getMoranSOCS;
+		if moranOn {do getMoranSOCS;}
 		
 		initialOutputsMap <- [
 			

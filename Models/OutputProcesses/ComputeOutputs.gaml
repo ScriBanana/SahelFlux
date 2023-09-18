@@ -259,7 +259,7 @@ global {
 		ecosystemGHGBalance <- totalMeanSOCVariation - totalGHG;
 		
 		// SOC moran indexes
-		do getMoranSOCS;
+		if moranOn {do getMoranSOCS;}
 		
 		// Global ENA indicators (Finn, 1980; Stark, 2016; Balandier, 2017; Latham, 2006)
 		float negNDerivatives <- poolsDerivativeMap.values sum_of (float(each[0]) < 0.0 ?  float(each[0]) : 0.0);

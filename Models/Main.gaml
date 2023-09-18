@@ -34,6 +34,7 @@ global {
 	bool enabledGUI <- false;
 	bool enableDebug <- false;
 	bool isExplo <- false;
+	bool moranOn <- true;
 	
 	// Village choice
 	list<string> villageNamesList <- ["Barry", "Sob", "Diohine"] const: true;

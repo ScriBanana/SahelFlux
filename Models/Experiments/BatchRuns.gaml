@@ -12,6 +12,7 @@ import "CoreExperiment.gaml"
 global {
 	init {
 		batchOn <- true;
+		moranOn <- false; // Tweak manually, this won't backfire
 	}
 }
 
@@ -150,13 +151,14 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 	init {
 		experimentType <- "Morris";
 		isExplo <- true;
+		moranOn <- false;
 		
 		endDate <- date([2025, 11, 1, eveningTime + 1, 0, 0]);
 	}
 	
 	method morris
 		levels: 4
-		outputs: ["ecosystemGHGBalance", "totalGHG", "ecosystemCBalance", "ecosystemNBalance", "totalMeanSOCS", "globalSOCMoran", "ICRN", "ICRC", "totalNFlows", "totalCFlows"]
+		outputs: ["ecosystemGHGBalance", "totalGHG", "ecosystemCBalance", "ecosystemNBalance", "totalMeanSOCS", "ICRN", "ICRC", "totalNFlows", "totalCFlows"]
 		sample: 100
 		report: outputDirectory + "Morris/"+ batchId + ".txt"
 		results: outputDirectory + "Morris/"+ batchId + "_raw.csv"
