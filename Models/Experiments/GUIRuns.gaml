@@ -28,7 +28,7 @@ experiment Run type: gui parent: CoreWithParameters {
 	}
 }
 
-experiment SOC type: gui parent: CoreExperiment {
+experiment SOC type: gui parent: CoreWithParameters {
 	
 	init { experimentType <- "SOCDispRun";}
 	

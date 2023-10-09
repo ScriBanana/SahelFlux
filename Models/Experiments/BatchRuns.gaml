@@ -136,11 +136,9 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 
 experiment MorrisBatch type: batch autorun: true until: endSimu {
 	
-	string batchId <- "230904-Morris"; // !!! machine_time doesn't work; NO INDIVIDUAL BATCH ID; BACKUP RESULTS
-		
-//	parameter "Village ID" var: villageFloat min: 0.0 max: 2.999999999999999;
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"];
-//	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: villageNamesList;
+	string batchId <- "MorrisOut"; // !!! machine_time doesn't work; NO INDIVIDUAL BATCH ID; BACKUP RESULTS
+	
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"]; //villageNamesList;
 	
 	parameter "Proportion transhuming households" var: propTranshumantHhExplo min: 0.0 max: 1.0;
 	parameter "Proportion fattening households" var: propFatteningHhExplo min: 0.0 max: 1.0;
@@ -162,5 +160,32 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 		sample: 100
 		report: outputDirectory + "Morris/"+ batchId + ".txt"
 		results: outputDirectory + "Morris/"+ batchId + "_raw.csv"
+	;
+}
+
+experiment sobolBatch type: batch autorun: true until: endSimu {
+	string batchId <- "SobolOut";
+
+	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"]; //villageNamesList;
+	
+	parameter "Proportion transhuming households" var: propTranshumantHhExplo min: 0.0 max: 1.0;
+	parameter "Proportion fattening households" var: propFatteningHhExplo min: 0.0 max: 1.0;
+	parameter "HerdSize average" var: meanHerdSizeExplo min: 1.0 max: 15.0;
+	parameter "FattenedGroupSize average" var: meanFattenedGroupSizeExplo min: 0.01 max: 3.0;
+	parameter "Home fields proportion" var: homeFieldsProportionExplo min: 0.1 max: 0.9;
+	
+	init {
+		experimentType <- "Sobol";
+		isExplo <- true;
+		moranOn <- false;
+		
+		endDate <- date([2025, 11, 1, eveningTime + 1, 0, 0]);
+	}
+	
+	method sobol
+		outputs: ["ecosystemGHGBalance", "totalGHG", "ecosystemCBalance", "ecosystemNBalance", "totalMeanSOCS", "ICRN", "ICRC", "totalNFlows", "totalCFlows"]
+		sample: 100
+		report: outputDirectory + "Sobol/"+ batchId + ".txt"
+		results: outputDirectory + "Sobol/"+ batchId + "_raw.csv"
 	;
 }

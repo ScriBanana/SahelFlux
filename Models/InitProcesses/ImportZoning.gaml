@@ -17,6 +17,7 @@ global {
 	float cellWidth <- cellSize #m;
 	float hectareToCell <- cellWidth * cellHeight / 10000 #m2; // cell/ha
 	
+	// NOTE : To generate the ASC file, see SahelFlux/Utilities/GenerateSpatialInput.gaml
 	string zoningFilesPath <- "../InputFiles/GridInputs/";
 	string zoningFileName <- "LU&ParcGrid" + villageName + cellSize + ".asc";
 	file gridData <- file(zoningFilesPath + zoningFileName);
