@@ -117,29 +117,29 @@ global {
 	// Gathers and saves parameters
 	action exportParameterData { // Redundant with log.
 		string pathParameters <-  outputDirectory + "Single/" + runPrefix + "Param.csv";
-		save parametersMap.keys to: pathParameters format: csv rewrite: true header: false;
-		save parametersMap.values to: pathParameters format: csv rewrite: false header: false;
+		save parametersMap.keys to: pathParameters rewrite: true header: false;
+		save parametersMap.values to: pathParameters rewrite: false header: false;
 	}
 	
 	// Gathers and saves global outputs
 	action exportOutputData { // Redundant with log.
 		string pathOutputs <-  outputDirectory + "Single/" + runPrefix + "Outputs.csv";
-		save differentialOutputsMap.keys to: pathOutputs format: csv rewrite: true header: false;
-		save differentialOutputsMap.values to: pathOutputs format: csv rewrite: false header: false;
+		save differentialOutputsMap.keys to: pathOutputs rewrite: true header: false;
+		save differentialOutputsMap.values to: pathOutputs rewrite: false header: false;
 	}
 	
 	// Gathers and saves pool GHG
 	action exportGHGMat {
 		string pathGHG <-  outputDirectory + "Single/" + runPrefix + "GHGmat.csv";
 		list<string> outputCSVheader <- ["", "kgCO2", "kgCH4", "kgN2O"];
-		save outputCSVheader to: pathGHG format: csv rewrite: true header: false;
+		save outputCSVheader to: pathGHG rewrite: true header: false;
 		
 		loop subMap over: GHGFlowsMap.pairs {
 			list lineToSave <- [subMap.key];
 			loop flowPair over: subMap.value.pairs {
 				lineToSave <+ string(flowPair.value);
 			}
-			save lineToSave to: pathGHG format: csv rewrite: false header: false;
+			save lineToSave to: pathGHG rewrite: false header: false;
 		}
 	}
 	
@@ -147,12 +147,12 @@ global {
 	action exportBalanceMat {
 		string pathBalance <-  outputDirectory + "Single/" + runPrefix + "Balancemat.csv";
 		list<string> outputCSVheader <- ["", "ΔkgC", "ΔkgN", "GHG(kgCO2eq)"];
-		save outputCSVheader to: pathBalance format: csv rewrite: true header: false;
+		save outputCSVheader to: pathBalance rewrite: true header: false;
 		
 		loop subMap over: poolFlowsMap.pairs {
 			list lineToSave <- [subMap.key];
 			lineToSave <<+ subMap.value;
-			save lineToSave to: pathBalance format: csv rewrite: false header: false;
+			save lineToSave to: pathBalance rewrite: false header: false;
 		}
 	}
 	
@@ -188,8 +188,8 @@ global {
 		string pathN <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Nmat.csv";
 		string pathC <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Cmat.csv";
 		
-		save outputCSVheader to: pathN format: csv rewrite: true header: false;
-		save outputCSVheader to: pathC format: csv rewrite: true header: false;
+		save outputCSVheader to: pathN rewrite: true header: false;
+		save outputCSVheader to: pathC rewrite: true header: false;
 		
 		//Again, could have been a loop over N and C, but Gama doesn't like looping on nested containers.
 		int outputId <- 0;
@@ -206,7 +206,7 @@ global {
 				lineToSave <+ string(valueToSave / divisionFactor);
 				inputId <- inputId + 1;
 			}
-			save lineToSave to: pathN format: csv rewrite: false;
+			save lineToSave to: pathN rewrite: false;
 			outputId <- outputId +1;
 		}
 		
@@ -224,7 +224,7 @@ global {
 				lineToSave <+ string(valueToSave / divisionFactor);
 				inputId <- inputId + 1;
 			}
-			save lineToSave to: pathC format: csv rewrite: false;
+			save lineToSave to: pathC rewrite: false;
 			outputId <- outputId +1;
 		}
 	}
