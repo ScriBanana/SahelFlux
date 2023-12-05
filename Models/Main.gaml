@@ -42,7 +42,7 @@ global {
 	string villageName <- villageNamesList[floor(villageFloat)] among: villageNamesList;
 	
 	// Space related parameter
-	int cellSize <- 50; // max LU shapefile pixelsize : 1.5 m
+	int cellSize <- 50; // Minimal = LU shapefile pixelsize : 1.5 m
 	
 	// Time and calendar parameters
 	float step <- 30.0 #minutes;

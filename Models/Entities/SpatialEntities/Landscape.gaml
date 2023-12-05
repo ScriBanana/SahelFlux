@@ -41,10 +41,10 @@ global {
 	float fallowExportedBiomass <- 0.55 const: true; // Surveys
 	
 	// Cell biomass parameters
-	float maxCroplandBiomass <-
+	float maxCroplandBiomassHa <-
 		milletMaxYw * (1 - milletRootProportion) * (1 - milletExportedAgriProductRatio) * (1 - milletExportedStrawRatio)
-	const: true;
-	float maxRangelandBiomass <- spontVegMaxYw * (1 - spontVegRootProportion) const: true;
+	const: true; // kgDM/ha
+	float maxRangelandBiomassHa <- spontVegMaxYw * (1 - spontVegRootProportion) const: true; // kgDM/ha
 	float cropBiomassContentInitHa <-
 		0.7 * 950 * (1.8608 * ln (meanRainfall) - 8.6756) *
 		(1 - milletRootProportion) * (1 - milletExportedAgriProductRatio) * (1 - milletExportedStrawRatio)
@@ -52,8 +52,8 @@ global {
 	float rangelandBiomassContentInitHa <-
 		0.7 * 1000 * (0.4322 * ln (meanRainfall) - 1.195) * (1 - spontVegRootProportion)
 	const: true; // See Biomass production model; NRF = 0.7
-	float cropBiomassContentInit <- cropBiomassContentInitHa * hectareToCell const: true;
-	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectareToCell const: true;
+	float cropBiomassContentInit <- cropBiomassContentInitHa * hectarePerCell const: true; // kgDM/cell
+	float rangelandBiomassContentInit <- rangelandBiomassContentInitHa * hectarePerCell const: true; // kgDM/cell
 	
 	// Cells categories
 	list<landscape> nonEmptyLandscape;
@@ -185,7 +185,7 @@ grid landscape
 			thisYearCFlowReceivingPool <- "SpontVeg";
 			thisYearBiomassCContent <- rangelandVegCContent;
 			waterLimitedYieldHa <- max(0.0, min(spontVegMaxYw, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
-			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
+			nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectarePerCell) - 0.7012));
 			rootProportion <- spontVegRootProportion;
 			
 		} else if myParcel != nil {
@@ -196,7 +196,7 @@ grid landscape
 					thisYearCFlowReceivingPool <- "Millet";
 					thisYearBiomassCContent <- wholeMilletCContent;
 					waterLimitedYieldHa <- max(0.0, min(milletMaxYw, 950 * (1.8608 * ln (yearRainfall) - 8.6756)));
-					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectareToCell) - 1.2179));
+					nitrogenReductionFactor <- max(0.25, min(1.0, 0.501 * ln (thisYearNAvailable / hectarePerCell) - 1.2179));
 					rootProportion <- milletRootProportion;
 				
 				} match "Groundnut" {
@@ -213,7 +213,7 @@ grid landscape
 					// Same as rangeland veg
 					thisYearBiomassCContent <- fallowVegCContent;
 					waterLimitedYieldHa <- max(0.0, min(spontVegMaxYw, 1000 * (0.4322 * ln (yearRainfall) - 1.195)));
-					nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectareToCell) - 0.7012));
+					nitrogenReductionFactor <- max(0.25, min(1.0, 0.414 * ln (thisYearNAvailable / hectarePerCell) - 0.7012));
 					rootProportion <- spontVegRootProportion;
 				
 				}
@@ -229,7 +229,7 @@ grid landscape
 		}
 		
 		// Producing biomass
-		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectareToCell * nitrogenReductionFactor;
+		yearlyBiomassToBeProduced <- waterLimitedYieldHa * hectarePerCell * nitrogenReductionFactor;
 		
 		// Adding roots
 		yearlyBiomassToBeProduced <- yearlyBiomassToBeProduced * (1 + rootProportion);
@@ -446,15 +446,15 @@ grid landscape
 	action updateColour {
 		if cellLU = "Cropland" { // Ternary possible, but if statement more secure and readable
 			color <- rgb(
-				255 + (216 - 255) / (maxCroplandBiomass * hectareToCell) * biomassContent,
-				255 + (232 - 255) / (maxCroplandBiomass * hectareToCell) * biomassContent,
+				255 + (216 - 255) / (maxCroplandBiomassHa * hectarePerCell) * biomassContent,
+				255 + (232 - 255) / (maxCroplandBiomassHa * hectarePerCell) * biomassContent,
 				180
 			);
 		} else if cellLU = "Rangeland" {
 			color <- rgb(
-				200 + (101 - 200) / (maxRangelandBiomass * hectareToCell) * biomassContent,
-				230 + (198 - 230) / (maxRangelandBiomass * hectareToCell) * biomassContent,
-				180 + (110 - 180) / (maxRangelandBiomass * hectareToCell) * biomassContent
+				200 + (101 - 200) / (maxRangelandBiomassHa * hectarePerCell) * biomassContent,
+				230 + (198 - 230) / (maxRangelandBiomassHa * hectarePerCell) * biomassContent,
+				180 + (110 - 180) / (maxRangelandBiomassHa * hectarePerCell) * biomassContent
 			);
 		}
 		

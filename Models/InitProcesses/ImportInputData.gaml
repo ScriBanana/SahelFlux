@@ -26,18 +26,18 @@ global {
 		
 		int scenarioIndex <- (inputData row_at 0) index_of villageName;
 		
-		villageCenterPoint <- point((inputData column_at scenarioIndex)[1]);
+		villageCenterPoint <- point((inputData column_at scenarioIndex)[1]); // m, m
 		fallowEnabled <- bool((inputData column_at scenarioIndex)[2]);
 		nbHousehold <- int((inputData column_at scenarioIndex)[3]);
 		propTranshumantHh <- float((inputData column_at scenarioIndex)[4]);
 		propFatteningHh <- float((inputData column_at scenarioIndex)[5]);
-		meanHerdSize <- float((inputData column_at scenarioIndex)[8]);
-		meanFattenedGroupSize <- float((inputData column_at scenarioIndex)[9]);
-		SDHerdSize <- float((inputData column_at scenarioIndex)[10]);
+		meanHerdSize <- float((inputData column_at scenarioIndex)[8]); // TLU
+		meanFattenedGroupSize <- float((inputData column_at scenarioIndex)[9]); // TLU
+		SDHerdSize <- float((inputData column_at scenarioIndex)[10]); // TLU
 		homeFieldsProportion <- float((inputData column_at scenarioIndex)[11]);
-		homefieldsSOChaInit <- float((inputData column_at scenarioIndex)[12]);
-		bushfieldsSOChaInit <- float((inputData column_at scenarioIndex)[13]);
-		rangelandSOChaInit <- float((inputData column_at scenarioIndex)[14]);
+		homefieldsSOChaInit <- float((inputData column_at scenarioIndex)[12]); // kgC/ha
+		bushfieldsSOChaInit <- float((inputData column_at scenarioIndex)[13]); // kgC/ha
+		rangelandSOChaInit <- float((inputData column_at scenarioIndex)[14]); // kgC/ha
 		
 		if isExplo {
 			propTranshumantHh <- propTranshumantHhExplo = -1.0 ? propTranshumantHh : propTranshumantHhExplo;
@@ -50,9 +50,9 @@ global {
 		
 		nbTranshumantHh <- round(propTranshumantHh * nbHousehold);
 		nbFatteningHh <- round(propFatteningHh * nbHousehold);
-		homefieldsSOCInit <- homefieldsSOChaInit * hectareToCell; // kgC/cell
-		bushfieldsSOCInit <- bushfieldsSOChaInit * hectareToCell; // kgC/cell
-		rangelandSOCInit <- rangelandSOChaInit * hectareToCell; // kgC/cell
+		homefieldsSOCInit <- homefieldsSOChaInit * hectarePerCell; // kgC/cell
+		bushfieldsSOCInit <- bushfieldsSOChaInit * hectarePerCell; // kgC/cell
+		rangelandSOCInit <- rangelandSOChaInit * hectarePerCell; // kgC/cell
 		
 	}
 }

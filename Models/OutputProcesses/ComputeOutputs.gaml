@@ -251,7 +251,7 @@ global {
 		
 		// SOC		
 		do getMeanSOCS;
-		totalMeanSOCVariation <- globalMeanSOC - totalMeanSOCInit; // kgC
+		totalMeanSOCVariation <- globalMeanSOC - totalMeanSOCInit; // kgC/cell
 		
 		//// Compute derivated outputs
 		

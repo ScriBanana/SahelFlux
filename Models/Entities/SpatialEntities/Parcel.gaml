@@ -51,7 +51,7 @@ global {
 		ask parcel {
 			if enableDebug {assert length(myCells) != 0;}
 			shape <- union(myCells);
-			parcelSurface <- length(myCells) / hectareToCell; // shape.area ?
+			parcelSurface <- length(myCells) * hectarePerCell; // shape.area ?
 			listAllBushParcels <+ self;
 			parcelColour <- #olive;
 		}

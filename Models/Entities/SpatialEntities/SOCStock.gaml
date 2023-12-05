@@ -31,8 +31,8 @@ global {
 	float kineticStable <- 0.01; // Dimensionless; own regression
 	float humificationCoef <- 0.05 const: true; // Dimensionless; own regression
 	init { // Conversion to get the SOC process to work with kgC/cell insteat of tC/ha
-		kineticLabile <- kineticLabile / 1000 / hectareToCell;
-		kineticStable <- kineticStable / 1000 / hectareToCell;
+		kineticLabile <- kineticLabile / 1000 * hectarePerCell;
+		kineticStable <- kineticStable / 1000 * hectarePerCell;
 	}
 	
 	// Setting Euler discretisation solver parameter
@@ -65,11 +65,11 @@ global {
 	}
 	
 	// Mean SOCS computation
-	float meanHomefieldsSOC; // kgC
-	float meanBushfieldsSOC; // kgC
-	float meanRangelandSOC; // kgC
-	float globalMeanSOC; // kgC
-	float totalMeanSOCInit; // kgC
+	float meanHomefieldsSOC; // kgC/cell
+	float meanBushfieldsSOC; // kgC/cell
+	float meanRangelandSOC; // kgC/cell
+	float globalMeanSOC; // kgC/cell
+	float totalMeanSOCInit; // kgC/cell, stored at the start of a simulation to get a delta
 	
 	action getMeanSOCS {
 		meanHomefieldsSOC <- (SOCStock where (each.myCell.homefieldCell)) mean_of each.totalSOC;

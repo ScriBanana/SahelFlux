@@ -26,22 +26,22 @@ experiment CoreExperiment virtual: true {
 		
 		display SOCChart type: java2D virtual: true refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "Average SOC per compartment (kgC/ha)" type: series {
-				data "Labile C homefields" value: (SOCStock where (each.myCell.homefieldCell) mean_of each.labileCPool) / hectareToCell color: #sienna;
-				data "Stable C homefields" value: (SOCStock where (each.myCell.homefieldCell)  mean_of each.stableCPool) / hectareToCell color: #brown;
-				data "Labile C bushfields" value: (SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell) mean_of each.labileCPool) / hectareToCell color: #darkkhaki;
-				data "Stable C bushfields" value: (SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell)  mean_of each.stableCPool) / hectareToCell color: #olive;
-				data "Labile C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectareToCell color: #green;
-				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectareToCell color: #darkgreen;
-				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectareToCell color: #grey;
-				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectareToCell color: #black;
+				data "Labile C homefields" value: (SOCStock where (each.myCell.homefieldCell) mean_of each.labileCPool) / hectarePerCell color: #sienna;
+				data "Stable C homefields" value: (SOCStock where (each.myCell.homefieldCell)  mean_of each.stableCPool) / hectarePerCell color: #brown;
+				data "Labile C bushfields" value: (SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell) mean_of each.labileCPool) / hectarePerCell color: #darkkhaki;
+				data "Stable C bushfields" value: (SOCStock where (each.myCell.cellLU = "Cropland" and !each.myCell.homefieldCell)  mean_of each.stableCPool) / hectarePerCell color: #olive;
+				data "Labile C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.labileCPool) / hectarePerCell color: #green;
+				data "Stable C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.stableCPool) / hectarePerCell color: #darkgreen;
+				data "Total C cropland" value: (SOCStock where (each.myCell.cellLU = "Cropland")  mean_of each.totalSOC) / hectarePerCell color: #grey;
+				data "Total C rangeland" value: (SOCStock where (each.myCell.cellLU = "Rangeland")  mean_of each.totalSOC) / hectarePerCell color: #black;
 			}
 		}
 		
 		display biomassChart type: java2D virtual: true refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "Average grazable biomass per compartment (kgDM/ha)" type: series {
-				data "Biomass homefields" value: (grazableLandscape where (each.homefieldCell) mean_of each.biomassContent) / hectareToCell color: #brown;
-				data "Biomass bushfields" value: (grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell) mean_of each.biomassContent) / hectareToCell color: #olive;
-				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectareToCell color: #green;
+				data "Biomass homefields" value: (grazableLandscape where (each.homefieldCell) mean_of each.biomassContent) / hectarePerCell color: #brown;
+				data "Biomass bushfields" value: (grazableLandscape where (each.cellLU = "Cropland" and !each.homefieldCell) mean_of each.biomassContent) / hectarePerCell color: #olive;
+				data "Biomass rangeland" value: (grazableLandscape where (each.cellLU = "Rangeland")  mean_of each.biomassContent) / hectarePerCell color: #green;
 			}
 		}
 		

@@ -15,7 +15,7 @@ experiment AnimalsAbstract parent: CoreExperiment virtual: true {
 	output synchronized: false {
 		display animalChart type: java2D virtual: true refresh: current_date.day = 1 and updateTimeOfDay {
 			chart "Animals in the simulated area" type: series {
-				data "Mobile herds (TLU/ha cropland)" value: (mobileHerd sum_of each.herdSize) color: #blue;// / ((grazableLandscape count (each.cellLU = "Cropland")) / hectareToCell) color: #blue;
+				data "Mobile herds (TLU/ha cropland)" value: (mobileHerd sum_of each.herdSize) color: #blue;// / ((grazableLandscape count (each.cellLU = "Cropland")) / hectarePerCell) color: #blue;
 				data "Fattened animals (TLU/fattening household)" value: (fattenedAnimal sum_of each.groupSize) color: #orange;// / nbFatteningHh color: #orange;
 			}
 		}

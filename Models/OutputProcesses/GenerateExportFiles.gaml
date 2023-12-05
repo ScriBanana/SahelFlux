@@ -107,7 +107,7 @@ global {
 		
 		do saveSFMatrix (outputCSVheader, "Flow-", 1.0, false);
 		do saveSFMatrix (outputCSVheader, "FlowYear-", durationSimu, false);
-		do saveSFMatrix (outputCSVheader, "FlowHaYear-", (length(grazableLandscape) / hectareToCell) * durationSimu, false);
+		do saveSFMatrix (outputCSVheader, "FlowHaYear-", (length(grazableLandscape) * hectarePerCell) * durationSimu, false);
 		do saveSFMatrix (outputCSVheader, "FlowDiv-", 1.0, true);
 		do saveSFMatrix (outputCSVheader, "FlowDivYear-", durationSimu, true);
 		
@@ -174,13 +174,13 @@ global {
 				"HomeFields"::(listAllHomeParcels sum_of each.parcelSurface),
 				"BushFields"::((grazableLandscape count (
 					each.cellLU = "Cropland" and (each.myParcel = nil or !each.myParcel.homeField)
-				)) / hectareToCell),
-				"Rangelands"::((grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell),
+				)) * hectarePerCell),
+				"Rangelands"::((grazableLandscape count (each.cellLU = "Rangeland")) * hectarePerCell),
 				"Millet"::(parcel sum_of each.parcelSurface),
 				"Groundnut"::(listAllBushParcels sum_of each.parcelSurface),
 				"FallowVeg"::(listAllBushParcels sum_of each.parcelSurface),
-				"SpontVeg"::((grazableLandscape count (each.cellLU = "Rangeland")) / hectareToCell),
-				"Weeds"::(length(grazableLandscape) / hectareToCell),
+				"SpontVeg"::((grazableLandscape count (each.cellLU = "Rangeland")) * hectarePerCell),
+				"Weeds"::(length(grazableLandscape) * hectarePerCell),
 				"Trees"::(grazableLandscape sum_of each.nbTrees)
 			];
 		}

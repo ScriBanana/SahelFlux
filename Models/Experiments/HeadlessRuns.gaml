@@ -17,7 +17,7 @@ experiment FastAutoRun parent: CoreWithParameters autorun: true {
 		enableDebug <- true;
 		parallelHerds <- true;
 		
-		endDate <- date([2021, 11, 1, eveningTime + 1, 0, 0]);
+		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 		nbHousehold <- 10;
 		propTranshumantHh <- 0.5;
 		propFatteningHh <- 0.5;

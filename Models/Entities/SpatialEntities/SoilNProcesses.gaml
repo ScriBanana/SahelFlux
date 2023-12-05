@@ -18,10 +18,10 @@ global {
 	float baseNFromSoilBushfieldsHa <- 12.0 const: true; // kgN/ha const: true; Grillot et al., 2018
 	float baseNAtmoMicroOrgaHa <- 7.5 const: true; // kgN/ha const: true; Grillot et al., 2018
 	float baseNAtmoGroundnutHa <- 20.0 const: true; // kgN/ha const: true; Grillot et al., 2018
-	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectareToCell const: true; // kgN/cell
-	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectareToCell const: true; // kgN/cell
-	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectareToCell const: true; // kgN/cell
-	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectareToCell const: true; // kgN/cell
+	float baseNFromSoilHomefields <- baseNFromSoilHomefieldsHa * hectarePerCell const: true; // kgN/cell
+	float baseNFromSoilBushfields <- baseNFromSoilBushfieldsHa * hectarePerCell const: true; // kgN/cell
+	float baseNAtmoMicroOrga <- baseNAtmoMicroOrgaHa * hectarePerCell const: true; // kgN/cell
+	float baseNAtmoGroundnut <- baseNAtmoGroundnutHa * hectarePerCell const: true; // kgN/cell
 	float baseNAtmoPerTree <- 4.0 const: true; // kgN const: true; Grillot et al., 2018
 	
 	map<string, list> dungMineraPercentMatrix <- [ // Proportion of N available over the years for : 
@@ -67,11 +67,11 @@ species soilNProcesses parallel: true schedules: [] {
 	
 	landscape myCell;
 	// Inflows of N within all other processes (public)
-	map<string, float> NInflows <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
+	map<string, float> NInflows <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0]; // kgN
 	// Memory variables
-	map<string, float> thisYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
-	map<string, float> nextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0];
-	float lastNFromSoil;
+	map<string, float> thisYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0]; // kgN
+	map<string, float> nextYearAfterEffect <- ["HerdsDung"::0.0, "HerdsUrine"::0.0, "ORP"::0.0, "MineralFerti"::0.0]; // kgN
+	float lastNFromSoil; // kgN
 	
 	float soilGasLossNToEmitInRS; // kgN TODO emit at some point (register in matrix?)
 	
