@@ -54,7 +54,7 @@ global {
 			"cellSize"::cellSize,
 			"meteoUpdateType"::meteoUpdateType,
 			"fallowEnabled"::fallowEnabled,
-			"totalAreaHa"::totalAreaHa,
+//			"totalAreaHa"::totalAreaHa,
 			"biomassProducingSurface"::biomassProducingSurface,
 			"rangelandSurface"::rangelandSurface,
 			"bushfieldsSurface"::bushfieldsSurface,

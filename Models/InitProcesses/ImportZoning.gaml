@@ -22,7 +22,7 @@ global {
 	string zoningFileName <- "LU&ParcGrid" + villageName + cellSize + ".asc";
 	file gridData <- file(zoningFilesPath + zoningFileName);
 	geometry shape <- envelope(gridData);
-	float totalAreaHa <- shape.area / 10000 #m2;
+//	float totalAreaHa <- shape.area / 10000 #m2;
 	
 	action readLandscapeInputData {
 		write "Reading grid data from " + zoningFileName;
