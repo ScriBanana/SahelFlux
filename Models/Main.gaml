@@ -29,7 +29,8 @@ global {
 	////	Global parameters	////
 	////	--------------------------	////
 	
-	float startTimeReal <- machine_time;
+	float initStartTime <- machine_time;
+	float simulationStartTime <- 0.0;
 	bool batchOn <- false;
 	bool enabledGUI <- false;
 	bool enableDebug <- false;
@@ -103,13 +104,17 @@ global {
 		if generateMonthlySaves { do initOutputsDuringSim;}
 		
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
-		runTime <- (machine_time - startTimeReal) / 60000;
+		runTime <- (machine_time - initStartTime) / 60000;
 		write "=== MODEL INITIALISED (" + (runTime * 60) with_precision 2 + " s) ===";
 	}
 	
 	////	--------------------------		////
 	////	Global scheduler		////
 	////	--------------------------		////
+	
+	reflex setStartTime when: (simulationStartTime = 0.0) {
+		simulationStartTime <- machine_time;
+	}
 	
 	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay { // Every 15 days default
 		
@@ -251,7 +256,7 @@ global {
 	bool endSimu <- false;
 	float runTime; // minutes
 	reflex endSim when: current_date = endDate {
-		runTime <- (machine_time - startTimeReal) / 60000;
+		runTime <- (machine_time - simulationStartTime) / 60000;
 		
 		write "=== END OF SIMULATION ===";
 		
