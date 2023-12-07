@@ -5,7 +5,6 @@
 * Author: Arthur Scriban (arthur.scriban@cirad.fr)
 */
 
-
 model SahelFlux
 
 global {
@@ -32,6 +31,18 @@ global {
 		if mod(increment, target / (100 / promptIncrement)) = 0 {
 			write "	" + int(ceil(increment / target * 100)) + " %";
 		}
+	}
+	
+	string getCurrentTimeStamp {
+		// Timestamp from current machine_time with YYMMDDhhmmss format
+		string currentTimeStamp <- "";
+		currentTimeStamp <- currentTimeStamp + (year(#now) - 2000);
+		currentTimeStamp <- currentTimeStamp + (month(#now) < 10 ? "0" + month(#now) : month(#now));
+		currentTimeStamp <- currentTimeStamp + (day(#now) < 10 ? "0" + day(#now) : day(#now));
+		currentTimeStamp <- currentTimeStamp + (hour(#now) < 10 ? "0" + hour(#now) : hour(#now));
+		currentTimeStamp <- currentTimeStamp + (minute(#now) < 10 ? "0" + minute(#now) : minute(#now));
+		currentTimeStamp <- currentTimeStamp + (second(#now) < 10 ? "0" + second(#now) : second(#now));
+		return currentTimeStamp;
 	}
 
 }

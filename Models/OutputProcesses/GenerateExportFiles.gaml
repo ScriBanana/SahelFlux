@@ -14,7 +14,8 @@ global {
 	string outputDirectory <- "../../OutputFiles/";
 	bool generateMonthlySaves <- false;
 	string experimentType;
-	string runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "-";
+	string timeStampInit;
+	string runPrefix;
 	
 	//// LOG
 	
@@ -51,10 +52,10 @@ global {
 	action saveOutputsDuringSim {
 		do gatherRegularOutputs(regularOutputNFlowsMap, regularOutputCFlowsMap, regularOutputGHGFlowsMap);
 		
-		list lineToSave <-  [current_date.year, current_date.month, cycle, machine_time, runTime];
+		list lineToSave <-  [current_date.year, current_date.month, cycle, timeStampInit, runTime];
 		lineToSave <<+ list<float>(variableOutputsMap.values);
 		save lineToSave
-			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
+			to: outputDirectory + "Monthly/" + runPrefix + "-MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
 			rewrite: (current_date.month = starting_date.month and current_date.year = starting_date.year) ? true : false
 			header: false
@@ -71,7 +72,7 @@ global {
 		inSimHeader <<+ list<string>(variableOutputsMap.keys);
 		
 		save inSimHeader
-			to: outputDirectory + "Monthly/" + runPrefix + "MnthSv-" + villageName + cellSize + ".csv"
+			to: outputDirectory + "Monthly/" + runPrefix + "-MnthSv-" + villageName + cellSize + ".csv"
 			format: "csv"
 			rewrite: true
 			header: false
@@ -90,8 +91,6 @@ global {
 		write "Saving data in " + outputDirectory;
 		// Saving a matrix to a csv doesn't work. Issue raised on github. Fix coming up in Gama 1.9.0 (commit a4d2a56)
 		
-		runPrefix <- "" + floor(machine_time / 1000) + "-" + experimentType + int(self) + "/" + runPrefix;
-		
 		// Variables
 		float durationSimu <- (current_date - starting_date)/#year;
 		
@@ -105,32 +104,32 @@ global {
 		do exportGHGMat;
 		do exportBalanceMat;
 		
-		do saveSFMatrix (outputCSVheader, "Flow-", 1.0, false);
-		do saveSFMatrix (outputCSVheader, "FlowYear-", durationSimu, false);
-		do saveSFMatrix (outputCSVheader, "FlowHaYear-", (length(grazableLandscape) * hectarePerCell) * durationSimu, false);
-		do saveSFMatrix (outputCSVheader, "FlowDiv-", 1.0, true);
-		do saveSFMatrix (outputCSVheader, "FlowDivYear-", durationSimu, true);
+		do saveSFMatrix (outputCSVheader, "-Flow-", 1.0, false);
+		do saveSFMatrix (outputCSVheader, "-FlowYear-", durationSimu, false);
+		do saveSFMatrix (outputCSVheader, "-FlowHaYear-", (length(grazableLandscape) * hectarePerCell) * durationSimu, false);
+		do saveSFMatrix (outputCSVheader, "-FlowDiv-", 1.0, true);
+		do saveSFMatrix (outputCSVheader, "-FlowDivYear-", durationSimu, true);
 		
 		write "... Done";
 	}
 	
 	// Gathers and saves parameters
 	action exportParameterData { // Redundant with log.
-		string pathParameters <-  outputDirectory + "Single/" + runPrefix + "Param.csv";
+		string pathParameters <-  outputDirectory + "Single/" + runPrefix + "/" + runPrefix + "-Param.csv";
 		save parametersMap.keys to: pathParameters rewrite: true header: false;
 		save parametersMap.values to: pathParameters rewrite: false header: false;
 	}
 	
 	// Gathers and saves global outputs
 	action exportOutputData { // Redundant with log.
-		string pathOutputs <-  outputDirectory + "Single/" + runPrefix + "Outputs.csv";
+		string pathOutputs <-  outputDirectory + "Single/" + runPrefix + "/" + runPrefix + "-Outputs.csv";
 		save differentialOutputsMap.keys to: pathOutputs rewrite: true header: false;
 		save differentialOutputsMap.values to: pathOutputs rewrite: false header: false;
 	}
 	
 	// Gathers and saves pool GHG
 	action exportGHGMat {
-		string pathGHG <-  outputDirectory + "Single/" + runPrefix + "GHGmat.csv";
+		string pathGHG <-  outputDirectory + "Single/" + runPrefix + "/" + runPrefix + "-GHGmat.csv";
 		list<string> outputCSVheader <- ["", "kgCO2", "kgCH4", "kgN2O"];
 		save outputCSVheader to: pathGHG rewrite: true header: false;
 		
@@ -145,7 +144,7 @@ global {
 	
 	// Gathers and saves pool balance
 	action exportBalanceMat {
-		string pathBalance <-  outputDirectory + "Single/" + runPrefix + "Balancemat.csv";
+		string pathBalance <-  outputDirectory + "Single/" + runPrefix + "/" + runPrefix + "-Balancemat.csv";
 		list<string> outputCSVheader <- ["", "ΔkgC", "ΔkgN", "GHG(kgCO2eq)"];
 		save outputCSVheader to: pathBalance rewrite: true header: false;
 		
@@ -185,8 +184,8 @@ global {
 			];
 		}
 		
-		string pathN <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Nmat.csv";
-		string pathC <-  outputDirectory + "Single/" + runPrefix + fileCoreName + "Cmat.csv";
+		string pathN <-  outputDirectory + "Single/" + runPrefix + "/" + runPrefix + fileCoreName + "Nmat.csv";
+		string pathC <-  outputDirectory + "Single/" + runPrefix + "/" + runPrefix + fileCoreName + "Cmat.csv";
 		
 		save outputCSVheader to: pathN rewrite: true header: false;
 		save outputCSVheader to: pathC rewrite: true header: false;

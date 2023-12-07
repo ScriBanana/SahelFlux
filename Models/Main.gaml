@@ -9,6 +9,7 @@
 
 model SahelFlux
 
+import "../Utilities/SupportFunctions.gaml"
 import "UnitTests.gaml"
 import "BiophysicalParameters.gaml"
 import "InitProcesses/ImportInputData.gaml"
@@ -30,7 +31,7 @@ global {
 	////	--------------------------	////
 	
 	float initStartTime <- machine_time;
-	float simulationStartTime <- 0.0;
+	float simulationStartTime <- 0.0; // in Unix epoch time format (like machine_time)
 	bool batchOn <- false;
 	bool enabledGUI <- false;
 	bool enableDebug <- false;
@@ -78,6 +79,7 @@ global {
 		write "=== RUN " + int(self) + " INITIALISATION ===";
 		
 		// Init variables
+		timeStampInit <- getCurrentTimeStamp();
 		drySeason <- !(
 			starting_date.month < drySeasonFirstMonth and starting_date.month >= rainySeasonFirstMonth
 		);
@@ -112,8 +114,10 @@ global {
 	////	Global scheduler		////
 	////	--------------------------		////
 	
-	reflex setStartTime when: (simulationStartTime = 0.0) {
+	reflex simStart when: (simulationStartTime = 0.0) {
+		// Last init part, to dodge init schedule issues
 		simulationStartTime <- machine_time;
+		runPrefix <- "" + timeStampInit + "-" + experimentType + int(self);
 	}
 	
 	reflex biophysicalProcessesStep when: mod(current_date.day, biophysicalProcessesUpdateFreq) = 0 and updateTimeOfDay { // Every 15 days default
