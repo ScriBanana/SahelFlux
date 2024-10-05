@@ -116,10 +116,15 @@ species ORPHeap schedules: [] {
 		heapFattenedInput <- []; // Useless but safer
 	}
 	
-	action emitRSHeapsCH4 {
+	action emitRSHeapsCH4andIndirectN2O {
 		ask world {	do saveFlowInMap("C", "ORPHeaps", "OF-GHG" , myself.heapCH4ToBeEmittedInRainySeason * coefCH4ToC);}
 		ask world { do saveGHGFlow("ORPHeaps", "CH4", myself.heapCH4ToBeEmittedInRainySeason / coefCH4ToC);}
 		heapCH4ToBeEmittedInRainySeason <- 0.0;
+		
+		// TODO check correctedness and activate upon implementing indirect emissions
+//		ask world {	do saveFlowInMap("N", "ORPHeaps", "OF-GHG" , myself.heapGasLossNToEmitInRS * coefN2OToN);}
+//		ask world { do saveGHGFlow("ORPHeaps", "N2O", myself.heapGasLossNToEmitInRS / coefN2OToN);}
+//		heapGasLossNToEmitInRS <- 0.0;
 	}
 	
 	action spreadORPOnParcels {

@@ -155,7 +155,7 @@ global {
 				do captureRemainingTranshumants;
 				
 				ask SOCStock { do emitRSSoilCH4;}
-				ask ORPHeap { do emitRSHeapsCH4;}
+				ask ORPHeap { do emitRSHeapsCH4andIndirectN2O;}
 				write "	Burning remaining biomass and computing future plant biomass production.";
 				ask grazableLandscape {
 					do burnAndIncorporateResidualBiomass;
