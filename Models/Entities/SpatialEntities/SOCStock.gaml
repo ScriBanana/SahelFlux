@@ -79,8 +79,9 @@ global {
 		meanRangelandSOC <- (
 			SOCStock where (each.myCell.cellLU = "Rangeland")
 		) mean_of each.totalSOC;
-		// TODO Unoptimised triple loop
-		globalMeanSOC <- mean(meanHomefieldsSOC, meanBushfieldsSOC, meanRangelandSOC);
+		globalMeanSOC <- SOCStock mean_of each.totalSOC;
+		
+		// TODO Unoptimised quadruple loop. Needs an intermediate vector.
 		
 		return [meanHomefieldsSOC, meanBushfieldsSOC, meanRangelandSOC];
 	}
