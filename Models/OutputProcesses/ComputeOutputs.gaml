@@ -45,7 +45,7 @@ global {
 	float ecosystemApparentCBalance; // Balance with no gas fixation nor emissions - human driven flows only
 	float ecosystemApparentNBalance;
 	float ecosystemCO2Balance; // kgCO2; atmo fix - CO2 emissions; used for validation
-	float ecosystemGHGBalance; // kgCO2eq; SOCS accumulation - GHG emissions
+	float ecosystemGHGBalance; // kgCO2eq; GHG emissions - SOCS accumulation
 	float CFootprint;
 	
 	// SOC
@@ -256,7 +256,7 @@ global {
 		//// Compute derivated outputs
 		
 		// Carbon balance
-		ecosystemGHGBalance <- totalMeanSOCVariation - totalGHG;
+		ecosystemGHGBalance <- totalGHG - totalMeanSOCVariation / coefCO2ToC; // kgCO2eq
 		
 		// SOC moran indexes
 		if moranOn {do getMoranSOCS;}
