@@ -12,6 +12,8 @@ import "../Main.gaml"
 global {
 	
 	map<string, matrix<float>> moranWeightsMatrixStorageMap;
+	string weightsMatrixType <- "Neighbours" among: ["Neighbours", "Distance"];
+	float moranDistance <- 56 #m; // Coherent with validation data
 	
 	action getMoranSOCS {
 		ask grazableLandscape {
@@ -33,26 +35,26 @@ global {
 			// Storing in a permanent CSV is slower and map<string, matrix<float>> is light enough in RAM
 			moranWeightsMatrix <- moranWeightsMatrixStorageMap[moranMatrixId];
 		} else {
-			moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
+			moranWeightsMatrix <- generateMoranWeightMatrix(inputGridList, weightsMatrixType);
 			moranWeightsMatrixStorageMap <+ moranMatrixId::moranWeightsMatrix;
 		}
 		
 		// Stores weight matrix in a map for single runs (faster, but requires too much RAM for batches) or in a CSV for batches
 		if batchOn and villageName = "Diohine" {
-			string dirPath <- "../../InputFiles/MoranWeights/Neighbours/";
+			string dirPath <- "../../InputFiles/MoranWeights/" + weightsMatrixType + "/";
 			string filePath <- dirPath + moranMatrixId + ".csv";
 			
 			if file_exists(filePath) {
 				moranWeightsMatrix <- matrix<float>(csv_file(filePath));
 			} else {
-				moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
+				moranWeightsMatrix <- generateMoranWeightMatrix(inputGridList, weightsMatrixType);
 				save moranWeightsMatrix to: filePath format: "csv" rewrite: false header: false;
 			}
 		} else {
 			if moranWeightsMatrixStorageMap[moranMatrixId] != nil {
 				moranWeightsMatrix <- moranWeightsMatrixStorageMap[moranMatrixId];
 			} else {
-				moranWeightsMatrix <- generateMoranNeighboursWeightMatrix(inputGridList);
+				moranWeightsMatrix <- generateMoranWeightMatrix(inputGridList, weightsMatrixType);
 				moranWeightsMatrixStorageMap <+ moranMatrixId::moranWeightsMatrix;
 			}
 		}
@@ -60,7 +62,7 @@ global {
 		return moran(inputGridList collect each.moranValue, moranWeightsMatrix);
 	}
 	
-	matrix<float> generateMoranNeighboursWeightMatrix (list<landscape> inputGridList) {
+	matrix<float> generateMoranWeightMatrix (list<landscape> inputGridList, string matrixType) {
 		matrix<float> moranWeightsMatrix;
 		map<landscape, int> moranInputsMap;
 		
@@ -73,8 +75,19 @@ global {
 		moranWeightsMatrix <- 0.0 as_matrix {length(moranInputsMap), length(moranInputsMap)};
 		
 		ask inputGridList {
-			ask self.neighbors where (each in inputGridList) {
-				moranWeightsMatrix[moranInputsMap[self], moranInputsMap[myself]] <- 1.0;
+			
+			switch weightsMatrixType {
+				match "Neighbours" {
+					ask self.neighbors where (each in inputGridList) {
+						moranWeightsMatrix[moranInputsMap[self], moranInputsMap[myself]] <- 1.0;
+					}
+				}
+				
+				match "Distance" {
+					ask inputGridList at_distance moranDistance {
+						moranWeightsMatrix[moranInputsMap[self], moranInputsMap[myself]] <- 1.0;
+					}
+				}
 			}
 		}
 		return moranWeightsMatrix;
