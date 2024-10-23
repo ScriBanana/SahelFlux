@@ -15,12 +15,12 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) #def repertoire de t
 
 ## PARAMETERS
 vilName <- "Barry"
-dir <- "/home/scriban/Dropbox/Thèse/DonneesEtSauvegardes/BackupSortiesSMA/230904-LongRun/Monthly/"
+dir <- "/home/arthur/Dropbox/These/SMA/OutputsSMA/241013-Out10ansRepli/Monthly/"
 nbRep <- 8
 runLength <- 10 # years
 ##
 
-path <- paste0(dir, vilName, "/")
+path <- dir #paste0(dir, vilName, "/")
 file.names <- list.files(path)
 
 file.names <- file.names[!is.na(stringr::str_extract(file.names, "\\d"))] ## filtre sur les fichier qui on un numero de mois
