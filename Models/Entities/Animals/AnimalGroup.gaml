@@ -45,8 +45,8 @@ global {
 	// Carboned gases parameters
 	float Fm <- 0.07 const: true; // Fraction of gross energy in feed converted to methane (IPCC, 2019)
 	float methaneEnergyContent <- 55.65 const: true; // MJ/kgCH4
-	float CH4ToCO2Slope <- 0.02859 const: true; // Adapted from Aubry et al
-	float CH4ToCO2Offset <- 0.01141 const: true; // Adapted from Aubry et al
+	float CH4ToCO2Slope <- 0.1619 const: true; // kgCH4/kgCO2; Adapted from Aubry et al
+	float CH4ToCO2Offset <- -8.550E-06 const: true; // kgCH4; Adapted from Aubry et al
 }
 
 species animalGroup virtual: true schedules: [] { // Not sure if schedules is not already empty if virtual is true.
@@ -81,7 +81,7 @@ species animalGroup virtual: true schedules: [] { // Not sure if schedules is no
 		}
 		
 		float entericCH4 <- eatenEnergy * Fm / methaneEnergyContent; // kgCH4/herd/timestep
-		float metaboCO2 <- max((entericCH4 - CH4ToCO2Offset) / CH4ToCO2Slope, 0.0); // kgCO2/herd/timestep
+		float metaboCO2 <- max(CH4ToCO2Slope * entericCH4 + CH4ToCO2Offset , 0.0); // kgCO2/herd/timestep
 		
 		string emittingPool <- eatenBiomassType = "FattenedRation" ? "FattenedAn" : "MobileHerds";
 		ask world {	do saveFlowInMap("C", emittingPool, "OF-GHG", entericCH4 * coefCH4ToC + metaboCO2 * coefCO2ToC);}
