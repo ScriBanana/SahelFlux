@@ -76,7 +76,7 @@ global {
 		
 		ask inputGridList {
 			
-			switch weightsMatrixType {
+			switch matrixType {
 				match "Neighbours" {
 					ask self.neighbors where (each in inputGridList) {
 						moranWeightsMatrix[moranInputsMap[self], moranInputsMap[myself]] <- 1.0;

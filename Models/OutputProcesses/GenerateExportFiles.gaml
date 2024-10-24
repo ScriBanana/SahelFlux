@@ -92,7 +92,7 @@ global {
 		// Saving a matrix to a csv doesn't work. Issue raised on github. Fix coming up in Gama 1.9.0 (commit a4d2a56)
 		
 		// Variables
-		float durationSimu <- (current_date - starting_date)/#year;
+		float durationSimu <- (current_date - starting_date)/#year != 0.0 ? (current_date - starting_date)/#year : endDate - starting_date;
 		
 		// Header with IF and TF origin; lines for each TF destination and outflows
 		list<string> outputCSVheader <- [""];
