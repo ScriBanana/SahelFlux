@@ -30,7 +30,7 @@ global {
 	////	Global parameters	////
 	////	--------------------------	////
 	
-	float initStartTime <- machine_time;
+	float initStartTime <- gama.machine_time;
 	float simulationStartTime <- 0.0; // in Unix epoch time format (like machine_time)
 	bool batchOn <- false;
 	bool enabledGUI <- false;
@@ -106,7 +106,7 @@ global {
 		if generateMonthlySaves { do initOutputsDuringSim;}
 		
 		write "Start date : " + starting_date + ", end date : " + endDate + ".";
-		runTime <- (machine_time - initStartTime) / 60000;
+		runTime <- (gama.machine_time - initStartTime) / 60000;
 		write "=== MODEL INITIALISED (" + (runTime * 60) with_precision 2 + " s) ===";
 	}
 	
@@ -116,7 +116,7 @@ global {
 	
 	reflex simStart when: (simulationStartTime = 0.0) {
 		// Last init part, to dodge init schedule issues
-		simulationStartTime <- machine_time;
+		simulationStartTime <- gama.machine_time;
 		runPrefix <- "" + timeStampInit + "-" + experimentType + int(self);
 	}
 	
@@ -260,7 +260,7 @@ global {
 	bool endSimu <- false;
 	float runTime; // minutes
 	reflex endSim when: current_date = endDate {
-		runTime <- (machine_time - simulationStartTime) / 60000;
+		runTime <- (gama.machine_time - simulationStartTime) / 60000;
 		
 		write "=== END OF SIMULATION ===";
 		

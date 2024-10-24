@@ -38,7 +38,7 @@ global {
 		
 		parametersMap <- [
 			// Simulation
-			"machine_time"::machine_time,
+			"machine_time"::gama.machine_time,
 			"simulation"::int(self),
 			"experimentType"::experimentType,
 			
