@@ -20,6 +20,7 @@ experiment BatchRun autorun: true type: batch repeat: 6 until: endSimu {
 	
 	init{
 		experimentType <- "SimpleBatch";
+		moranOn <- true;
 		
 		endDate <- date([2030, 11, 1, eveningTime + 1, 0, 0]);
 	}
@@ -136,14 +137,14 @@ experiment SOCxSON type: batch autorun: true repeat: 10 until: endSimu {
 
 experiment MorrisBatch type: batch autorun: true until: endSimu {
 	
-	string batchId <- "MorrisOut"; // !!! machine_time doesn't work; NO INDIVIDUAL BATCH ID; BACKUP RESULTS
+	string batchId <- "MorrisOut-seed" + rnd(100000); // !!! machine_time doesn't work; NO INDIVIDUAL BATCH ID; BACKUP RESULTS
 	
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"]; //villageNamesList;
-	
+//	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"]; //villageNamesList;
+	init {villageName <- "Sob";}
 	parameter "Proportion transhuming households" var: propTranshumantHhExplo min: 0.0 max: 1.0;
 	parameter "Proportion fattening households" var: propFatteningHhExplo min: 0.0 max: 1.0;
 	parameter "HerdSize average" var: meanHerdSizeExplo min: 1.0 max: 15.0;
-	parameter "FattenedGroupSize average" var: meanFattenedGroupSizeExplo min: 0.01 max: 3.0;
+//	parameter "FattenedGroupSize average" var: meanFattenedGroupSizeExplo min: 0.01 max: 3.0;
 	parameter "Home fields proportion" var: homeFieldsProportionExplo min: 0.1 max: 0.9;
 	
 	init {
@@ -155,23 +156,24 @@ experiment MorrisBatch type: batch autorun: true until: endSimu {
 	}
 	
 	method morris
-		levels: 4
-		outputs: ["ecosystemGHGBalance", "totalGHG", "ecosystemCBalance", "ecosystemNBalance", "totalMeanSOCS", "ICRN", "ICRC", "totalNFlows", "totalCFlows"]
-		sample: 100
+		levels: 8
+		outputs: ["ecosystemGHGBalance"]//, "totalGHG", "ecosystemCBalance", "ecosystemNBalance",
+//		"totalMeanSOCS", "totalMeanSOCVariation", "ICRN", "ICRC", "TSTN", "TSTC"]
+		sample: 40
 		report: outputDirectory + "Morris/"+ batchId + ".txt"
 		results: outputDirectory + "Morris/"+ batchId + "_raw.csv"
 	;
 }
 
 experiment sobolBatch type: batch autorun: true until: endSimu {
-	string batchId <- "SobolOut";
+	string batchId <- "SobolOut-seed" + rnd(100000);
 
-	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"]; //villageNamesList;
-	
+//	parameter "Landscape layout" category: "Scenario - Spatial layout" var: villageName among: ["Sob", "Barry"]; //villageNamesList;
+	init {villageName <- "Sob";}
 	parameter "Proportion transhuming households" var: propTranshumantHhExplo min: 0.0 max: 1.0;
 	parameter "Proportion fattening households" var: propFatteningHhExplo min: 0.0 max: 1.0;
 	parameter "HerdSize average" var: meanHerdSizeExplo min: 1.0 max: 15.0;
-	parameter "FattenedGroupSize average" var: meanFattenedGroupSizeExplo min: 0.01 max: 3.0;
+//	parameter "FattenedGroupSize average" var: meanFattenedGroupSizeExplo min: 0.01 max: 3.0;
 	parameter "Home fields proportion" var: homeFieldsProportionExplo min: 0.1 max: 0.9;
 	
 	init {
@@ -183,7 +185,8 @@ experiment sobolBatch type: batch autorun: true until: endSimu {
 	}
 	
 	method sobol
-		outputs: ["ecosystemGHGBalance", "totalGHG", "ecosystemCBalance", "ecosystemNBalance", "totalMeanSOCS", "ICRN", "ICRC", "totalNFlows", "totalCFlows"]
+		outputs: ["ecosystemGHGBalance"]//, "totalGHG", "ecosystemCBalance", "ecosystemNBalance",
+//		"totalMeanSOCS", "totalMeanSOCVariation", "ICRN", "ICRC", "TSTN", "TSTC"]
 		sample: 100
 		report: outputDirectory + "Sobol/"+ batchId + ".txt"
 		results: outputDirectory + "Sobol/"+ batchId + "_raw.csv"
