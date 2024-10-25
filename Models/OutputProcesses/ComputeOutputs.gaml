@@ -188,7 +188,7 @@ global {
 						} match "IF-FromTranshu" {
 							poolFlowsMap["Transhumance"][0] <- float(poolFlowsMap["Transhumance"][0]) - flowValue;
 						} match "IF-FromAtmo" {
-							ecosystemCO2Balance <- ecosystemCO2Balance + flowValue / coefCO2ToC;
+							ecosystemCO2Balance <- ecosystemCO2Balance - flowValue / coefCO2ToC;
 							poolFlowsMap["Atmosphere"][0] <- float(poolFlowsMap["Atmosphere"][0]) - flowValue;
 							ecosystemApparentCBalance <- ecosystemApparentCBalance - flowValue;
 						}
@@ -235,7 +235,7 @@ global {
 				if GHGKey = "CO2" {
 					totalCO2 <- totalCO2 + flowValue;
 					totalGHG <- totalGHG + flowValue;
-					ecosystemCO2Balance <- ecosystemCO2Balance - flowValue;
+					ecosystemCO2Balance <- ecosystemCO2Balance + flowValue;
 					poolFlowsMap[poolKey][2] <- float(poolFlowsMap[poolKey][2]) + flowValue;
 				} else if GHGKey = "CH4" {
 					totalCH4 <- totalCH4 + flowValue;
