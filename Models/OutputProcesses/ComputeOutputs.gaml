@@ -256,7 +256,7 @@ global {
 		//// Compute derivated outputs
 		
 		// Carbon balance
-		ecosystemGHGBalance <- totalGHG - totalMeanSOCVariation / coefCO2ToC; // kgCO2eq
+		ecosystemGHGBalance <- totalGHG - (totalMeanSOCVariation  * (length(grazableLandscape) * hectarePerCell) / coefCO2ToC); // kgCO2eq
 		
 		// SOC moran indexes
 		if moranOn {do getMoranSOCS;}
